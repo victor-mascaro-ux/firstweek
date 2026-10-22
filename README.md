@@ -21,6 +21,8 @@ The bar above the browser window walks you through 9 short tasks, one action eac
 5. **"I don't know"**: nothing in the documents covers dogs at the office, so the AI says so and hands the question to Jordan, Nina's manager.
 6. **Answers that stay**: Jordan's answer goes back to Omar, who adds it to the handbook for the next new hire.
 
+Omar's other tabs show the People team's side: **Documents** lists what Firstweek reads, what each document feeds, and the handbook section a newer document replaced; **Answers** lists every question Nina asks, how Firstweek answered it, and what needed a person.
+
 ## Design decisions
 
 - **Every answer shows its source.** Click it to read the exact passage, and see when it was last updated.

@@ -601,6 +601,53 @@ mark{padding:1px 2px;border-radius:3px;background:var(--brand-soft);color:inheri
 .pp-about b{color:var(--muted);font-weight:600}
 .pp-tag{display:flex;align-items:flex-start;gap:6px;margin:0;padding:4px 9px;border-radius:7px;background:var(--human-soft);color:var(--human);font-size:12.5px;font-weight:600}
 .pp-tag svg.i{width:14px;height:14px;margin-top:calc((1.5em - 14px) / 2)}
+/* Omar's Documents: the list on the left, the document on the right */
+.lib{display:grid;grid-template-columns:minmax(250px,.85fr) minmax(0,1.25fr)}
+.lib-list{min-height:0;overflow-y:auto;padding:22px;border-right:1px solid var(--line)}
+.lib-list h1,.answers h1{margin:0;font-size:22px;line-height:1.25;letter-spacing:-.015em}
+.lib-docs{display:flex;flex-direction:column;gap:8px;margin:16px 0 0;padding:0;list-style:none}
+.lib-doc{display:flex;align-items:flex-start;gap:10px;width:100%;padding:12px 14px;border:1px solid var(--line);border-radius:12px;background:var(--surface);color:var(--ink);text-align:left;cursor:pointer;transition:border-color .15s,background-color .15s}
+.lib-doc:hover{border-color:var(--line-strong)}
+.lib-doc[aria-current="true"]{border-color:var(--brand);background:var(--brand-soft)}
+.lib-doc>svg.i{width:20px;height:20px;flex:none;color:var(--brand);margin-top:1px}
+.lt{display:flex;flex-direction:column;align-items:flex-start;gap:2px;min-width:0}
+.lt b{font-size:14.5px;font-weight:650}
+.lu{color:var(--muted);font-size:12.5px}
+.flag{display:inline-flex;align-items:flex-start;gap:5px;padding:3px 9px;border-radius:7px;background:var(--well);color:var(--muted);font-size:12px;font-weight:600;line-height:1.4}
+.flag svg.i{width:14px;height:14px;flex:none;margin-top:calc((1.4em - 14px) / 2)}
+.flag.brand{background:var(--brand-soft);color:var(--brand-ink)}
+.flag.warn{background:var(--warn-bg);color:var(--warn-ink)}
+.flag.ok{background:var(--human-soft);color:var(--human)}
+.lt .flag{margin-top:5px}
+.lib-read{min-height:0;overflow-y:auto;padding:22px 26px 28px;background:var(--surface)}
+.lib-read .doc-upd{margin-bottom:16px}
+.lib-s{border:1px solid var(--line)}
+.lib-s.old{border-color:var(--warn-line)}
+.lib-s.old>p:first-of-type{color:var(--muted)}
+.sec-note{display:flex;align-items:flex-start;gap:6px;margin:10px 0 0!important;font-size:13px!important;font-weight:600}
+.sec-note svg.i{width:15px;height:15px;flex:none;margin-top:calc((1.5em - 15px) / 2)}
+.sec-note.warn{color:var(--warn-ink)}
+.sec-note.ok{color:var(--human)}
+.uses{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin-top:10px}
+.uses-h{color:var(--muted);font-size:12px;font-weight:700}
+.use{display:inline-flex;align-items:flex-start;gap:5px;padding:3px 9px;border-radius:7px;background:var(--well);color:var(--ink);font-size:12px;font-weight:600;line-height:1.4}
+.use svg.i{width:14px;height:14px;flex:none;color:var(--muted);margin-top:calc((1.4em - 14px) / 2)}
+/* Omar's Answers: one card per question, newest first */
+.ans-body{overflow-y:auto}
+.answers{flex:1;max-width:880px;padding:22px}
+.ans-list{display:flex;flex-direction:column;gap:12px;margin:18px 0 0;padding:0;list-style:none}
+.ans{padding:16px;border:1px solid var(--line);border-radius:14px;background:var(--surface);animation:rise .35s var(--ease-out) backwards}
+.ans-top{display:flex;align-items:flex-start;gap:10px;margin-bottom:10px}
+.ans-q{margin:0;font-size:15.5px;font-weight:700;line-height:1.35}
+.ans-who{margin:0;color:var(--muted);font-size:13px}
+.ans-a{margin:0 0 10px;font-size:14px}
+.ans-a b{color:var(--brand-ink)}
+.ans-tags{display:flex;flex-wrap:wrap;align-items:center;gap:6px}
+.ans-reply{margin:12px 0 0;padding:10px 12px;border:1px solid var(--human-line);border-radius:12px;background:var(--human-soft);font-size:14px}
+.ans .keep-why{margin:8px 0 10px;color:var(--muted);font-size:14px}
+.ans .keep-done{margin:10px 0 0}
+.ans-empty{display:flex;align-items:flex-start;gap:10px;margin:18px 0 0;padding:18px;border:1px dashed var(--line-strong);border-radius:14px;color:var(--muted);font-size:14.5px}
+.ans-empty svg.i{width:20px;height:20px;flex:none;margin-top:calc((1.5em - 20px) / 2)}
 .avatar.priya{background:#FBE3EF;color:#8E2A5C}
 .avatar.it{background:#E6E8EE;color:#3B4152}
 .avatar.it svg.i{width:18px;height:18px}
@@ -636,8 +683,15 @@ mark{padding:1px 2px;border-radius:3px;background:var(--brand-soft);color:inheri
   .who{display:none}
 }
 @container app (max-width:760px){
-  .nav{display:none}
-  .app-head{gap:12px;padding:0 14px}
+  /* the tabs move to their own row */
+  .app-head{flex-wrap:wrap;height:auto;gap:0 12px;padding:0 14px}
+  .brand{height:52px}
+  .nav{order:3;flex:0 0 calc(100% + 28px);height:42px;margin:0 -14px;padding:0 8px;overflow-x:auto;border-top:1px solid var(--line)}
+  .nav button{flex:none}
+  .lib{display:block;overflow-y:auto}
+  .lib-list{overflow:visible;padding:18px 14px;border-right:0;border-bottom:1px solid var(--line)}
+  .lib-read{overflow:visible;padding:18px 14px 24px}
+  .answers{padding:18px 14px}
   .plan{overflow-y:auto}
   .plan-head{flex-direction:column;padding:16px 14px 12px}
   .ph-end{justify-content:flex-start}
@@ -776,7 +830,7 @@ const STR = {
     ctaAsk: 'Want something like this for your product?', ctaLinkedIn: 'Message me on LinkedIn', ctaPortfolio: 'See my portfolio', restart: 'Start over',
     timeSec: '{s} s', timeMin: '{m} min {s} s',
     navLabel: 'Firstweek', navNewHires: 'New hires', navDocs: 'Documents', navAnswers: 'Answers', navWeek: 'My first week', navPeople: 'People',
-    roleOmar: 'People team', roleNina: 'Sales · first week', protoOnly: 'Not part of this prototype.',
+    roleOmar: 'People team', roleNina: 'Sales · first week',
     planTitle: "Nina Costa's first week", planMeta: 'Sales · starts {date} · Manager: {manager}',
     draftPill: 'AI draft from {n} documents', publish: 'Publish to Nina', publishedPill: 'Published to Nina',
     boardLabel: 'The days of the first week', dayN: 'Day {n}', addStep: 'Add step',
@@ -823,6 +877,13 @@ const STR = {
     mTitle: 'Message {name}', mTo: 'To {name} · {role}', mLabel: 'Message', mDraft: 'Hi {first}! ', mSend: 'Send',
     mNote: 'The answer shows up in Ask about Acme, marked as coming from a person, not a document.',
     mSentTo: 'To {name}', mSent: 'Sent to {first}. The answer will show up here.', mFrom: '{name} · a person, not a document', mToast: '{name} answered.', mSentToast: 'Sent to {first}.',
+    libTitle: "Acme's documents", libSub: 'Firstweek drafts each first week, and answers new hires, only from these. Keep them current, and the answers stay right.',
+    libStep1: '1 step', libStepN: '{n} steps', libAns1: '1 answer', libAnsN: '{n} answers', libUsed: 'Used in {list}', libUnused: 'Not used yet',
+    libReplaced: '1 section replaced by a newer document', libNew: 'New section today', libDocLabel: 'Document', libUsedFor: 'Used in',
+    secReplaced: 'Replaced by the {doc} ({date}). Firstweek answers with the newer one.', secReplaces: 'Replaces the vacation section of the {doc}. Firstweek answers with this one.', libOpenNewer: 'Open it',
+    ansTitle: 'What new hires asked', ansSub: 'Every question, how Firstweek answered it, and what needed a person.',
+    ansEmpty: 'No questions yet. Once Nina starts on Monday, each question she asks shows up here.', ansWho: '{name} · day 1', ansAi: 'Firstweek:',
+    outDoc: 'Answered from a document', outConflict: 'Documents disagreed: used the newer one', outNone: 'Not in the documents, so no guess', outSent: 'Sent to {name}',
     peopleTitle: 'Your people at Acme', peopleSub: "When Acme's documents don't have the answer, Firstweek sends you to the right person.",
     askAbout: 'Ask about', messageTo: 'Message {first}', lunchTag: 'Lunch together on day 2',
     r_jordan_role: 'Your manager · Sales', r_priya_role: 'Your buddy · Sales', r_omar_role: 'People team', r_it_role: '3rd floor',
@@ -869,7 +930,7 @@ const STR = {
     ctaAsk: 'Quer algo assim no seu produto?', ctaLinkedIn: 'Falar comigo no LinkedIn', ctaPortfolio: 'Ver meu portfólio', restart: 'Começar de novo',
     timeSec: '{s} s', timeMin: '{m} min {s} s',
     navLabel: 'Firstweek', navNewHires: 'Contratações', navDocs: 'Documentos', navAnswers: 'Respostas', navWeek: 'Minha primeira semana', navPeople: 'Pessoas',
-    roleOmar: 'Time de Pessoas', roleNina: 'Vendas · primeira semana', protoOnly: 'Não faz parte deste protótipo.',
+    roleOmar: 'Time de Pessoas', roleNina: 'Vendas · primeira semana',
     planTitle: 'Primeira semana de Nina Costa', planMeta: 'Vendas · começa {date} · Gestor: {manager}',
     draftPill: 'Rascunho da IA a partir de {n} documentos', publish: 'Publicar para a Nina', publishedPill: 'Publicado para a Nina',
     boardLabel: 'Os dias da primeira semana', dayN: 'Dia {n}', addStep: 'Adicionar etapa',
@@ -916,6 +977,13 @@ const STR = {
     mTitle: 'Mensagem para {name}', mTo: 'Para {name} · {role}', mLabel: 'Mensagem', mDraft: 'Oi, {first}! ', mSend: 'Enviar',
     mNote: 'A resposta aparece em Pergunte sobre a Acme, marcada como vinda de uma pessoa, não de um documento.',
     mSentTo: 'Para {name}', mSent: 'Enviada para {first}. A resposta vai aparecer aqui.', mFrom: '{name} · uma pessoa, não um documento', mToast: '{name} respondeu.', mSentToast: 'Enviada para {first}.',
+    libTitle: 'Documentos da Acme', libSub: 'O Firstweek monta cada primeira semana, e responde a quem chega, só com base nestes documentos. Mantenha-os em dia, e as respostas continuam certas.',
+    libStep1: '1 etapa', libStepN: '{n} etapas', libAns1: '1 resposta', libAnsN: '{n} respostas', libUsed: 'Usado em {list}', libUnused: 'Ainda não usado',
+    libReplaced: '1 seção substituída por um documento mais novo', libNew: 'Seção nova hoje', libDocLabel: 'Documento', libUsedFor: 'Usado em',
+    secReplaced: 'Substituída pela {doc} ({date}). O Firstweek responde com a mais nova.', secReplaces: 'Substitui a seção de férias do {doc}. O Firstweek responde com esta.', libOpenNewer: 'Abrir',
+    ansTitle: 'O que quem chegou perguntou', ansSub: 'Cada pergunta, como o Firstweek respondeu e o que precisou de uma pessoa.',
+    ansEmpty: 'Nenhuma pergunta ainda. Quando a Nina começar na segunda, cada pergunta dela aparece aqui.', ansWho: '{name} · dia 1', ansAi: 'Firstweek:',
+    outDoc: 'Respondida com um documento', outConflict: 'Os documentos discordaram: usou o mais novo', outNone: 'Não está nos documentos, então sem chute', outSent: 'Enviada para {name}',
     peopleTitle: 'Suas pessoas na Acme', peopleSub: 'Quando os documentos da Acme não têm a resposta, o Firstweek leva você à pessoa certa.',
     askAbout: 'Pergunte sobre', messageTo: 'Falar com {first}', lunchTag: 'Almoço juntos no dia 2',
     r_jordan_role: 'Seu gestor · Vendas', r_priya_role: 'Seu buddy · Vendas', r_omar_role: 'Time de Pessoas', r_it_role: '3º andar',
@@ -940,6 +1008,8 @@ const DOCS = {
   sales: { updated: '2026-07-15', sections: [{ id: 'first', h: 'h_first', p: 'p_first' }] }
 };
 const DOC_ORDER = ['handbook', 'vacation', 'it', 'benefits', 'sales'];
+// the passages each answer cites, for Omar's Documents tab
+const ANSWER_SRC = [['q1', 'benefits', 'enroll'], ['q2', 'handbook', 'vac_old'], ['q2', 'vacation', 'vac_new']];
 // added to the handbook from Jordan's answer, in the last task
 const DOG_SECTION = { id: 'dogs', h: 'h_dogs', p: 'p_dogs', added: true };
 // the week the AI drafted: each step points at the passage it came from
@@ -977,7 +1047,8 @@ const ICON = {
   plus: '<path d="M12 5v14M5 12h14"/>',
   more: '<path d="M5.5 12h.01M12 12h.01M18.5 12h.01" stroke-width="3.2"/>',
   trash: '<path d="M4.5 7h15M9.5 7V4.5h5V7M6.5 7l1 13h9l1-13"/>',
-  laptop: '<rect x="4" y="5" width="16" height="11" rx="1.5"/><path d="M2.5 19h19"/>'
+  laptop: '<rect x="4" y="5" width="16" height="11" rx="1.5"/><path d="M2.5 19h19"/>',
+  calendar: '<rect x="4" y="5.5" width="16" height="14.5" rx="2"/><path d="M4 10h16M8.5 3.5v4M15.5 3.5v4"/>'
 };
 const icon = (name, cls = '') => `<svg class="i ${cls}" viewBox="0 0 24 24" aria-hidden="true">${ICON[name] || ''}</svg>`;
 // the same steps as the favicon: a first week, one step at a time
@@ -993,7 +1064,7 @@ function newState(prev) {
     srcView: null, checkedSource: false, menu: null, adding: null, addDraft: '', addIdea: null, flash: null,
     moved: false, added: false, published: false,
     checked: {}, chat: [], asked: {}, answered: {}, q1Src: false, askDraft: '', doc: null,
-    ninaTab: 'week', modal: null, mDraft: '', mEdited: false, sentJordan: false, keep: null, docAdded: false,
+    omarTab: 'hires', libDoc: 'handbook', ninaTab: 'week', modal: null, mDraft: '', mEdited: false, sentJordan: false, keep: null, docAdded: false,
     startedAt: null, finishMs: null, focus: null,
     guideOpen: false, aboutOpen: prev ? prev.aboutOpen : false, demo: false, lastTask: null
   };
@@ -1317,6 +1388,8 @@ function renderGuide() {
     </div>`;
 }
 
+// Omar's tasks happen on New hires; Jordan's answer can also be kept from Answers
+const onOmarTab = task => state.omarTab === 'hires' || (task === 't7' && state.omarTab === 'answers');
 /* Pulsing ring: points at the next control in the window */
 function ringCandidates() {
   const task = currentTask();
@@ -1324,6 +1397,7 @@ function ringCandidates() {
   if (state.role !== TASK_ROLE[task]) return [];
   // Nina's tasks happen on My first week: point back there from People
   if (state.role === 'nina' && state.ninaTab === 'people' && !state.modal) return ['[data-action="nav"][data-tab="week"]'];
+  if (state.role === 'omar' && !onOmarTab(task)) return ['[data-action="nav"][data-tab="hires"]'];
   switch (task) {
     case 't1': return ['[data-action="step-src"][data-step="vpn"]'];
     case 't2':
@@ -1337,7 +1411,7 @@ function ringCandidates() {
     case 't6j':
       if (state.modal) return state.modal.msgId ? ['[data-action="send-msg"]'] : [];
       return ['[data-action="ask-jordan"][data-q="q3"]'];
-    case 't7': return state.keep === 'later' ? ['[data-action="keep-review"]'] : ['[data-action="keep-add"]'];
+    case 't7': return state.keep === 'later' ? ['[data-action="keep-review"]', '[data-action="keep-add"]'] : ['[data-action="keep-add"]'];
   }
   return [];
 }
@@ -1415,19 +1489,24 @@ async function demo() {
     if (state.modal && !state.modal.msgId) { state.modal = null; renderApp(); }
     if (state.ninaTab === 'people') { await tap('[data-action="nav"][data-tab="week"]'); await wait(300); }
   };
+  const toBoard = async () => {
+    if (!onOmarTab(task)) { await tap('[data-action="nav"][data-tab="hires"]'); await wait(300); }
+  };
   try {
     switch (task) {
       case 't1':
+        await toBoard();
         if (state.srcView) { state.srcView = null; renderApp(); await wait(250); }
         await tap('[data-action="step-src"][data-step="vpn"]'); break;
       case 't2':
+        await toBoard();
         if (!state.moved) {
           if (state.menu !== 'vpn') await tap('[data-action="step-menu"][data-step="vpn"]');
           await wait(250);
           await tap('[data-action="move-to"][data-step="vpn"][data-day="1"]');
         }
         break;
-      case 't3': await tap('[data-action="publish"]'); break;
+      case 't3': await toBoard(); await tap('[data-action="publish"]'); break;
       case 't4':
         await onRole('nina'); await toWeek();
         if (!state.asked.q1) await tap('[data-action="ask-q"][data-q="q1"]');
@@ -1451,7 +1530,7 @@ async function demo() {
         await wait(600);
         await tap('[data-action="send-msg"]'); break;
       case 't7':
-        await onRole('omar');
+        await onRole('omar'); await toBoard();
         await until(() => state.keep, 8000);
         await wait(300);
         if (state.keep === 'later') { await tap('[data-action="keep-review"]'); await wait(300); }
@@ -1484,7 +1563,7 @@ function focusKey(el) {
 function renderApp() {
   const app = $('#app');
   // scroll positions and focus survive the redraw
-  const keep = ['.board', '.chat', '.week', '.side', '.nina-body', '.people-body'].map(sel => { const el = app.querySelector(sel); return [sel, el ? el.scrollTop : 0, el ? el.scrollLeft : 0]; });
+  const keep = ['.board', '.chat', '.week', '.side', '.nina-body', '.people-body', '.lib', '.lib-list', '.lib-read', '.ans-body'].map(sel => { const el = app.querySelector(sel); return [sel, el ? el.scrollTop : 0, el ? el.scrollLeft : 0]; });
   const fk = focusKey(document.activeElement);
   const firstPaint = !app.firstElementChild || app.firstElementChild.dataset.role !== state.role;
   app.innerHTML = state.role === 'omar' ? omarHTML() : ninaHTML();
@@ -1516,23 +1595,28 @@ function renderChrome() {
 function headHTML(role) {
   const p = PEOPLE[role];
   const nav = role === 'omar' ? [['navNewHires', 'hires'], ['navDocs', 'docs'], ['navAnswers', 'answers']] : [['navWeek', 'week'], ['navPeople', 'people']];
-  const cur = role === 'omar' ? 'hires' : state.ninaTab;
+  const cur = role === 'omar' ? state.omarTab : state.ninaTab;
   return `<header class="app-head">
       <div class="brand"><span class="logo">${LOGO}</span><span>Firstweek</span><span class="ws">Acme</span></div>
-      <nav class="nav" aria-label="${t('navLabel')}">${nav.map(([k, id]) => `<button type="button" ${id === cur ? 'aria-current="page"' : `data-action="${role === 'nina' ? 'nav' : 'stub'}" data-tab="${id}"`}>${t(k)}</button>`).join('')}</nav>
+      <nav class="nav" aria-label="${t('navLabel')}">${nav.map(([k, id]) => `<button type="button" ${id === cur ? 'aria-current="page"' : `data-action="nav" data-tab="${id}"`}>${t(k)}</button>`).join('')}</nav>
       <div class="head-end"><span class="who"><b>${p.name}</b><span>${t(role === 'omar' ? 'roleOmar' : 'roleNina')}</span></span><span class="avatar ${role}" aria-hidden="true">${p.ini}</span></div>
     </header>`;
 }
 
-/* Omar: the week the AI drafted, which the People team makes its own */
+/* Omar: the week the AI drafted (New hires), the documents it reads, and what new hires asked */
 function omarHTML() {
+  const body = state.omarTab === 'docs' ? libHTML() : state.omarTab === 'answers' ? answersHTML() : boardHTML();
+  return `<div class="view omar" data-role="omar">
+    ${headHTML('omar')}
+    ${body}
+  </div>`;
+}
+function boardHTML() {
   let keep = '';
   if (state.keep === 'pending') keep = keepHTML();
   else if (state.keep === 'later') keep = `<div class="keep-mini"><span>${icon('chat')}${t('keepWaiting')}</span><button class="link-btn" type="button" data-action="keep-review">${t('keepReview')}</button></div>`;
   else if (state.keep === 'kept') keep = `<p class="keep-done">${icon('check')}<span>${t('keptLine')}</span></p>`;
-  return `<div class="view omar" data-role="omar">
-    ${headHTML('omar')}
-    <div class="body">
+  return `<div class="body">
       <section class="plan" aria-labelledby="plan-title">
         <div class="plan-head">
           <div>
@@ -1548,8 +1632,7 @@ function omarHTML() {
         <div class="board" role="list" aria-label="${t('boardLabel')}">${[1, 2, 3, 4, 5].map(dayHTML).join('')}</div>
       </section>
       ${sideHTML()}
-    </div>
-  </div>`;
+    </div>`;
 }
 function dayHTML(n) {
   const steps = state.steps.filter(s => s.day === n);
@@ -1619,6 +1702,82 @@ function keepHTML() {
         <div class="keep-row"><button class="btn btn-primary btn-sm" type="button" data-action="keep-add">${icon('plus')}${t('keepAdd')}</button><button class="btn btn-plain btn-sm" type="button" data-action="keep-later">${t('keepLater')}</button></div>
       </div>
     </section>`;
+}
+
+/* Omar's Documents: what each document feeds, and where a newer one overrules an older one */
+function docUses(doc, sec) {
+  const steps = state.steps.filter(s => !s.custom && s.src[0] === doc && (!sec || s.src[1] === sec));
+  const qs = [...new Set(ANSWER_SRC.filter(([q, d, x]) => d === doc && (!sec || x === sec) && state.answered[q]).map(([q]) => q))];
+  return { steps, qs };
+}
+function libHTML() {
+  const rows = DOC_ORDER.map(id => {
+    const u = docUses(id);
+    const used = [u.steps.length ? t(u.steps.length === 1 ? 'libStep1' : 'libStepN', { n: u.steps.length }) : '', u.qs.length ? t(u.qs.length === 1 ? 'libAns1' : 'libAnsN', { n: u.qs.length }) : ''].filter(Boolean).join(' · ');
+    const flags = id !== 'handbook' ? '' : (state.docAdded ? `<span class="flag ok">${icon('check')}<span>${t('libNew')}</span></span>` : '') + `<span class="flag warn">${icon('alert')}<span>${t('libReplaced')}</span></span>`;
+    return `<li><button class="lib-doc" type="button" data-action="lib-open" data-doc="${id}"${id === state.libDoc ? ' aria-current="true"' : ''}>${icon('doc')}<span class="lt"><b>${docTitle(id)}</b><span class="lu">${updatedText(id)}</span><span class="lu">${used ? t('libUsed', { list: used }) : t('libUnused')}</span>${flags}</span></button></li>`;
+  }).join('');
+  return `<div class="body lib">
+      <section class="lib-list" aria-labelledby="lib-title">
+        <h1 id="lib-title" tabindex="-1">${t('libTitle')}</h1>
+        <p class="meta">${t('libSub')}</p>
+        <ul class="lib-docs">${rows}</ul>
+      </section>
+      ${readerHTML(state.libDoc)}
+    </div>`;
+}
+function readerHTML(doc) {
+  const secs = DOCS[doc].sections.concat(doc === 'handbook' && state.docAdded ? [DOG_SECTION] : []);
+  return `<section class="lib-read" aria-labelledby="lib-doc-title">
+      <p class="side-label">${t('libDocLabel')}</p>
+      <h2 class="doc-title" id="lib-doc-title" tabindex="-1">${docTitle(doc)}</h2>
+      <p class="doc-upd">${updatedText(doc)}</p>
+      ${secs.map(x => {
+        const u = docUses(doc, x.id), old = x.id === 'vac_old';
+        const uses = u.steps.map(st => `<span class="use">${icon('calendar')}<span>${t('dayN', { n: st.day })} · ${esc(stepText(st))}</span></span>`)
+          .concat(u.qs.map(q => `<span class="use">${icon('chat')}<span>${t(q)}</span></span>`)).join('');
+        return `<section class="doc-s lib-s${old ? ' old' : ''}${x.added ? ' added' : ''}"><h3>${t(x.h)}</h3><p>${t(x.p)}</p>
+          ${old ? `<p class="sec-note warn">${icon('alert')}<span>${t('secReplaced', { doc: docTitle('vacation'), date: monthYear(DOCS.vacation.updated) })} <button class="link-btn" type="button" data-action="lib-open" data-doc="vacation">${t('libOpenNewer')}</button></span></p>` : ''}
+          ${x.id === 'vac_new' ? `<p class="sec-note ok">${icon('check')}<span>${t('secReplaces', { doc: docTitle('handbook') })}</span></p>` : ''}
+          ${x.added ? `<p class="added-tag">${t('dogsAdded', { date: dateShort(START), manager: MANAGER })}</p>` : ''}
+          ${uses ? `<div class="uses"><span class="uses-h">${t('libUsedFor')}</span>${uses}</div>` : ''}
+        </section>`;
+      }).join('')}
+    </section>`;
+}
+/* Omar's Answers: every question, how Firstweek answered it, and what needed a person */
+function answersHTML() {
+  const items = state.chat.filter(m => m.kind === 'ai').reverse();
+  return `<div class="body ans-body"><section class="answers" aria-labelledby="ans-title">
+      <h1 id="ans-title" tabindex="-1">${t('ansTitle')}</h1>
+      <p class="meta">${t('ansSub')}</p>
+      ${items.length ? `<ul class="ans-list">${items.map(ansItemHTML).join('')}</ul>` : `<p class="ans-empty">${icon('chat')}<span>${t('ansEmpty')}</span></p>`}
+    </section></div>`;
+}
+function ansItemHTML(m) {
+  const q = m.q === 'other' || m.typed ? esc(m.text) : t(m.q);
+  const flag = (ic, cls, text) => `<span class="flag ${cls}">${icon(ic)}<span>${text}</span></span>`;
+  const chips = list => list.map(d => `<button class="src" type="button" data-action="lib-open" data-doc="${d}">${icon('doc')}<span>${docTitle(d)}</span></button>`).join('');
+  let answer, tags, extra = '';
+  if (m.q === 'q1') { answer = t('a1', { deadline: dateShort(HEALTH_DEADLINE) }); tags = flag('doc', 'brand', t('outDoc')) + chips(['benefits']); }
+  else if (m.q === 'q2') { answer = t('a2'); tags = flag('alert', 'warn', t('outConflict')) + chips(['vacation', 'handbook']); }
+  else {
+    const dog = m.q === 'q3', sent = dog ? state.sentJordan : m.sent;
+    answer = `${t(dog ? 'a3' : 'aUnknown')} ${t('a3b', { manager: MANAGER })}`;
+    tags = flag('person', '', t('outNone')) + (sent ? flag('send', 'ok', t('outSent', { name: MANAGER })) : '');
+    // Jordan's reply comes back here too, to keep for the next new hire
+    if (dog && state.keep) {
+      extra = `<p class="ans-reply"><b>${t('keepAnswered', { name: MANAGER })}</b> “${t('jReply')}”</p>`
+        + (state.keep === 'kept' ? `<p class="keep-done">${icon('check')}<span>${t('keptLine')}</span></p>`
+          : `<p class="keep-why">${t('keepWhy')}</p><div class="keep-row"><button class="btn btn-primary btn-sm" type="button" data-action="keep-add">${icon('plus')}${t('keepAdd')}</button>${state.keep === 'pending' ? `<button class="btn btn-plain btn-sm" type="button" data-action="keep-later">${t('keepLater')}</button>` : ''}</div>`);
+    }
+  }
+  return `<li class="ans">
+      <div class="ans-top"><span class="avatar nina sm" aria-hidden="true">${PEOPLE.nina.ini}</span><div><p class="ans-q">${q}</p><p class="ans-who">${t('ansWho', { name: PEOPLE.nina.name })}</p></div></div>
+      <p class="ans-a"><b>${t('ansAi')}</b> ${answer}</p>
+      <div class="ans-tags">${tags}</div>
+      ${extra}
+    </li>`;
 }
 
 /* Nina: day 1 on the left, and answers from Acme's documents on the right */
@@ -1760,7 +1919,7 @@ function switchTo(role, when) {
   announce(`${t(role === 'nina' ? 'switchNina' : 'switchOmar')}, ${t(when)}`);
   setTimeout(() => {
     if (state !== run) return;
-    state.role = role; state.srcView = null; state.doc = null; state.ninaTab = 'week';
+    state.role = role; state.srcView = null; state.doc = null; state.ninaTab = 'week'; state.omarTab = 'hires';
     renderApp(); renderGuide();
   }, reduceMotion() ? 150 : 750);
   setTimeout(() => {
@@ -1834,7 +1993,7 @@ function ask(q, text) {
   renderApp();
   setTimeout(() => {
     if (state !== run) return;
-    const answer = { id: ++msgN, kind: 'ai', q, text: text || t(q) };
+    const answer = { id: ++msgN, kind: 'ai', q, text: text || t(q), typed: !!text };
     const i = state.chat.indexOf(think);
     if (i >= 0) state.chat.splice(i, 1, answer); else state.chat.push(answer);
     if (q !== 'other') state.answered[q] = true;
@@ -1935,7 +2094,6 @@ document.addEventListener('click', e => {
     }
     // Try it: the window glows and the steps panel opens with the current task
     case 'hint': lastActivity = performance.now() - HINT_DELAY; hintScrollAt = 0; replay($('#laptop .lid'), 'look'); openGuide(); break;
-    case 'stub': showToast(t('protoOnly')); break;
     case 'step-src': startClock(); openSource(el.dataset.step); break;
     case 'src-close': state.srcView = null; state.focus = `[data-action="step-src"]`; renderApp(); break;
     case 'step-menu': state.menu = state.menu === el.dataset.step ? null : el.dataset.step; state.adding = null; renderApp(); break;
@@ -1965,7 +2123,21 @@ document.addEventListener('click', e => {
     }
     case 'ask-jordan': openMessage('jordan', Number(el.dataset.m)); break;
     case 'message': openMessage(el.dataset.to, null); break;
-    case 'nav': state.ninaTab = el.dataset.tab; state.doc = null; state.focus = state.ninaTab === 'people' ? '#people-title' : '#week-title'; renderApp(); break;
+    case 'nav':
+      if (state.role === 'omar') {
+        state.omarTab = el.dataset.tab; state.srcView = null; state.menu = null; state.adding = null;
+        state.focus = { hires: '#plan-title', docs: '#lib-title', answers: '#ans-title' }[state.omarTab];
+      } else { state.ninaTab = el.dataset.tab; state.doc = null; state.focus = state.ninaTab === 'people' ? '#people-title' : '#week-title'; }
+      renderApp(); break;
+    case 'lib-open': {
+      state.libDoc = el.dataset.doc; state.omarTab = 'docs'; state.focus = '#lib-doc-title';
+      renderApp();
+      const r = $('.lib-read'); if (r) r.scrollTop = 0;
+      // stacked in a narrow window: the document comes up to the top
+      const lib = $('.lib'), read = $('.lib-read');
+      if (lib && read && getComputedStyle(lib).display === 'block') lib.scrollTop = read.offsetTop;
+      break;
+    }
     case 'go-laptop': startClock(); switchTo(el.dataset.role, el.dataset.role === 'nina' ? 'whenMon' : 'whenLater'); break;
     case 'modal-close': if (el.classList.contains('modal-layer') && e.target !== el) break; closeModal(); break;
     case 'send-msg': sendMessage(); break;
