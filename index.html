@@ -256,8 +256,11 @@ body{overflow:auto;background:radial-gradient(var(--dot) 1px,transparent 1.3px) 
 .guide.open .g-expand svg{transform:rotate(180deg)}
 .guide.opening .g-expand svg{animation:turn .35s var(--ease-pop)}
 @keyframes turn{from{transform:none}}
-.g-full{display:none;position:absolute;top:100%;left:0;width:min(520px,100%);max-height:calc(100dvh - 140px);overflow-y:auto;flex-direction:column;gap:16px;padding:16px 18px;background:var(--navy-2);border:1px solid var(--navy-line);border-top:0;border-radius:0 0 14px 14px;box-shadow:var(--pop-shadow);scrollbar-width:none}
+.g-full{display:none;position:absolute;top:100%;left:0;right:0;max-height:calc(100dvh - 140px);overflow-y:auto;flex-direction:column;gap:16px;padding:16px 18px;background:var(--navy-2);border:1px solid var(--navy-line);border-top:0;border-radius:0 0 14px 14px;box-shadow:var(--pop-shadow);scrollbar-width:none}
 .g-full .g-card{padding:0;background:none;border:0;border-radius:0}
+/* the full-width dropdown: the task on the left; the concept, contact and start over on the right (one column on phones) */
+.g-cols{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px 36px;align-items:start}
+.g-col{display:flex;flex-direction:column;gap:16px;min-width:0}
 .g-full::-webkit-scrollbar{display:none}
 /* the panel unfolds from the bar and folds back up; while it's open the bar is just its header */
 .guide.open .g-full{display:flex}
@@ -659,6 +662,7 @@ mark{padding:1px 2px;border-radius:3px;background:var(--brand-soft);color:inheri
   .stage{flex:1;gap:0;overflow:hidden}
   .g-compact{border:0;border-bottom:1px solid var(--navy-line);border-radius:0;background:var(--navy)}
   .g-who{display:none}
+  .g-cols{grid-template-columns:minmax(0,1fr)}
   .g-full{top:100%;width:auto;right:0;max-height:calc(100dvh - 72px);padding-top:12px;border:0;border-bottom:1px solid var(--navy-line);border-radius:0;background:var(--navy)}
   .guide.open .g-compact{border-radius:0}
   .g-full .g-head{display:flex}
@@ -744,8 +748,8 @@ const STR = {
     showMe: 'Show me', showing: 'Showing…',
     helpRing: 'or do it yourself in the window: click where the blue outline appears.',
     expand: 'Show the instructions', collapse: 'Hide the instructions',
-    t1: 'See where the VPN step came from', t1d: "Nina Costa joins Acme's sales team on Monday. Omar, on the People team, is setting up Nina's first week, and the AI drafted it from Acme's documents. Click the VPN step's source to see where it came from.",
-    t2: 'Move the VPN to day 1, add a lunch', t2d: 'Nina needs the sales tools from day 1, and they only open on the VPN. Move the VPN step to day 1, then add a lunch with a buddy on day 2.',
+    t1: 'Check the document for the “Set up the VPN” step', t1d: "Nina Costa joins Acme's sales team on Monday. Omar, on the People team, is setting up Nina's first week, and the AI drafted it from Acme's documents. Click the VPN step's source to see where it came from.",
+    t2: 'Drag the “Set up the VPN” step to day 1', t2d: 'Nina needs the sales tools from day 1, and they only open on the VPN. The step’s ⋯ menu works too.',
     t3: 'Publish the week to Nina', t3d: 'The week is ready. Publish it, and Nina sees day 1 when logging in on Monday.',
     t4: 'Ask when to pick a health plan', t4d: "It's Monday, Nina's first day. Go to Nina's laptop, ask when Nina has to pick a health plan, then click the source number to check the answer.",
     t5: 'Ask how many vacation days Nina gets', t5d: "Two of Acme's documents disagree on vacation days. Ask how many Nina gets, and see how the answer handles it.",
@@ -774,7 +778,7 @@ const STR = {
     movedToast: 'Moved to day {n}.', addedToast: 'Added to day {n}.', removedToast: 'Step removed.', publishedToast: 'Published. Nina sees day 1 when logging in on Monday.',
     docsTitle: 'Drafted from {n} documents', docsNote: "Firstweek drafts the steps, and answers new hires' questions, only from these documents.",
     updated: 'Updated {date}', updatedToday: 'Updated today',
-    srcTitle: 'Where this step came from', backToDocs: 'All documents', srcNote: 'The AI wrote this step from this passage. Edit the step and the document stays as it is.',
+    srcTitle: 'Where this step came from', backToDocs: 'All documents', srcNote: 'The AI drafted this step from the highlighted passage.',
     s_laptop: 'Pick up your laptop', s_contract: 'Sign your contract and tax forms', s_meet: 'Meet Jordan, your manager', s_vpn: 'Set up the VPN', s_playbook: 'Read the sales playbook', s_health: 'Pick your health plan', s_shadow: 'Shadow a sales call', s_checkin: 'First-week check-in with Jordan',
     doc_handbook: 'People handbook', doc_vacation: 'Vacation policy update', doc_it: 'IT setup guide', doc_benefits: 'Benefits guide 2026', doc_sales: 'Sales team guide',
     h_contract: 'Your first day', p_contract: 'On your first day, sign your employment contract and tax forms in the HR portal. Your People partner sends the links before you start.',
@@ -834,8 +838,8 @@ const STR = {
     showMe: 'Mostrar', showing: 'Mostrando…',
     helpRing: 'ou faça você mesmo na janela: clique onde aparecer o contorno azul.',
     expand: 'Mostrar as instruções', collapse: 'Ocultar as instruções',
-    t1: 'Veja de onde veio a etapa da VPN', t1d: 'Nina Costa entra no time de vendas da Acme na segunda. Omar, do time de Pessoas, está montando a primeira semana da Nina, e a IA fez um rascunho a partir dos documentos da Acme. Clique na fonte da etapa da VPN para ver de onde ela veio.',
-    t2: 'Leve a VPN ao dia 1 e adicione um almoço', t2d: 'A Nina precisa das ferramentas de vendas desde o dia 1, e elas só abrem na VPN. Leve a etapa da VPN para o dia 1 e adicione um almoço com um buddy no dia 2.',
+    t1: 'Confira o documento da etapa “Configurar a VPN”', t1d: 'Nina Costa entra no time de vendas da Acme na segunda. Omar, do time de Pessoas, está montando a primeira semana da Nina, e a IA fez um rascunho a partir dos documentos da Acme. Clique na fonte da etapa da VPN para ver de onde ela veio.',
+    t2: 'Arraste a etapa “Configurar a VPN” para o dia 1', t2d: 'A Nina precisa das ferramentas de vendas desde o dia 1, e elas só abrem na VPN. O menu ⋯ da etapa também funciona.',
     t3: 'Publique a semana para a Nina', t3d: 'A semana está pronta. Publique, e a Nina vê o dia 1 ao entrar na segunda.',
     t4: 'Pergunte o prazo do plano de saúde', t4d: 'É segunda, o primeiro dia da Nina. Vá para o notebook da Nina, pergunte até quando a Nina precisa escolher um plano de saúde e clique no número da fonte para conferir a resposta.',
     t5: 'Pergunte quantos dias de férias a Nina tem', t5d: 'Dois documentos da Acme discordam sobre os dias de férias. Pergunte quantos a Nina tem e veja como a resposta lida com isso.',
@@ -864,7 +868,7 @@ const STR = {
     movedToast: 'Movida para o dia {n}.', addedToast: 'Adicionada ao dia {n}.', removedToast: 'Etapa removida.', publishedToast: 'Publicado. A Nina vê o dia 1 ao entrar na segunda.',
     docsTitle: 'Rascunho a partir de {n} documentos', docsNote: 'O Firstweek monta as etapas, e responde às perguntas de quem chega, só com base nestes documentos.',
     updated: 'Atualizado em {date}', updatedToday: 'Atualizado hoje',
-    srcTitle: 'De onde veio esta etapa', backToDocs: 'Todos os documentos', srcNote: 'A IA escreveu esta etapa a partir deste trecho. Se você editar a etapa, o documento continua igual.',
+    srcTitle: 'De onde veio esta etapa', backToDocs: 'Todos os documentos', srcNote: 'A IA criou esta etapa a partir do trecho destacado.',
     s_laptop: 'Retirar o notebook', s_contract: 'Assinar o contrato e os documentos fiscais', s_meet: 'Conhecer o Jordan, seu gestor', s_vpn: 'Configurar a VPN', s_playbook: 'Ler o playbook de vendas', s_health: 'Escolher o plano de saúde', s_shadow: 'Acompanhar uma ligação de vendas', s_checkin: 'Conversa de fim de semana com o Jordan',
     doc_handbook: 'Manual de Pessoas', doc_vacation: 'Atualização da política de férias', doc_it: 'Guia de configuração de TI', doc_benefits: 'Guia de benefícios 2026', doc_sales: 'Guia do time de vendas',
     h_contract: 'Seu primeiro dia', p_contract: 'No primeiro dia, assine o contrato de trabalho e os documentos fiscais no portal de RH. Sua pessoa de referência em Pessoas manda os links antes de você começar.',
@@ -1020,7 +1024,7 @@ function markActive() { lastActivity = performance.now(); hintScrollAt = 0; }
 
 /* ================= GUIDE (outside the product) ================= */
 function currentTask() {
-  if (!state.published) return !state.checkedSource ? 't1' : !(state.moved && state.added) ? 't2' : 't3';
+  if (!state.published) return !state.checkedSource ? 't1' : !state.moved ? 't2' : 't3';
   if (!(state.answered.q1 && state.q1Src)) return 't4';
   if (!state.answered.q2) return 't5';
   if (!state.sentJordan) return 't6';
@@ -1282,10 +1286,16 @@ function renderGuide() {
         <div class="c-tools">${themeButton()}${langButton()}</div>
       </div>
       <div class="g-dashes" aria-hidden="true">${dashes}</div>
-      <p class="g-label">${task === 'done' ? t('doneChip') : t('taskOf', { n: idx + 1, total: TASKS.length })}</p>
-      ${card}
-      ${about}
-      ${foot}
+      <div class="g-cols">
+        <div class="g-col">
+          <p class="g-label">${task === 'done' ? t('doneChip') : t('taskOf', { n: idx + 1, total: TASKS.length })}</p>
+          ${card}
+        </div>
+        <div class="g-col">
+          ${about}
+          ${foot}
+        </div>
+      </div>
     </div>`;
 }
 
@@ -1299,9 +1309,8 @@ function ringCandidates() {
   switch (task) {
     case 't1': return ['[data-action="step-src"][data-step="vpn"]'];
     case 't2':
-      if (!state.moved) return state.menu === 'vpn' ? ['[data-action="move-to"][data-step="vpn"][data-day="1"]'] : ['[data-action="step-menu"][data-step="vpn"]'];
-      if (state.adding === 2) return state.addDraft.trim() ? ['[data-action="add-save"]'] : ['[data-action="idea"][data-idea="lunch"]'];
-      return ['[data-action="add-step"][data-day="2"]'];
+      // the ring sits on the card to drag; with its menu open, on day 1
+      return state.menu === 'vpn' ? ['[data-action="move-to"][data-step="vpn"][data-day="1"]'] : ['[data-drag="vpn"]'];
     case 't3': return ['[data-action="publish"]'];
     case 't4': return state.answered.q1 ? ['.msg.ai [data-action="cite"][data-q="q1"]'] : ['[data-action="ask-q"][data-q="q1"]'];
     case 't5': return ['[data-action="ask-q"][data-q="q2"]'];
@@ -1396,14 +1405,6 @@ async function demo() {
           if (state.menu !== 'vpn') await tap('[data-action="step-menu"][data-step="vpn"]');
           await wait(250);
           await tap('[data-action="move-to"][data-step="vpn"][data-day="1"]');
-          await wait(450);
-        }
-        if (!state.added) {
-          if (state.adding !== 2) await tap('[data-action="add-step"][data-day="2"]');
-          await wait(250);
-          await tap('[data-action="idea"][data-idea="lunch"]');
-          await wait(300);
-          await tap('[data-action="add-save"]');
         }
         break;
       case 't3': await tap('[data-action="publish"]'); break;

@@ -15,7 +15,7 @@ Concept and design by [Victor Mascaro](https://victor-mascaro-ux.github.io/my-po
 The bar above the browser window walks you through 7 short tasks on two laptops: first Omar, on Acme's People team, sets up Nina's first week; then Nina, a new hire in sales, asks questions. Each task has a **Show me** button that does it for you, and if you pause for a few seconds, a pulsing outline points at the next click. Each part shows a different thing the AI does:
 
 1. **The draft**: the AI drafts the first week from Acme's documents, and every step links to the passage it came from.
-2. **The company's own steps**: Omar moves the VPN to day 1 (drag it, or use the step's menu) and adds a lunch with a buddy. The AI drafts; the People team decides.
+2. **The company's own steps**: Omar drags the VPN step to day 1 (or uses the step's menu), and can add steps of the company's own. The AI drafts; the People team decides.
 3. **Answers with sources**: Nina asks when to pick a health plan. The answer cites the benefits guide, and the number opens the exact passage.
 4. **Documents that disagree**: the handbook says 15 vacation days, a newer update says 20. The answer shows both and goes with the newer one.
 5. **"I don't know"**: nothing in the documents covers dogs at the office, so the AI says so and hands the question to Jordan, Nina's manager.
