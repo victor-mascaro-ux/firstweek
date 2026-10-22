@@ -368,6 +368,8 @@ body{overflow:auto;background:radial-gradient(var(--dot) 1px,transparent 1.3px) 
 .app{position:absolute;inset:0;display:flex;flex-direction:column}
 .view{flex:1;min-height:0;display:flex;flex-direction:column}
 .view.in{animation:fade .3s ease-out}
+/* already on screen before the redraw: no entrance again */
+.still{animation:none!important}
 .app-head{flex:none;display:flex;align-items:center;gap:20px;height:56px;padding:0 20px;background:var(--surface);border-bottom:1px solid var(--line)}
 .brand{display:flex;align-items:center;gap:8px;font-weight:700;font-size:16px;letter-spacing:-.01em}
 .logo{display:grid;place-items:center;width:28px;height:28px;border-radius:8px;background:var(--brand);color:#fff}
@@ -876,7 +878,7 @@ const STR = {
     goNinaD: "The next step, “{task}”, happens on Nina's laptop.", goOmarD: "The next step, “{task}”, happens on Omar's laptop.",
     mTitle: 'Message {name}', mTo: 'To {name} · {role}', mLabel: 'Message', mDraft: 'Hi {first}! ', mSend: 'Send',
     mNote: 'The answer shows up in Ask about Acme, marked as coming from a person, not a document.',
-    mSentTo: 'To {name}', mSent: 'Sent to {first}. The answer will show up here.', mFrom: '{name} · a person, not a document', mToast: '{name} answered.', mSentToast: 'Sent to {first}.',
+    mSentTo: 'To {name}', mSent: 'Sent to {first}. The answer will show up here.', mFrom: '{name} · a person, not a document', mToast: '{name} answered.',
     libTitle: "Acme's documents", libSub: 'Firstweek drafts each first week, and answers new hires, only from these. Keep them current, and the answers stay right.',
     libStep1: '1 step', libStepN: '{n} steps', libAns1: '1 answer', libAnsN: '{n} answers', libUsed: 'Used in {list}', libUnused: 'Not used yet',
     libReplaced: '1 section replaced by a newer document', libNew: 'New section today', libDocLabel: 'Document', libUsedFor: 'Used in',
@@ -976,7 +978,7 @@ const STR = {
     goNinaD: 'A próxima etapa, “{task}”, acontece no notebook da Nina.', goOmarD: 'A próxima etapa, “{task}”, acontece no notebook do Omar.',
     mTitle: 'Mensagem para {name}', mTo: 'Para {name} · {role}', mLabel: 'Mensagem', mDraft: 'Oi, {first}! ', mSend: 'Enviar',
     mNote: 'A resposta aparece em Pergunte sobre a Acme, marcada como vinda de uma pessoa, não de um documento.',
-    mSentTo: 'Para {name}', mSent: 'Enviada para {first}. A resposta vai aparecer aqui.', mFrom: '{name} · uma pessoa, não um documento', mToast: '{name} respondeu.', mSentToast: 'Enviada para {first}.',
+    mSentTo: 'Para {name}', mSent: 'Enviada para {first}. A resposta vai aparecer aqui.', mFrom: '{name} · uma pessoa, não um documento', mToast: '{name} respondeu.',
     libTitle: 'Documentos da Acme', libSub: 'O Firstweek monta cada primeira semana, e responde a quem chega, só com base nestes documentos. Mantenha-os em dia, e as respostas continuam certas.',
     libStep1: '1 etapa', libStepN: '{n} etapas', libAns1: '1 resposta', libAnsN: '{n} respostas', libUsed: 'Usado em {list}', libUnused: 'Ainda não usado',
     libReplaced: '1 seção substituída por um documento mais novo', libNew: 'Seção nova hoje', libDocLabel: 'Documento', libUsedFor: 'Usado em',
@@ -1566,7 +1568,10 @@ function renderApp() {
   const keep = ['.board', '.chat', '.week', '.side', '.nina-body', '.people-body', '.lib', '.lib-list', '.lib-read', '.ans-body'].map(sel => { const el = app.querySelector(sel); return [sel, el ? el.scrollTop : 0, el ? el.scrollLeft : 0]; });
   const fk = focusKey(document.activeElement);
   const firstPaint = !app.firstElementChild || app.firstElementChild.dataset.role !== state.role;
+  // an entrance plays when its element first appears, not when a modal or menu redraws the page
+  const shown = new Set([...app.querySelectorAll('[data-anim]')].map(el => el.dataset.anim));
   app.innerHTML = state.role === 'omar' ? omarHTML() : ninaHTML();
+  app.querySelectorAll('[data-anim]').forEach(el => { if (shown.has(el.dataset.anim)) el.classList.add('still'); });
   if (!firstPaint) keep.forEach(([sel, top, left]) => { const el = app.querySelector(sel); if (el) { el.scrollTop = top; el.scrollLeft = left; } });
   const chat = app.querySelector('.chat');
   if (chat && state.chat.length !== shownChat) chat.scrollTop = chat.scrollHeight;
@@ -1615,7 +1620,7 @@ function boardHTML() {
   let keep = '';
   if (state.keep === 'pending') keep = keepHTML();
   else if (state.keep === 'later') keep = `<div class="keep-mini"><span>${icon('chat')}${t('keepWaiting')}</span><button class="link-btn" type="button" data-action="keep-review">${t('keepReview')}</button></div>`;
-  else if (state.keep === 'kept') keep = `<p class="keep-done">${icon('check')}<span>${t('keptLine')}</span></p>`;
+  else if (state.keep === 'kept') keep = `<p class="keep-done" data-anim="kept">${icon('check')}<span>${t('keptLine')}</span></p>`;
   return `<div class="body">
       <section class="plan" aria-labelledby="plan-title">
         <div class="plan-head">
@@ -1624,7 +1629,7 @@ function boardHTML() {
             <p class="meta">${t('planMeta', { date: dateNice(START), manager: MANAGER })}</p>
           </div>
           <div class="ph-end">
-            ${state.published ? `<span class="pill ok">${icon('check')}${t('publishedPill')}</span>`
+            ${state.published ? `<span class="pill ok" data-anim="published">${icon('check')}${t('publishedPill')}</span>`
               : `<span class="pill ai">${icon('spark')}${t('draftPill', { n: DOC_ORDER.length })}</span><button class="btn btn-primary" type="button" data-action="publish">${icon('send')}${t('publish')}</button>`}
           </div>
         </div>
@@ -1672,7 +1677,7 @@ function sideHTML() {
   const s = state.srcView && state.steps.find(x => x.id === state.srcView);
   if (s) {
     const [doc, sec] = s.src, section = DOCS[doc].sections.find(x => x.id === sec);
-    return `<aside class="side open" aria-labelledby="side-title">
+    return `<aside class="side open" data-anim="side-${s.id}" aria-labelledby="side-title">
         <button class="link-back" type="button" data-action="src-close">${icon('back')}${t('backToDocs')}</button>
         <p class="side-label">${t('srcTitle')}</p>
         <h2 class="side-title" id="side-title" tabindex="-1">${esc(stepText(s))}</h2>
@@ -1687,12 +1692,12 @@ function sideHTML() {
   }
   return `<aside class="side" aria-labelledby="side-title">
       <p class="side-label" id="side-title">${t('docsTitle', { n: DOC_ORDER.length })}</p>
-      <ul class="docs">${DOC_ORDER.map(id => `<li>${icon('doc')}<span><b>${docTitle(id)}</b>${updatedText(id)}</span>${id === 'handbook' && state.docAdded ? `<span class="pill ok sm">${icon('check')}</span>` : ''}</li>`).join('')}</ul>
+      <ul class="docs">${DOC_ORDER.map(id => `<li>${icon('doc')}<span><b>${docTitle(id)}</b>${updatedText(id)}</span>${id === 'handbook' && state.docAdded ? `<span class="pill ok sm" data-anim="handbook-kept">${icon('check')}</span>` : ''}</li>`).join('')}</ul>
       <p class="side-note">${icon('spark')}<span>${t('docsNote')}</span></p>
     </aside>`;
 }
 function keepHTML() {
-  return `<section class="keep" aria-labelledby="keep-h">
+  return `<section class="keep" data-anim="keep" aria-labelledby="keep-h">
       <span class="keep-ic">${icon('chat')}</span>
       <div>
         <h2 class="keep-h" id="keep-h">${t('keepTitle')}</h2>
@@ -1768,11 +1773,11 @@ function ansItemHTML(m) {
     // Jordan's reply comes back here too, to keep for the next new hire
     if (dog && state.keep) {
       extra = `<p class="ans-reply"><b>${t('keepAnswered', { name: MANAGER })}</b> “${t('jReply')}”</p>`
-        + (state.keep === 'kept' ? `<p class="keep-done">${icon('check')}<span>${t('keptLine')}</span></p>`
+        + (state.keep === 'kept' ? `<p class="keep-done" data-anim="kept">${icon('check')}<span>${t('keptLine')}</span></p>`
           : `<p class="keep-why">${t('keepWhy')}</p><div class="keep-row"><button class="btn btn-primary btn-sm" type="button" data-action="keep-add">${icon('plus')}${t('keepAdd')}</button>${state.keep === 'pending' ? `<button class="btn btn-plain btn-sm" type="button" data-action="keep-later">${t('keepLater')}</button>` : ''}</div>`);
     }
   }
-  return `<li class="ans">
+  return `<li class="ans" data-anim="ans-${m.id}">
       <div class="ans-top"><span class="avatar nina sm" aria-hidden="true">${PEOPLE.nina.ini}</span><div><p class="ans-q">${q}</p><p class="ans-who">${t('ansWho', { name: PEOPLE.nina.name })}</p></div></div>
       <p class="ans-a"><b>${t('ansAi')}</b> ${answer}</p>
       <div class="ans-tags">${tags}</div>
@@ -1797,7 +1802,7 @@ function weekHTML() {
         <p class="meta">${t('dayOneMeta', { date: dateNice(START) })}</p>
         <div class="progress" aria-hidden="true"><span style="--p:${day1.length ? doneN / day1.length : 0}"></span></div>
         <p class="meta sm">${t('doneOf', { d: doneN, n: day1.length })}</p>
-        <ul class="checklist" aria-label="${t('todoLabel')}">${day1.map(s => `<li><label class="check"><input type="checkbox" id="todo-${s.id}" name="todo" data-step="${s.id}"${state.checked[s.id] ? ' checked' : ''}><span class="box" aria-hidden="true">${icon('check')}</span><span class="ct"><span class="ct-t">${esc(stepText(s))}</span>${s.custom ? '' : `<span class="ct-s">${docTitle(s.src[0])}</span>`}</span></label></li>`).join('')}</ul>
+        <ul class="checklist" aria-label="${t('todoLabel')}">${day1.map(s => `<li><label class="check"><input type="checkbox" id="todo-${s.id}" name="todo" data-step="${s.id}"${state.checked[s.id] ? ' checked' : ''}><span class="box" aria-hidden="true"${state.checked[s.id] ? ` data-anim="box-${s.id}"` : ''}>${icon('check')}</span><span class="ct"><span class="ct-t">${esc(stepText(s))}</span>${s.custom ? '' : `<span class="ct-s">${docTitle(s.src[0])}</span>`}</span></label></li>`).join('')}</ul>
         <h2 class="h2">${t('comingUp')}</h2>
         <ul class="upcoming">${day2.map(s => `<li>${esc(stepText(s))}</li>`).join('')}</ul>
       </section>
@@ -1818,7 +1823,7 @@ function peopleHTML() {
       <p class="meta">${t('peopleSub')}</p>
       <ul class="people-grid">${DIR.map(d => {
         const p = person(d.id);
-        return `<li class="person">
+        return `<li class="person" data-anim="person-${d.id}">
           <div class="pp-top">${avatarHTML(d.id)}<div><p class="pp-name">${esc(p.name)}</p><p class="pp-role">${t('r_' + d.id + '_role')}</p></div></div>
           <p class="pp-about"><b>${t('askAbout')}</b> ${t('r_' + d.id + '_about')}</p>
           ${d.id === 'priya' && lunch ? `<p class="pp-tag">${icon('check')}<span>${t('lunchTag')}</span></p>` : ''}
@@ -1873,7 +1878,7 @@ function docViewerHTML() {
   if (!state.doc) return '';
   const { doc, sec } = state.doc;
   const secs = DOCS[doc].sections.concat(doc === 'handbook' && state.docAdded ? [DOG_SECTION] : []);
-  return `<div class="doc" role="region" aria-labelledby="doc-title">
+  return `<div class="doc" data-anim="doc-${doc}" role="region" aria-labelledby="doc-title">
       <div class="doc-top"><p class="side-label">${t('docSource')}</p><button class="icon-btn" type="button" data-action="doc-close" aria-label="${t('docClose')}">${icon('close')}</button></div>
       <h2 class="doc-title" id="doc-title" tabindex="-1">${docTitle(doc)}</h2>
       <p class="doc-upd">${updatedText(doc)}</p>
@@ -2034,9 +2039,13 @@ function sendMessage() {
   if (dog) state.sentJordan = true; else if (m) m.sent = true;
   // an untouched draft is rebuilt on render, so it follows a language switch
   state.chat.push({ id: ++msgN, kind: 'sent', to, msgId, text: state.mEdited ? state.mDraft.trim() : null });
-  state.focus = msgId ? '#ask-input' : `[data-action="message"][data-to="${to}"]`;
+  // sent from People: My first week's chat is where the message and the answer show up
+  const fromPeople = state.ninaTab === 'people';
+  state.ninaTab = 'week'; state.focus = '#ask-input';
   renderApp(); renderGuide();
-  if (state.ninaTab === 'people') showToast(t('mSentToast', { first: person(to).first }));
+  // a narrow window stacks day 1 above the chat, so the chat comes up
+  const body = $('.nina-body'), askEl = $('.ask');
+  if (fromPeople && body && askEl) body.scrollTop = askEl.offsetTop;
   setTimeout(() => {
     if (state !== run) return;
     state.chat.push({ id: ++msgN, kind: 'human', from: to, generic: !dog });
