@@ -139,28 +139,21 @@ body{overflow:auto;background:radial-gradient(var(--dot) 1px,transparent 1.3px) 
 .laptop{--chrome:#DADDE6;--chrome-line:#C9CDD8;--tab-bg:var(--bg);--tab-ink:#30343C;--tab-dim:#5A5F6B;--url-bg:#F2F3F7;--url-ink:#4B4F5C}
 .laptop.is-omar{--chrome:#2A2D35;--chrome-line:#16171C;--tab-bg:#3B3F4A;--tab-ink:#F2F3F7;--tab-dim:#A3A8B5;--url-bg:#1C1E24;--url-ink:#C9CDD8}
 .laptop.is-nina{--chrome:#DCE6F7;--chrome-line:#C3D1EC;--tab-bg:#FFFFFF;--tab-ink:#1D2A44;--tab-dim:#55627E;--url-bg:#FFFFFF;--url-ink:#3B4A66}
-.b-bar{flex:none;display:flex;align-items:flex-end;gap:10px;height:42px;padding:0 14px;background:var(--chrome);border-bottom:1px solid var(--chrome-line);transition:background-color .4s,border-color .4s}
-.b-dots{display:flex;gap:7px;align-self:center}
+.b-bar{flex:none;display:flex;align-items:center;gap:10px;height:42px;padding:10px 14px 0;background:var(--chrome);border-bottom:1px solid var(--chrome-line);transition:background-color .4s,border-color .4s}
+.b-dots{display:flex;gap:7px}
 .b-dots i{width:12px;height:12px;border-radius:50%;background:#FF5F57}
 .b-dots i:nth-child(2){background:#FEBC2E}
 .b-dots i:nth-child(3){background:#28C840}
-.b-tabs{display:flex;gap:2px;margin-left:4px;min-width:0}
+.b-tabs{display:flex;align-self:stretch;gap:2px;margin-left:4px;min-width:0}
 .b-tab{display:flex;align-items:center;gap:8px;height:32px;padding:0 16px 0 12px;border-radius:9px 9px 0 0;background:var(--tab-bg);font:600 13px/1 var(--font);color:var(--tab-ink);white-space:nowrap}
 .b-tab.dim{background:transparent;color:var(--tab-dim);font-weight:500}
 .b-tab .mini-logo{display:grid;place-items:center;width:16px;height:16px;border-radius:4px;background:var(--brand);color:#fff}
 .b-tab .mini-logo svg{width:11px;height:11px}
 .b-tab .tab-ic{width:14px;height:14px;border-radius:4px;background:currentColor;opacity:.45}
-.b-url{align-self:center;margin-left:6px;padding:5px 12px;border-radius:999px;background:var(--url-bg);font:500 12.5px/1 var(--font);color:var(--url-ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
-.b-who{align-self:center;margin-left:auto}
+.b-url{margin-left:6px;padding:5px 12px;border-radius:999px;background:var(--url-bg);font:500 12.5px/1 var(--font);color:var(--url-ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+.b-who{margin-left:auto}
 .b-who .mini-av{width:24px;height:24px}
 /* Windows-style controls: minimize, maximize, close */
-.b-win{display:flex;align-self:stretch;margin:0 -14px 0 0}
-.b-win i{position:relative;width:42px;color:var(--tab-dim)}
-.b-win i::before,.b-win i::after{content:"";position:absolute;left:50%;top:50%;transform:translate(-50%,-50%)}
-.b-win .min::before{width:10px;height:1.5px;background:currentColor}
-.b-win .max::before{width:9px;height:9px;border:1.5px solid currentColor;border-radius:1px}
-.b-win .x::before,.b-win .x::after{width:12px;height:1.5px;background:currentColor;transform:translate(-50%,-50%) rotate(45deg)}
-.b-win .x::after{transform:translate(-50%,-50%) rotate(-45deg)}
 .screen{position:relative;flex:1;min-height:0;overflow:hidden;background:var(--bg);color:var(--ink);font:15px/1.5 var(--font);container:app/inline-size}
 
 /* ================= Context (left) ================= */
@@ -893,7 +886,7 @@ const STR = {
     goNinaD: "The next step, “{task}”, happens on Nina's laptop.", goOmarD: "The next step, “{task}”, happens on Omar's laptop.",
     mTitle: 'Message {name}', mTo: 'To {name} · {role}', mLabel: 'Message', mDraft: 'Hi {first}! ', mSend: 'Send',
     mNote: 'The answer shows up in Ask about Acme, marked as coming from a person, not a document.',
-    mSentTo: 'To {name}', mSent: 'Sent to {first}. The answer will show up here.', mFrom: '{name} · a person, not a document', mToast: '{name} answered.', notifNow: 'now', notifClose: 'Dismiss',
+    mSentTo: 'To {name}', mSent: 'Sent to {first}. The answer will show up here.', mFrom: '{name} · a person, not a document', mToast: '{name} answered.', mSentToast: 'Sent to {first}.', notifNow: 'now', notifClose: 'Dismiss',
     libTitle: "Acme's documents", libSub: 'Firstweek drafts each first week, and answers new hires, only from these. Keep them current, and the answers stay right.',
     libStep1: '1 step', libStepN: '{n} steps', libAns1: '1 answer', libAnsN: '{n} answers', libUsed: 'Used in {list}', libUnused: 'Not used yet',
     libReplaced: '1 section replaced by a newer document', libNew: 'New section today', libDocLabel: 'Document', libUsedFor: 'Used in',
@@ -993,7 +986,7 @@ const STR = {
     goNinaD: 'A próxima etapa, “{task}”, acontece no notebook da Nina.', goOmarD: 'A próxima etapa, “{task}”, acontece no notebook do Omar.',
     mTitle: 'Mensagem para {name}', mTo: 'Para {name} · {role}', mLabel: 'Mensagem', mDraft: 'Oi, {first}! ', mSend: 'Enviar',
     mNote: 'A resposta aparece em Pergunte sobre a Acme, marcada como vinda de uma pessoa, não de um documento.',
-    mSentTo: 'Para {name}', mSent: 'Enviada para {first}. A resposta vai aparecer aqui.', mFrom: '{name} · uma pessoa, não um documento', mToast: '{name} respondeu.', notifNow: 'agora', notifClose: 'Dispensar',
+    mSentTo: 'Para {name}', mSent: 'Enviada para {first}. A resposta vai aparecer aqui.', mFrom: '{name} · uma pessoa, não um documento', mToast: '{name} respondeu.', mSentToast: 'Enviada para {first}.', notifNow: 'agora', notifClose: 'Dispensar',
     libTitle: 'Documentos da Acme', libSub: 'O Firstweek monta cada primeira semana, e responde a quem chega, só com base nestes documentos. Mantenha-os em dia, e as respostas continuam certas.',
     libStep1: '1 etapa', libStepN: '{n} etapas', libAns1: '1 resposta', libAnsN: '{n} respostas', libUsed: 'Usado em {list}', libUnused: 'Ainda não usado',
     libReplaced: '1 seção substituída por um documento mais novo', libNew: 'Seção nova hoje', libDocLabel: 'Documento', libUsedFor: 'Usado em',
@@ -1606,11 +1599,10 @@ function renderChrome() {
   const lap = $('#laptop');
   lap.classList.toggle('is-omar', mac); lap.classList.toggle('is-nina', !mac);
   const other = t(mac ? 'tabHr' : 'tabWelcome');
-  $('#b-bar').innerHTML = `${mac ? '<span class="b-dots"><i></i><i></i><i></i></span>' : ''}
+  $('#b-bar').innerHTML = `<span class="b-dots"><i></i><i></i><i></i></span>
     <span class="b-tabs"><span class="b-tab dim"><span class="tab-ic"></span>${esc(other)}</span><span class="b-tab"><span class="mini-logo">${LOGO}</span>Firstweek · Acme</span></span>
     <span class="b-url">${mac ? 'acme.firstweek.app/new-hires/nina-costa' : 'acme.firstweek.app/my-first-week'}</span>
-    <span class="b-who"><span class="mini-av${mac ? '' : ' nina'}">${PEOPLE[role].ini}</span></span>
-    ${mac ? '' : '<span class="b-win"><i class="min"></i><i class="max"></i><i class="x"></i></span>'}`;
+    <span class="b-who"><span class="mini-av${mac ? '' : ' nina'}">${PEOPLE[role].ini}</span></span>`;
 }
 function headHTML(role) {
   const p = PEOPLE[role];
@@ -1957,6 +1949,7 @@ function showNotif(m) {
   announce(t('mToast', { name: p.name }));
   el.innerHTML = `<p class="nt-top"><span class="mini-logo">${LOGO}</span><span>Firstweek</span><span class="nt-when">${t('notifNow')}</span><button class="nt-x" type="button" data-action="notif-close" aria-label="${t('notifClose')}">${icon('close')}</button></p>
     <button class="nt-body" type="button" data-action="notif-open">${avatarHTML(from)}<span class="nt-msg"><b>${esc(p.name)}</b><span class="nt-text">${replyText(m)}</span></span></button>`;
+  $('#toast').classList.remove('show');
   el.removeAttribute('aria-hidden'); el.classList.add('show');
   clearTimeout(notifTimer);
   notifTimer = setTimeout(hideNotif, 6000);
@@ -2072,13 +2065,10 @@ function sendMessage() {
   if (dog) state.sentJordan = true; else if (m) m.sent = true;
   // an untouched draft is rebuilt on render, so it follows a language switch
   state.chat.push({ id: ++msgN, kind: 'sent', to, msgId, text: state.mEdited ? state.mDraft.trim() : null });
-  // sent from People: My first week's chat is where the message and the answer show up
-  const fromPeople = state.ninaTab === 'people';
-  state.ninaTab = 'week'; state.focus = '#ask-input';
+  // you stay where you are: the answer arrives as a notification, which opens the chat
+  state.focus = state.ninaTab === 'people' ? `[data-action="message"][data-to="${to}"]` : '#ask-input';
   renderApp(); renderGuide();
-  // a narrow window stacks day 1 above the chat, so the chat comes up
-  const body = $('.nina-body'), askEl = $('.ask');
-  if (fromPeople && body && askEl) body.scrollTop = askEl.offsetTop;
+  showToast(t('mSentToast', { first: person(to).first }));
   setTimeout(() => {
     if (state !== run) return;
     const reply = { id: ++msgN, kind: 'human', from: to, generic: !dog };
