@@ -674,6 +674,20 @@ mark{padding:1px 2px;border-radius:3px;background:var(--brand-soft);color:inheri
 .toast.show{opacity:1;transform:translate(-50%,0)}
 .toast svg.i{margin-top:calc((1.5em - 20px) / 2);color:#7FE0B5}
 .toast.show svg.i{animation:pop .45s var(--ease-pop) .1s backwards}
+/* a person's reply: a notification from the laptop, bottom right as on Windows, not the app's toast */
+.notif{position:absolute;z-index:34;right:14px;bottom:14px;width:min(360px,calc(100% - 28px));padding:10px 12px 12px;border:1px solid rgba(16,24,40,.08);border-radius:10px;background:rgba(249,250,252,.97);-webkit-backdrop-filter:blur(18px);backdrop-filter:blur(18px);box-shadow:0 14px 36px rgba(16,24,40,.24);color:var(--ink);opacity:0;visibility:hidden;transform:translateX(28px);transition:opacity .22s,transform .3s var(--ease-out),visibility 0s .3s}
+.notif.show{opacity:1;visibility:visible;transform:none;transition:opacity .22s,transform .3s var(--ease-out),visibility 0s}
+.nt-top{display:flex;align-items:center;gap:7px;margin:0 0 8px;color:var(--muted);font-size:12px}
+.nt-top .mini-logo{display:grid;place-items:center;width:16px;height:16px;border-radius:4px;background:var(--brand);color:#fff}
+.nt-top .mini-logo svg{width:11px;height:11px}
+.nt-when{margin-left:auto}
+.nt-x{display:grid;place-items:center;width:26px;height:26px;margin:-4px -6px -4px 0;border:0;border-radius:6px;background:none;color:var(--muted);cursor:pointer}
+.nt-x:hover{background:var(--well);color:var(--ink)}
+.nt-x svg.i{width:14px;height:14px}
+.nt-body{display:flex;align-items:flex-start;gap:10px;width:100%;padding:0;border:0;background:none;color:inherit;font:inherit;text-align:left;cursor:pointer}
+.nt-msg{display:flex;flex-direction:column;gap:1px;min-width:0}
+.nt-msg b{font-size:14px}
+.nt-text{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;font-size:13.5px;line-height:1.45}
 
 /* the window narrower than a laptop: the source panel slides over, then everything stacks */
 @container app (max-width:1000px){
@@ -752,6 +766,7 @@ mark{padding:1px 2px;border-radius:3px;background:var(--brand-soft);color:inheri
           <div class="b-bar" id="b-bar" aria-hidden="true"></div>
           <div class="screen" id="screen">
             <div class="app" id="app" role="region" aria-label="Firstweek"></div>
+            <div class="notif" id="notif" role="status" aria-hidden="true"></div>
             <div class="toast" id="toast" aria-hidden="true"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg><span></span></div>
             <div class="switch-layer" id="switch" aria-hidden="true"></div>
             <div class="ring" id="ring" aria-hidden="true"></div>
@@ -878,7 +893,7 @@ const STR = {
     goNinaD: "The next step, “{task}”, happens on Nina's laptop.", goOmarD: "The next step, “{task}”, happens on Omar's laptop.",
     mTitle: 'Message {name}', mTo: 'To {name} · {role}', mLabel: 'Message', mDraft: 'Hi {first}! ', mSend: 'Send',
     mNote: 'The answer shows up in Ask about Acme, marked as coming from a person, not a document.',
-    mSentTo: 'To {name}', mSent: 'Sent to {first}. The answer will show up here.', mFrom: '{name} · a person, not a document', mToast: '{name} answered.',
+    mSentTo: 'To {name}', mSent: 'Sent to {first}. The answer will show up here.', mFrom: '{name} · a person, not a document', mToast: '{name} answered.', notifNow: 'now', notifClose: 'Dismiss',
     libTitle: "Acme's documents", libSub: 'Firstweek drafts each first week, and answers new hires, only from these. Keep them current, and the answers stay right.',
     libStep1: '1 step', libStepN: '{n} steps', libAns1: '1 answer', libAnsN: '{n} answers', libUsed: 'Used in {list}', libUnused: 'Not used yet',
     libReplaced: '1 section replaced by a newer document', libNew: 'New section today', libDocLabel: 'Document', libUsedFor: 'Used in',
@@ -978,7 +993,7 @@ const STR = {
     goNinaD: 'A próxima etapa, “{task}”, acontece no notebook da Nina.', goOmarD: 'A próxima etapa, “{task}”, acontece no notebook do Omar.',
     mTitle: 'Mensagem para {name}', mTo: 'Para {name} · {role}', mLabel: 'Mensagem', mDraft: 'Oi, {first}! ', mSend: 'Enviar',
     mNote: 'A resposta aparece em Pergunte sobre a Acme, marcada como vinda de uma pessoa, não de um documento.',
-    mSentTo: 'Para {name}', mSent: 'Enviada para {first}. A resposta vai aparecer aqui.', mFrom: '{name} · uma pessoa, não um documento', mToast: '{name} respondeu.',
+    mSentTo: 'Para {name}', mSent: 'Enviada para {first}. A resposta vai aparecer aqui.', mFrom: '{name} · uma pessoa, não um documento', mToast: '{name} respondeu.', notifNow: 'agora', notifClose: 'Dispensar',
     libTitle: 'Documentos da Acme', libSub: 'O Firstweek monta cada primeira semana, e responde a quem chega, só com base nestes documentos. Mantenha-os em dia, e as respostas continuam certas.',
     libStep1: '1 etapa', libStepN: '{n} etapas', libAns1: '1 resposta', libAnsN: '{n} respostas', libUsed: 'Usado em {list}', libUnused: 'Ainda não usado',
     libReplaced: '1 seção substituída por um documento mais novo', libNew: 'Seção nova hoje', libDocLabel: 'Documento', libUsedFor: 'Usado em',
@@ -1859,6 +1874,7 @@ function answerHTML(m) {
   return `<p>${t(dog ? 'a3' : 'aUnknown')}</p><p class="handoff">${t('a3b', { manager: MANAGER })}</p>
     ${sent ? `<p class="sent-note">${icon('check')}<span>${t('jAsked')}</span></p>` : `<button class="btn btn-primary btn-sm" type="button" data-action="ask-jordan" data-q="${m.q}" data-m="${m.id}">${icon('chat')}${t('askJordan')}</button>`}`;
 }
+const replyText = m => (!m.generic ? t('jReply') : (m.from || 'jordan') === 'jordan' ? t('jReplyGeneric') : t('reply_' + m.from));
 function msgHTML(m) {
   const fresh = seenMsgs.has(m.id) ? '' : ' in';
   if (m.kind === 'me') return `<div class="msg me${fresh}"><p>${esc(m.text)}</p></div>`;
@@ -1869,7 +1885,7 @@ function msgHTML(m) {
       <p class="msg sys${fresh}">${icon('send')}<span>${t('mSent', { first: esc(person(to).first) })}</span></p>`;
   }
   if (m.kind === 'human') {
-    const from = m.from || 'jordan', text = !m.generic ? t('jReply') : from === 'jordan' ? t('jReplyGeneric') : t('reply_' + from);
+    const from = m.from || 'jordan', text = replyText(m);
     return `<div class="msg human${fresh}">${avatarHTML(from, true)}<div class="bubble"><p class="from">${t('mFrom', { name: esc(person(from).name) })}</p><p>${text}</p></div></div>`;
   }
   return `<div class="msg ai${fresh}"><div class="bubble"><p class="ai-label"><span class="logo">${LOGO}</span>Firstweek</p>${answerHTML(m)}</div></div>`;
@@ -1920,6 +1936,7 @@ function switchTo(role, when) {
   const run = state;
   state.switching = { role, when };
   state.menu = null; state.adding = null; state.modal = null;
+  hideNotif();
   renderSwitch(); renderGuide();
   announce(`${t(role === 'nina' ? 'switchNina' : 'switchOmar')}, ${t(when)}`);
   setTimeout(() => {
@@ -1932,6 +1949,22 @@ function switchTo(role, when) {
     state.switching = null; renderSwitch(); markActive();
     const h = $('#app h1'); if (h) h.focus({ preventScroll: true });
   }, reduceMotion() ? 500 : 1700);
+}
+// a person's reply, as the laptop's own notification; clicking it opens the chat
+let notifTimer = null;
+function showNotif(m) {
+  const from = m.from || 'jordan', p = person(from), el = $('#notif');
+  announce(t('mToast', { name: p.name }));
+  el.innerHTML = `<p class="nt-top"><span class="mini-logo">${LOGO}</span><span>Firstweek</span><span class="nt-when">${t('notifNow')}</span><button class="nt-x" type="button" data-action="notif-close" aria-label="${t('notifClose')}">${icon('close')}</button></p>
+    <button class="nt-body" type="button" data-action="notif-open">${avatarHTML(from)}<span class="nt-msg"><b>${esc(p.name)}</b><span class="nt-text">${replyText(m)}</span></span></button>`;
+  el.removeAttribute('aria-hidden'); el.classList.add('show');
+  clearTimeout(notifTimer);
+  notifTimer = setTimeout(hideNotif, 6000);
+}
+function hideNotif() {
+  const el = $('#notif');
+  clearTimeout(notifTimer);
+  el.classList.remove('show'); el.setAttribute('aria-hidden', 'true');
 }
 let toastTimer = null;
 function showToast(msg) {
@@ -2048,9 +2081,11 @@ function sendMessage() {
   if (fromPeople && body && askEl) body.scrollTop = askEl.offsetTop;
   setTimeout(() => {
     if (state !== run) return;
-    state.chat.push({ id: ++msgN, kind: 'human', from: to, generic: !dog });
+    const reply = { id: ++msgN, kind: 'human', from: to, generic: !dog };
+    state.chat.push(reply);
     if (state.role === 'nina') renderApp();
-    showToast(t('mToast', { name: person(to).name }));
+    // it reaches Nina's laptop: on Omar's, there is nothing to show
+    if (state.role === 'nina' && !state.switching) showNotif(reply);
     if (!dog) return;
     // Jordan's answer reaches the People team as one to keep
     state.keep = 'pending';
@@ -2096,8 +2131,18 @@ document.addEventListener('click', e => {
       break;
     }
     case 'theme': setTheme(currentTheme() === 'dark' ? 'light' : 'dark', el); break;
+    case 'notif-close': hideNotif(); break;
+    case 'notif-open': {
+      hideNotif();
+      if (state.role !== 'nina') break;
+      state.ninaTab = 'week'; state.modal = null; state.focus = '#ask-input';
+      renderApp();
+      const chat = $('.chat'); if (chat) chat.scrollTop = chat.scrollHeight;
+      const body = $('.nina-body'), askEl = $('.ask'); if (body && askEl) body.scrollTop = askEl.offsetTop;
+      break;
+    }
     case 'restart': {
-      const go = () => { state = newState(state); seenMsgs.clear(); msgN = 0; shownChat = 0; $('#toast').classList.remove('show'); render(); markActive(); };
+      const go = () => { state = newState(state); seenMsgs.clear(); msgN = 0; shownChat = 0; $('#toast').classList.remove('show'); hideNotif(); render(); markActive(); };
       if (state.guideOpen) closeGuide(go); else go();
       break;
     }
