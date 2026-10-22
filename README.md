@@ -12,18 +12,18 @@ Concept and design by [Victor Mascaro](https://victor-mascaro-ux.github.io/my-po
 
 ## How to try it
 
-The bar above the browser window walks you through 7 short tasks on two laptops: first Omar, on Acme's People team, sets up Nina's first week; then Nina, a new hire in sales, asks questions. Each task has a **Show me** button that does it for you, and if you pause for a few seconds, a pulsing outline points at the next click. Each part shows a different thing the AI does:
+The bar above the browser window walks you through 9 short tasks, one action each, on two laptops: first Omar, on Acme's People team, sets up Nina's first week; then Nina, a new hire in sales, asks questions. Each task has a **Show me** button that does it for you, and if you pause for a few seconds, a pulsing outline points at the next click. Each part shows a different thing the AI does:
 
 1. **The draft**: the AI drafts the first week from Acme's documents, and every step links to the passage it came from.
 2. **The company's own steps**: Omar drags the VPN step to day 1 (or uses the step's menu), and can add steps of the company's own. The AI drafts; the People team decides.
-3. **Answers with sources**: Nina asks when to pick a health plan. The answer cites the benefits guide, and the number opens the exact passage.
+3. **Answers with sources**: Nina asks when to pick a health plan. The benefits guide sits under the answer as its source, and opens on the exact passage.
 4. **Documents that disagree**: the handbook says 15 vacation days, a newer update says 20. The answer shows both and goes with the newer one.
 5. **"I don't know"**: nothing in the documents covers dogs at the office, so the AI says so and hands the question to Jordan, Nina's manager.
 6. **Answers that stay**: Jordan's answer goes back to Omar, who adds it to the handbook for the next new hire.
 
 ## Design decisions
 
-- **Every answer shows its source.** Click the number to read the exact passage, and see when it was last updated.
+- **Every answer shows its source.** Click it to read the exact passage, and see when it was last updated.
 - **Documents disagree? It says so.** It shows both, and goes with the newer one.
 - **"I don't know" is an answer.** When the documents don't cover it, the AI hands you to your manager instead of guessing.
 - **The company owns the steps.** The AI drafts the first week from your documents; the People team makes it its own.

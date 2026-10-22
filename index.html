@@ -295,6 +295,8 @@ body{overflow:auto;background:radial-gradient(var(--dot) 1px,transparent 1.3px) 
 .g-btn:not(.ghost)::after,.g-show-sm::after{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(105deg,transparent 35%,rgba(255,255,255,.28) 50%,transparent 65%);transform:translateX(-110%)}
 .g-btn:not(.ghost):hover::after,.g-show-sm:hover::after{transform:translateX(110%);transition:transform .75s var(--ease-out)}
 .g-btn svg.i{width:16px;height:16px;fill:currentColor}
+/* the done card's contact buttons: outline icons, as in the contact card */
+.g-card a.g-btn svg.i{display:inline-block;width:18px;height:18px;margin-right:8px;vertical-align:middle;fill:none;stroke-width:2}
 .g-btn.ghost{background:transparent;color:var(--ice);border-color:var(--ghost-line);box-shadow:none}
 .g-btn.ghost:hover{border-color:var(--ice);background:var(--navy-2)}
 .g-btn[aria-disabled="true"],.g-show-sm[aria-disabled="true"]{opacity:.75;cursor:progress;transform:none;background-image:linear-gradient(100deg,transparent 30%,rgba(255,255,255,.55) 50%,transparent 70%);background-size:200% 100%;animation:shimmer 1.1s linear infinite}
@@ -541,6 +543,8 @@ mark{padding:1px 2px;border-radius:3px;background:var(--brand-soft);color:inheri
 @keyframes msgIn{from{opacity:0;transform:translateY(10px)}}
 .msg p{margin:0}
 .msg.me{align-self:flex-end;padding:9px 13px;border-radius:16px 16px 4px 16px;background:var(--brand);color:#fff}
+.msg.out .to{margin-bottom:3px;font-size:12px;font-weight:700;opacity:.8}
+.msg.out .to + p{white-space:pre-wrap}
 .msg.ai{align-self:flex-start;max-width:94%}
 .msg.ai .bubble{padding:11px 14px;border:1px solid #E3DFF7;border-radius:4px 16px 16px 16px;background:#F6F4FE}
 .msg.think{display:flex;align-items:center;gap:8px;padding:10px 14px;border-radius:4px 16px 16px 16px;background:#F6F4FE;color:var(--muted);font-size:14px}
@@ -548,11 +552,8 @@ mark{padding:1px 2px;border-radius:3px;background:var(--brand-soft);color:inheri
 .ai-label .logo{width:18px;height:18px;border-radius:5px}
 .ai-label .logo svg{width:12px;height:12px}
 .msg.ai p + p{margin-top:6px}
-.cite{display:inline-grid;place-items:center;min-width:20px;height:19px;margin:0 1px 0 3px;padding:0 5px;border:0;border-radius:6px;background:var(--brand);color:#fff;font:700 11px/1 var(--font);vertical-align:2px;cursor:pointer;transition:transform .12s}
-.cite:hover{transform:scale(1.12)}
 .sources{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin-top:10px}
 .sources-h{margin:0 2px 0 0!important;color:var(--muted);font-size:12px;font-weight:700}
-.sources .src b{display:inline-grid;place-items:center;min-width:16px;height:16px;margin-right:2px;border-radius:4px;background:var(--brand);color:#fff;font-size:10.5px}
 /* two documents disagree: both side by side, the newer one used */
 .conflict{margin-top:10px;padding:10px;border:1px solid var(--warn-line);border-radius:12px;background:var(--warn-bg)}
 .conflict-h{display:flex;align-items:flex-start;gap:6px;margin:0 0 8px!important;color:var(--warn-ink);font-size:13px;font-weight:700}
@@ -663,6 +664,10 @@ mark{padding:1px 2px;border-radius:3px;background:var(--brand-soft);color:inheri
   .g-compact{border:0;border-bottom:1px solid var(--navy-line);border-radius:0;background:var(--navy)}
   .g-who{display:none}
   .g-cols{grid-template-columns:minmax(0,1fr)}
+  .g-col{display:contents}
+  .g-about{order:1}
+  .g-foot{order:2}
+  .g-cols.is-done .g-about{order:3}
   .g-full{top:100%;width:auto;right:0;max-height:calc(100dvh - 72px);padding-top:12px;border:0;border-bottom:1px solid var(--navy-line);border-radius:0;background:var(--navy)}
   .guide.open .g-compact{border-radius:0}
   .g-full .g-head{display:flex}
@@ -719,9 +724,10 @@ const MANAGER = 'Jordan Lee';
 const START = '2026-10-26';           // Nina's first day, a Monday
 const HEALTH_DEADLINE = '2026-11-25'; // 30 days after it, from the benefits guide
 const HINT_DELAY = 4000;
-const TASKS = ['t1', 't2', 't3', 't4', 't5', 't6', 't7'];
+// one action per task: asking and checking the source are two, and so are asking and sending to Jordan
+const TASKS = ['t1', 't2', 't3', 't4', 't4s', 't5', 't6', 't6j', 't7'];
 // whose laptop each task happens on
-const TASK_ROLE = { t1: 'omar', t2: 'omar', t3: 'omar', t4: 'nina', t5: 'nina', t6: 'nina', t7: 'omar', done: 'omar' };
+const TASK_ROLE = { t1: 'omar', t2: 'omar', t3: 'omar', t4: 'nina', t4s: 'nina', t5: 'nina', t6: 'nina', t6j: 'nina', t7: 'omar', done: 'omar' };
 // everyone here is fictional
 const PEOPLE = { omar: { ini: 'OH', name: 'Omar Haddad' }, nina: { ini: 'NC', name: 'Nina Costa' }, jordan: { ini: 'JL', name: MANAGER } };
 // Nina's People tab: who to ask about what (all fictional); the IT desk is a team, so its name translates
@@ -751,17 +757,19 @@ const STR = {
     t1: 'Check the document for the “Set up the VPN” step', t1d: "Nina Costa joins Acme's sales team on Monday. Omar, on the People team, is setting up Nina's first week, and the AI drafted it from Acme's documents. Click the VPN step's source to see where it came from.",
     t2: 'Drag the “Set up the VPN” step to day 1', t2d: 'Nina needs the sales tools from day 1, and they only open on the VPN. The step’s ⋯ menu works too.',
     t3: 'Publish the week to Nina', t3d: 'The week is ready. Publish it, and Nina sees day 1 when logging in on Monday.',
-    t4: 'Ask when to pick a health plan', t4d: "It's Monday, Nina's first day. Go to Nina's laptop, ask when Nina has to pick a health plan, then click the source number to check the answer.",
+    t4: 'Ask when to pick a health plan', t4d: "It's Monday, Nina's first day. Ask when Nina has to pick a health plan.",
+    t4s: 'Click the source to check the answer', t4sd: "Firstweek answers only from Acme's documents. Click the source under the answer to read the passage it came from.",
     t5: 'Ask how many vacation days Nina gets', t5d: "Two of Acme's documents disagree on vacation days. Ask how many Nina gets, and see how the answer handles it.",
-    t6: 'Ask about dogs, then ask Jordan', t6d: 'Nina wants to bring a dog to the office. Ask, then send the question to Jordan, the manager.',
-    t7: "Add Jordan's answer to the handbook", t7d: "Jordan answered. Go back to Omar's laptop and add Jordan's answer to the People handbook, so the next new hire gets it right away.",
+    t6: 'Ask if Nina can bring a dog to the office', t6d: "Nina wants to bring a dog to the office, and none of Acme's documents covers it. Ask, and see what the AI does.",
+    t6j: 'Send the question to Jordan', t6jd: "The AI doesn't guess: it hands the question to a person. Send it to Jordan, Nina's manager. You can edit the message first.",
+    t7: "Add Jordan's answer to the handbook", t7d: "Jordan answered. Add Jordan's answer to the People handbook, so the next new hire gets it right away.",
     doneChip: 'Done', doneT: "Nina's first week is set",
     doneD: "The next new hire who asks about dogs gets Jordan's answer from the handbook, with its source. You did it in {time}.",
     doneDNoTime: "The next new hire who asks about dogs gets Jordan's answer from the handbook, with its source.",
     about: 'About this concept', aProblemH: 'The problem',
     aSource: 'Gartner survey of 4,861 full-time digital workers in the US, UK, India and China, May 2023.', aSourceLink: 'Read it',
     aDecH: 'Design decisions',
-    d1: '<b>Every answer shows its source.</b> Click the number to read the exact passage, and see when it was last updated.',
+    d1: '<b>Every answer shows its source.</b> Click it to read the exact passage, and see when it was last updated.',
     d2: '<b>Documents disagree? It says so.</b> It shows both, and goes with the newer one.',
     d3: "<b>“I don't know” is an answer.</b> When the documents don't cover it, the AI hands you to your manager instead of guessing.",
     d4: '<b>The company owns the steps.</b> The AI drafts the first week from your documents; the People team makes it its own.',
@@ -798,11 +806,11 @@ const STR = {
     askTitle: 'Ask about Acme', askSub: "Answers come only from Acme's documents, with the source.", askPh: 'Ask anything about Acme…', askSend: 'Ask',
     chatEmpty: "Ask about benefits, tools or rules. If Acme's documents don't say, you'll hear that too.",
     suggestH: 'New hires often ask', q1: 'When do I have to pick a health plan?', q2: 'How many vacation days do I get?', q3: 'Can I bring my dog to the office?',
-    searching: "Searching Acme's documents…", sourcesH: 'Sources', citeAria: 'Source {n}: {doc}',
-    a1: 'You have 30 days from your start date to pick one, so until <b>{deadline}</b>. Until then, you are on the basic plan.{c1}',
-    a2: 'You get <b>20 vacation days</b> a year, plus public holidays.{c2}',
+    searching: "Searching Acme's documents…", sourcesH: 'Sources',
+    a1: 'You have 30 days from your start date to pick one, so until <b>{deadline}</b>. Until then, you are on the basic plan.',
+    a2: 'You get <b>20 vacation days</b> a year, plus public holidays.',
     conflictH: 'Two documents disagree', cfOld: 'Older', cfNew: 'Newer · used', cfOldVal: '15 days', cfNewVal: '20 days',
-    cfWhy: 'The People handbook says 15,{c1} but the January 2026 update replaced that section.{c2}',
+    cfWhy: 'The People handbook says 15, but the January 2026 update replaced that section.',
     a3: "I couldn't find anything about dogs in Acme's documents, so I won't guess.", aUnknown: "I couldn't find this in Acme's documents, so I won't guess.",
     a3b: '{manager}, your manager, can tell you.',
     askJordan: 'Ask Jordan', jAsked: 'Sent to Jordan',
@@ -811,9 +819,10 @@ const STR = {
     jReply: 'Yes, on Fridays, if your team agrees. Ask the office manager about the dog-friendly floor.',
     jReplyGeneric: 'Good question. Let me find out, and I’ll get back to you today.',
     goNina: "Go to Nina's laptop", goOmar: "Go to Omar's laptop",
+    goNinaD: "The next step, “{task}”, happens on Nina's laptop.", goOmarD: "The next step, “{task}”, happens on Omar's laptop.",
     mTitle: 'Message {name}', mTo: 'To {name} · {role}', mLabel: 'Message', mDraft: 'Hi {first}! ', mSend: 'Send',
     mNote: 'The answer shows up in Ask about Acme, marked as coming from a person, not a document.',
-    mSent: 'Sent to {first}. The answer will show up here.', mFrom: '{name} · a person, not a document', mToast: '{name} answered.', mSentToast: 'Sent to {first}.',
+    mSentTo: 'To {name}', mSent: 'Sent to {first}. The answer will show up here.', mFrom: '{name} · a person, not a document', mToast: '{name} answered.', mSentToast: 'Sent to {first}.',
     peopleTitle: 'Your people at Acme', peopleSub: "When Acme's documents don't have the answer, Firstweek sends you to the right person.",
     askAbout: 'Ask about', messageTo: 'Message {first}', lunchTag: 'Lunch together on day 2',
     r_jordan_role: 'Your manager · Sales', r_priya_role: 'Your buddy · Sales', r_omar_role: 'People team', r_it_role: '3rd floor',
@@ -841,17 +850,19 @@ const STR = {
     t1: 'Confira o documento da etapa “Configurar a VPN”', t1d: 'Nina Costa entra no time de vendas da Acme na segunda. Omar, do time de Pessoas, está montando a primeira semana da Nina, e a IA fez um rascunho a partir dos documentos da Acme. Clique na fonte da etapa da VPN para ver de onde ela veio.',
     t2: 'Arraste a etapa “Configurar a VPN” para o dia 1', t2d: 'A Nina precisa das ferramentas de vendas desde o dia 1, e elas só abrem na VPN. O menu ⋯ da etapa também funciona.',
     t3: 'Publique a semana para a Nina', t3d: 'A semana está pronta. Publique, e a Nina vê o dia 1 ao entrar na segunda.',
-    t4: 'Pergunte o prazo do plano de saúde', t4d: 'É segunda, o primeiro dia da Nina. Vá para o notebook da Nina, pergunte até quando a Nina precisa escolher um plano de saúde e clique no número da fonte para conferir a resposta.',
+    t4: 'Pergunte o prazo do plano de saúde', t4d: 'É segunda, o primeiro dia da Nina. Pergunte até quando a Nina precisa escolher um plano de saúde.',
+    t4s: 'Clique na fonte para conferir a resposta', t4sd: 'O Firstweek responde só com base nos documentos da Acme. Clique na fonte abaixo da resposta para ler o trecho de onde ela veio.',
     t5: 'Pergunte quantos dias de férias a Nina tem', t5d: 'Dois documentos da Acme discordam sobre os dias de férias. Pergunte quantos a Nina tem e veja como a resposta lida com isso.',
-    t6: 'Pergunte sobre cachorros e chame o Jordan', t6d: 'A Nina quer levar o cachorro para o escritório. Pergunte e depois mande a pergunta para o Jordan, o gestor.',
-    t7: 'Adicione a resposta do Jordan ao manual', t7d: 'O Jordan respondeu. Volte para o notebook do Omar e adicione a resposta do Jordan ao Manual de Pessoas, para a próxima pessoa contratada recebê-la na hora.',
+    t6: 'Pergunte se a Nina pode levar o cachorro para o escritório', t6d: 'A Nina quer levar o cachorro para o escritório, e nenhum documento da Acme fala disso. Pergunte e veja o que a IA faz.',
+    t6j: 'Envie a pergunta para o Jordan', t6jd: 'A IA não chuta: passa a pergunta para uma pessoa. Envie para o Jordan, gestor da Nina. Dá para editar a mensagem antes.',
+    t7: 'Adicione a resposta do Jordan ao manual', t7d: 'O Jordan respondeu. Adicione a resposta do Jordan ao Manual de Pessoas, para a próxima pessoa contratada recebê-la na hora.',
     doneChip: 'Pronto', doneT: 'A primeira semana da Nina está pronta',
     doneD: 'A próxima pessoa contratada que perguntar sobre cachorros recebe a resposta do Jordan pelo manual, com a fonte. Você fez tudo em {time}.',
     doneDNoTime: 'A próxima pessoa contratada que perguntar sobre cachorros recebe a resposta do Jordan pelo manual, com a fonte.',
     about: 'Sobre este conceito', aProblemH: 'O problema',
     aSource: 'Pesquisa Gartner com 4.861 profissionais digitais em tempo integral nos EUA, Reino Unido, Índia e China, mai 2023.', aSourceLink: 'Ler a pesquisa',
     aDecH: 'Decisões de design',
-    d1: '<b>Toda resposta mostra a fonte.</b> Clique no número para ler o trecho exato e ver quando ele foi atualizado.',
+    d1: '<b>Toda resposta mostra a fonte.</b> Clique nela para ler o trecho exato e ver quando ele foi atualizado.',
     d2: '<b>Documentos discordam? A IA avisa.</b> Mostra os dois e fica com o mais novo.',
     d3: '<b>“Não sei” também é resposta.</b> Quando os documentos não cobrem o assunto, a IA leva você ao seu gestor em vez de chutar.',
     d4: '<b>A empresa decide as etapas.</b> A IA faz o rascunho da primeira semana a partir dos documentos; o time de Pessoas deixa do seu jeito.',
@@ -888,11 +899,11 @@ const STR = {
     askTitle: 'Pergunte sobre a Acme', askSub: 'As respostas vêm só dos documentos da Acme, com a fonte.', askPh: 'Pergunte qualquer coisa sobre a Acme…', askSend: 'Perguntar',
     chatEmpty: 'Pergunte sobre benefícios, ferramentas ou regras. Se os documentos da Acme não disserem, você fica sabendo também.',
     suggestH: 'Quem chega costuma perguntar', q1: 'Até quando preciso escolher um plano de saúde?', q2: 'Quantos dias de férias eu tenho?', q3: 'Posso levar meu cachorro para o escritório?',
-    searching: 'Procurando nos documentos da Acme…', sourcesH: 'Fontes', citeAria: 'Fonte {n}: {doc}',
-    a1: 'Você tem 30 dias a partir da data de início para escolher, ou seja, até <b>{deadline}</b>. Até lá, você fica no plano básico.{c1}',
-    a2: 'Você tem <b>20 dias de férias</b> por ano, além dos feriados.{c2}',
+    searching: 'Procurando nos documentos da Acme…', sourcesH: 'Fontes',
+    a1: 'Você tem 30 dias a partir da data de início para escolher, ou seja, até <b>{deadline}</b>. Até lá, você fica no plano básico.',
+    a2: 'Você tem <b>20 dias de férias</b> por ano, além dos feriados.',
     conflictH: 'Dois documentos discordam', cfOld: 'Mais antigo', cfNew: 'Mais novo · usado', cfOldVal: '15 dias', cfNewVal: '20 dias',
-    cfWhy: 'O Manual de Pessoas diz 15,{c1} mas a atualização de janeiro de 2026 substituiu essa seção.{c2}',
+    cfWhy: 'O Manual de Pessoas diz 15, mas a atualização de janeiro de 2026 substituiu essa seção.',
     a3: 'Não achei nada sobre cachorros nos documentos da Acme, então não vou chutar.', aUnknown: 'Não achei isso nos documentos da Acme, então não vou chutar.',
     a3b: '{manager}, seu gestor, pode responder.',
     askJordan: 'Perguntar ao Jordan', jAsked: 'Enviada ao Jordan',
@@ -901,9 +912,10 @@ const STR = {
     jReply: 'Pode sim, às sextas, se o seu time concordar. Fale com a gerência do escritório sobre o andar que aceita cachorros.',
     jReplyGeneric: 'Boa pergunta. Vou descobrir e te respondo hoje.',
     goNina: 'Ir para o notebook da Nina', goOmar: 'Ir para o notebook do Omar',
+    goNinaD: 'A próxima etapa, “{task}”, acontece no notebook da Nina.', goOmarD: 'A próxima etapa, “{task}”, acontece no notebook do Omar.',
     mTitle: 'Mensagem para {name}', mTo: 'Para {name} · {role}', mLabel: 'Mensagem', mDraft: 'Oi, {first}! ', mSend: 'Enviar',
     mNote: 'A resposta aparece em Pergunte sobre a Acme, marcada como vinda de uma pessoa, não de um documento.',
-    mSent: 'Enviada para {first}. A resposta vai aparecer aqui.', mFrom: '{name} · uma pessoa, não um documento', mToast: '{name} respondeu.', mSentToast: 'Enviada para {first}.',
+    mSentTo: 'Para {name}', mSent: 'Enviada para {first}. A resposta vai aparecer aqui.', mFrom: '{name} · uma pessoa, não um documento', mToast: '{name} respondeu.', mSentToast: 'Enviada para {first}.',
     peopleTitle: 'Suas pessoas na Acme', peopleSub: 'Quando os documentos da Acme não têm a resposta, o Firstweek leva você à pessoa certa.',
     askAbout: 'Pergunte sobre', messageTo: 'Falar com {first}', lunchTag: 'Almoço juntos no dia 2',
     r_jordan_role: 'Seu gestor · Vendas', r_priya_role: 'Seu buddy · Vendas', r_omar_role: 'Time de Pessoas', r_it_role: '3º andar',
@@ -1025,9 +1037,11 @@ function markActive() { lastActivity = performance.now(); hintScrollAt = 0; }
 /* ================= GUIDE (outside the product) ================= */
 function currentTask() {
   if (!state.published) return !state.checkedSource ? 't1' : !state.moved ? 't2' : 't3';
-  if (!(state.answered.q1 && state.q1Src)) return 't4';
+  if (!state.answered.q1) return 't4';
+  if (!state.q1Src) return 't4s';
   if (!state.answered.q2) return 't5';
-  if (!state.sentJordan) return 't6';
+  if (!state.answered.q3) return 't6';
+  if (!state.sentJordan) return 't6j';
   if (!state.docAdded) return 't7';
   return 'done';
 }
@@ -1217,20 +1231,24 @@ function whoChip(role) {
   return `<span class="mini-av${role === 'nina' ? ' nina' : ''}" aria-hidden="true">${PEOPLE[role].ini}</span>${t(role === 'nina' ? 'onNina' : 'onOmar')}`;
 }
 function renderGuide() {
-  const task = currentTask();
-  if (state.lastTask !== task) {
-    if (state.lastTask) {
-      announce(task === 'done' ? t('doneT') : `${t('taskOf', { n: TASKS.indexOf(task) + 1, total: TASKS.length })}: ${t(task)}`);
-      guideSwapAt = performance.now();
-    }
-    state.lastTask = task;
-  }
-  const swapAge = performance.now() - guideSwapAt, swap = swapAge < 1000 && !reduceMotion();
-  const idx = task === 'done' ? TASKS.length : TASKS.indexOf(task);
-  const dashes = TASKS.map((_, i) => `<i class="${i < idx ? 'done' : i === idx ? 'now' : ''}"></i>`).join('');
-  const running = state.demo, role = TASK_ROLE[task];
+  const task = currentTask(), running = state.demo, role = TASK_ROLE[task];
   const away = task !== 'done' && !state.switching && state.role !== role;
   const goLabel = t(role === 'nina' ? 'goNina' : 'goOmar');
+  // on the other laptop, going there is the instruction, and the chip says where you are
+  const title = task === 'done' ? t('doneT') : away ? goLabel : t(task);
+  const desc = away ? t(role === 'nina' ? 'goNinaD' : 'goOmarD', { task: t(task) }) : t(task + 'd');
+  const here = away ? state.role : role;
+  const shown = away ? 'go-' + task : task;
+  const idx = task === 'done' ? TASKS.length : TASKS.indexOf(task);
+  if (state.lastTask !== shown) {
+    if (state.lastTask) {
+      announce(task === 'done' ? title : `${t('taskOf', { n: idx + 1, total: TASKS.length })}: ${title}`);
+      guideSwapAt = performance.now();
+    }
+    state.lastTask = shown;
+  }
+  const swapAge = performance.now() - guideSwapAt, swap = swapAge < 1000 && !reduceMotion();
+  const dashes = TASKS.map((_, i) => `<i class="${i < idx ? 'done' : i === idx ? 'now' : ''}"></i>`).join('');
   let card;
   if (task === 'done') {
     const desc = state.finishMs ? t('doneD', { time: fmtTime(state.finishMs) }) : t('doneDNoTime');
@@ -1241,16 +1259,16 @@ function renderGuide() {
         <p class="g-desc">${desc}</p>
         <p class="g-desc" style="color:var(--ice);font-weight:600;margin-bottom:12px">${t('ctaAsk')}</p>
         <div class="g-stack">
-          <a class="g-btn" href="${LINKS.linkedin}" target="_blank" rel="noopener">${t('ctaLinkedIn')}</a>
-          <a class="g-btn ghost" href="${LINKS.portfolio}" target="_blank" rel="noopener">${t('ctaPortfolio')}</a>
+          <a class="g-btn" href="${LINKS.linkedin}" target="_blank" rel="noopener"><span>${icon('linkedin')}${t('ctaLinkedIn')}</span></a>
+          <a class="g-btn ghost" href="${LINKS.portfolio}" target="_blank" rel="noopener"><span>${icon('portfolio')}${t('ctaPortfolio')}</span></a>
         </div>
       </section>`;
   } else {
     card = `
       <section class="g-card" aria-live="polite">
-        <span class="g-chip">${whoChip(role)}</span>
-        <h2 class="g-title">${t(task)}</h2>
-        <p class="g-desc">${t(task + 'd')}</p>
+        <span class="g-chip">${whoChip(here)}</span>
+        <h2 class="g-title">${title}</h2>
+        <p class="g-desc">${desc}</p>
         ${away ? `<button class="g-btn go" type="button" data-action="go-laptop" data-role="${role}">${icon('laptop')}${goLabel}</button>`
           : `<button class="g-btn" type="button" data-action="demo" ${running ? 'aria-disabled="true"' : ''}>${icon('play')}${running ? t('showing') : t('showMe')}</button>
         <p class="g-help">${t('helpRing')}</p>`}
@@ -1273,8 +1291,8 @@ function renderGuide() {
   guide.innerHTML = `
     <div class="g-compact${swap ? ' swap' : ''}"${swap ? ` style="--age:-${Math.round(swapAge)}ms"` : ''}>
       <span class="g-step">${task === 'done' ? '✓' : `${idx + 1}/${TASKS.length}`}</span>
-      <p class="g-ctitle">${task === 'done' ? t('doneT') : t(task)}</p>
-      ${task !== 'done' ? `<span class="g-who">${whoChip(role)}</span>` : ''}
+      <p class="g-ctitle">${title}</p>
+      ${task !== 'done' ? `<span class="g-who">${whoChip(here)}</span>` : ''}
       <p class="g-howto">${t('howTo')}</p>
       ${task === 'done' ? '' : away ? `<button class="g-show-sm go" type="button" data-action="go-laptop" data-role="${role}">${goLabel}</button>`
         : `<button class="g-show-sm" type="button" data-action="demo" ${running ? 'aria-disabled="true"' : ''}>${icon('play')}${running ? t('showing') : t('showMe')}</button>`}
@@ -1286,13 +1304,13 @@ function renderGuide() {
         <div class="c-tools">${themeButton()}${langButton()}</div>
       </div>
       <div class="g-dashes" aria-hidden="true">${dashes}</div>
-      <div class="g-cols">
+      <div class="g-cols${task === 'done' ? ' is-done' : ''}">
+        <div class="g-col">
+          ${about}
+        </div>
         <div class="g-col">
           <p class="g-label">${task === 'done' ? t('doneChip') : t('taskOf', { n: idx + 1, total: TASKS.length })}</p>
           ${card}
-        </div>
-        <div class="g-col">
-          ${about}
           ${foot}
         </div>
       </div>
@@ -1312,11 +1330,13 @@ function ringCandidates() {
       // the ring sits on the card to drag; with its menu open, on day 1
       return state.menu === 'vpn' ? ['[data-action="move-to"][data-step="vpn"][data-day="1"]'] : ['[data-drag="vpn"]'];
     case 't3': return ['[data-action="publish"]'];
-    case 't4': return state.answered.q1 ? ['.msg.ai [data-action="cite"][data-q="q1"]'] : ['[data-action="ask-q"][data-q="q1"]'];
+    case 't4': return ['[data-action="ask-q"][data-q="q1"]'];
+    case 't4s': return ['.msg.ai [data-action="cite"][data-q="q1"]'];
     case 't5': return ['[data-action="ask-q"][data-q="q2"]'];
-    case 't6':
+    case 't6': return state.modal ? [] : ['[data-action="ask-q"][data-q="q3"]'];
+    case 't6j':
       if (state.modal) return state.modal.msgId ? ['[data-action="send-msg"]'] : [];
-      return state.answered.q3 ? ['[data-action="ask-jordan"][data-q="q3"]'] : ['[data-action="ask-q"][data-q="q3"]'];
+      return ['[data-action="ask-jordan"][data-q="q3"]'];
     case 't7': return state.keep === 'later' ? ['[data-action="keep-review"]'] : ['[data-action="keep-add"]'];
   }
   return [];
@@ -1410,11 +1430,10 @@ async function demo() {
       case 't3': await tap('[data-action="publish"]'); break;
       case 't4':
         await onRole('nina'); await toWeek();
-        if (!state.answered.q1) {
-          if (!state.asked.q1) await tap('[data-action="ask-q"][data-q="q1"]');
-          await until(() => state.answered.q1);
-          await wait(500);
-        }
+        if (!state.asked.q1) await tap('[data-action="ask-q"][data-q="q1"]');
+        await until(() => state.answered.q1); break;
+      case 't4s':
+        await onRole('nina'); await toWeek();
         await tap('.msg.ai [data-action="cite"][data-q="q1"]'); break;
       case 't5':
         await onRole('nina'); await toWeek();
@@ -1423,11 +1442,11 @@ async function demo() {
         await until(() => state.answered.q2); break;
       case 't6':
         await onRole('nina'); await toWeek();
-        if (!state.answered.q3) {
-          if (!state.asked.q3) await tap('[data-action="ask-q"][data-q="q3"]');
-          await until(() => state.answered.q3);
-          await wait(500);
-        }
+        if (state.doc) { state.doc = null; renderApp(); await wait(250); }
+        if (!state.asked.q3) await tap('[data-action="ask-q"][data-q="q3"]');
+        await until(() => state.answered.q3); break;
+      case 't6j':
+        await onRole('nina'); await toWeek();
         if (!state.modal) await tap('[data-action="ask-jordan"][data-q="q3"]');
         await wait(600);
         await tap('[data-action="send-msg"]'); break;
@@ -1654,24 +1673,20 @@ function suggestHTML() {
   if (!qs.length) return '';
   return `<div class="suggest"><p class="suggest-h">${t('suggestH')}</p><div class="q-chips">${qs.map(q => `<button class="q-chip" type="button" data-action="ask-q" data-q="${q}">${t(q)}</button>`).join('')}</div></div>`;
 }
-function cite(n, doc, sec, q) {
-  return `<button class="cite" type="button" data-action="cite" data-doc="${doc}" data-sec="${sec}" data-q="${q}" aria-label="${t('citeAria', { n, doc: docTitle(doc) })}">${n}</button>`;
-}
 function sourcesHTML(list, q) {
-  return `<div class="sources"><p class="sources-h">${t('sourcesH')}</p>${list.map(([doc, sec], i) => `<button class="src" type="button" data-action="cite" data-doc="${doc}" data-sec="${sec}" data-q="${q}"><b>${i + 1}</b><span>${docTitle(doc)} · ${monthYear(DOCS[doc].updated)}</span></button>`).join('')}</div>`;
+  return `<div class="sources"><p class="sources-h">${t('sourcesH')}</p>${list.map(([doc, sec]) => `<button class="src" type="button" data-action="cite" data-doc="${doc}" data-sec="${sec}" data-q="${q}">${icon('doc')}<span>${docTitle(doc)} · ${monthYear(DOCS[doc].updated)}</span></button>`).join('')}</div>`;
 }
 function answerHTML(m) {
-  if (m.q === 'q1') return `<p>${t('a1', { deadline: dateShort(HEALTH_DEADLINE).replace(/ /g, ' '), c1: cite(1, 'benefits', 'enroll', 'q1') })}</p>${sourcesHTML([['benefits', 'enroll']], 'q1')}`;
+  if (m.q === 'q1') return `<p>${t('a1', { deadline: dateShort(HEALTH_DEADLINE).replace(/ /g, ' ') })}</p>${sourcesHTML([['benefits', 'enroll']], 'q1')}`;
   if (m.q === 'q2') {
-    const c1 = cite(1, 'handbook', 'vac_old', 'q2'), c2 = cite(2, 'vacation', 'vac_new', 'q2');
-    return `<p>${t('a2', { c2 })}</p>
+    return `<p>${t('a2')}</p>
       <div class="conflict" role="group" aria-label="${t('conflictH')}">
         <p class="conflict-h">${icon('alert')}<span>${t('conflictH')}</span></p>
         <div class="cf-row">
           <div class="cf old"><span class="cf-tag">${t('cfOld')}</span><b>${t('cfOldVal')}</b><span>${docTitle('handbook')} · ${monthYear(DOCS.handbook.updated)}</span></div>
           <div class="cf new"><span class="cf-tag">${icon('check')}${t('cfNew')}</span><b>${t('cfNewVal')}</b><span>${docTitle('vacation')} · ${monthYear(DOCS.vacation.updated)}</span></div>
         </div>
-        <p class="cf-why">${t('cfWhy', { c1, c2 })}</p>
+        <p class="cf-why">${t('cfWhy')}</p>
       </div>
       ${sourcesHTML([['handbook', 'vac_old'], ['vacation', 'vac_new']], 'q2')}`;
   }
@@ -1684,7 +1699,11 @@ function msgHTML(m) {
   const fresh = seenMsgs.has(m.id) ? '' : ' in';
   if (m.kind === 'me') return `<div class="msg me${fresh}"><p>${esc(m.text)}</p></div>`;
   if (m.kind === 'think') return `<div class="msg think${fresh}"><span class="spinner" aria-hidden="true"></span>${t('searching')}</div>`;
-  if (m.kind === 'sent') return `<p class="msg sys${fresh}">${icon('send')}<span>${t('mSent', { first: esc(person(m.to || 'jordan').first) })}</span></p>`;
+  if (m.kind === 'sent') {
+    const to = m.to || 'jordan', text = m.text != null ? m.text : draftFor({ to, msgId: m.msgId });
+    return `<div class="msg me out${fresh}"><p class="to">${t('mSentTo', { name: esc(person(to).name) })}</p><p>${esc(text)}</p></div>
+      <p class="msg sys${fresh}">${icon('send')}<span>${t('mSent', { first: esc(person(to).first) })}</span></p>`;
+  }
   if (m.kind === 'human') {
     const from = m.from || 'jordan', text = !m.generic ? t('jReply') : from === 'jordan' ? t('jReplyGeneric') : t('reply_' + from);
     return `<div class="msg human${fresh}">${avatarHTML(from, true)}<div class="bubble"><p class="from">${t('mFrom', { name: esc(person(from).name) })}</p><p>${text}</p></div></div>`;
@@ -1854,7 +1873,8 @@ function sendMessage() {
   const dog = to === 'jordan' && !!m && m.q === 'q3';
   state.modal = null;
   if (dog) state.sentJordan = true; else if (m) m.sent = true;
-  state.chat.push({ id: ++msgN, kind: 'sent', to });
+  // an untouched draft is rebuilt on render, so it follows a language switch
+  state.chat.push({ id: ++msgN, kind: 'sent', to, msgId, text: state.mEdited ? state.mDraft.trim() : null });
   state.focus = msgId ? '#ask-input' : `[data-action="message"][data-to="${to}"]`;
   renderApp(); renderGuide();
   if (state.ninaTab === 'people') showToast(t('mSentToast', { first: person(to).first }));
