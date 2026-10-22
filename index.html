@@ -2,8 +2,9 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
+<script>try{var m=localStorage.getItem('vm-theme');if(m==='light'||m==='dark')document.documentElement.setAttribute('data-theme',m)}catch(e){}</script>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Firstweek · Prototype 03 · Victor Mascaro</title>
+<title>Firstweek · Prototype 02 · Victor Mascaro</title>
 <meta name="description" content="A prototype you can try: onboarding where the company sets up the first week and new hires get answers only from the company's own documents, with sources. By Victor Mascaro, UX/AI designer.">
 <meta name="theme-color" content="#0A1430">
 <meta property="og:type" content="website">
@@ -33,12 +34,41 @@
   --neon:#4FC3F7; --neon-ink:#06122B; --neon-soft:#102E57; --gold:#FFC83D;
   --dot:rgba(120,170,255,.10); --glow:rgba(79,195,247,.12);
   --card-glow:0 0 48px -4px rgba(79,195,247,.42),0 0 130px -16px rgba(79,195,247,.3);
+  --frame-line:#2B3557; --frame-shade:rgba(0,0,0,.5);
   --f-display:"Bricolage Grotesque","Avenir Next","Segoe UI",system-ui,sans-serif;
   --f-body:"Instrument Sans","Segoe UI",system-ui,-apple-system,"Helvetica Neue",sans-serif;
   --f-mono:"JetBrains Mono",ui-monospace,"SFMono-Regular",Menlo,Consolas,monospace;
   --ease:cubic-bezier(.2,.8,.2,1); --ease-out:cubic-bezier(.16,1,.3,1); --ease-pop:cubic-bezier(.34,1.56,.64,1);
   --card-gap:32px; /* one gap between every block in the concept */
+  --gold-text:#FFC83D; --neon-line:rgba(79,195,247,.35); --track:#24325E; --ok-bg:#103B33; --ok-ink:#7FE0B5; --try-glow:rgba(79,195,247,.6); --ghost-line:rgba(197,208,234,.5);
+  --pop-shadow:0 2px 6px rgba(0,0,0,.4),0 36px 72px -18px rgba(0,0,0,.75);
 }
+/* light theme: the portfolio's light tokens under the same names (the names come from the dark theme).
+   It follows the system unless the sun/moon button made a choice */
+@media (prefers-color-scheme: light){
+  :root:not([data-theme="dark"]){
+    --navy:#EEF3FA; --navy-2:#F8FAFD; --navy-3:#E7EEF8; --navy-line:#D2DCEB; --navy-line-2:#B8C6DC;
+    --ice:#0B1530; --ice-2:#26345A; --ice-muted:#4F5F82;
+    --neon:#0B63C9; --neon-ink:#FFFFFF; --neon-soft:#DCE9FB; --neon-line:rgba(11,99,201,.28);
+    --gold:#F2B705; --gold-text:#7E5600; --dot:rgba(11,21,48,.12); --glow:rgba(11,99,201,.10);
+    --card-glow:0 0 44px -6px rgba(11,99,201,.3),0 0 110px -20px rgba(11,99,201,.22);
+    --track:#D2DCEB; --ok-bg:#DDF3E8; --ok-ink:#0B6B4A; --try-glow:rgba(11,99,201,.35); --ghost-line:#8FA0BF;
+    --pop-shadow:0 2px 6px rgba(11,21,48,.08),0 32px 64px -16px rgba(11,21,48,.3);
+    --frame-line:#C3CEE0; --frame-shade:rgba(11,21,48,.22);
+  }
+}
+:root[data-theme="light"]{
+    --navy:#EEF3FA; --navy-2:#F8FAFD; --navy-3:#E7EEF8; --navy-line:#D2DCEB; --navy-line-2:#B8C6DC;
+    --ice:#0B1530; --ice-2:#26345A; --ice-muted:#4F5F82;
+    --neon:#0B63C9; --neon-ink:#FFFFFF; --neon-soft:#DCE9FB; --neon-line:rgba(11,99,201,.28);
+    --gold:#F2B705; --gold-text:#7E5600; --dot:rgba(11,21,48,.12); --glow:rgba(11,99,201,.10);
+    --card-glow:0 0 44px -6px rgba(11,99,201,.3),0 0 110px -20px rgba(11,99,201,.22);
+    --track:#D2DCEB; --ok-bg:#DDF3E8; --ok-ink:#0B6B4A; --try-glow:rgba(11,99,201,.35); --ghost-line:#8FA0BF;
+    --pop-shadow:0 2px 6px rgba(11,21,48,.08),0 32px 64px -16px rgba(11,21,48,.3);
+    --frame-line:#C3CEE0; --frame-shade:rgba(11,21,48,.22);
+}
+/* the switch reveals the new theme in a circle from the button, as in the portfolio */
+::view-transition-old(root),::view-transition-new(root){animation:none;mix-blend-mode:normal}
 *{box-sizing:border-box}
 html,body{height:100%}
 body{margin:0;color:var(--ice);font:17px/1.6 var(--f-body);-webkit-font-smoothing:antialiased}
@@ -65,19 +95,48 @@ body{overflow:auto;background:radial-gradient(var(--dot) 1px,transparent 1.3px) 
 .lang-flag{width:20px;height:14px;object-fit:cover;object-position:left center;border-radius:3px;box-shadow:0 0 0 1px var(--navy-line);flex:none}
 .lang-code{font-family:var(--f-mono);font-size:.74rem;font-weight:700;letter-spacing:.04em}
 .flag-br:not(:lang(pt-BR)),.flag-us:lang(pt-BR){display:none}
+/* theme button, as in the portfolio: a sun in light, a moon in dark */
+.c-tools{display:flex;gap:8px}
+.tool.icon{width:38px;padding:0;justify-content:center}
+.tool.icon svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;animation:iconIn .5s var(--ease-pop)}
+.i-moon{display:none}
+:root[data-theme="dark"] .i-sun{display:none}
+:root[data-theme="dark"] .i-moon{display:block}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]) .i-sun{display:none}
+  :root:not([data-theme="light"]) .i-moon{display:block}
+}
+@keyframes iconIn{from{opacity:0;transform:rotate(-90deg) scale(.5)}}
 .stage{grid-area:stage;position:relative;display:flex;flex-direction:column;gap:12px;min-width:0;min-height:0}
 .mini-av{display:inline-grid;place-items:center;width:22px;height:22px;border-radius:50%;background:#FDE7D9;color:#8A3B12;font-size:10px;font-weight:700}
 .mini-av.nina{background:#E2EEFF;color:#1D4E9E}
 /* the browser window: Firstweek is a desktop web app */
-.browser{position:relative;flex:1;min-height:0;display:flex;flex-direction:column;border-radius:14px;overflow:hidden;background:#E3E5EC;box-shadow:0 0 0 1px #2B3557,0 40px 90px rgba(0,0,0,.5),var(--card-glow)}
-/* Try it: the window's glow swells once and settles, to say "over here" */
-.browser.look{animation:look 1.3s ease-in-out}
-@keyframes look{35%{box-shadow:0 0 0 2px var(--neon),0 40px 90px rgba(0,0,0,.5),0 0 64px 4px rgba(79,195,247,.7),0 0 160px 10px rgba(79,195,247,.4)}}
+.browser{position:relative;flex:1;min-height:0;display:flex;flex-direction:column;border-radius:6px;overflow:hidden;background:#E3E5EC}
+/* each person's laptop: Omar's a dark Mac-style one with a camera notch and a space-gray base,
+   Nina's a light silver one with a deeper chin and a silver base; the bezel changes with the switch */
+.laptop{position:relative;flex:1;min-height:0;display:flex;flex-direction:column;align-items:center;
+  --bz:12px;--bz-top:14px;--bz-bottom:12px;--bz-r:18px;--bz-bg:#0E0F12;--bz-edge:#2B2E36;--deck:linear-gradient(#5B5F69,#2B2E35);--deck-r:0 0 16px 16px}
+.laptop.is-nina{--bz:14px;--bz-bottom:30px;--bz-r:12px;--bz-bg:#EEF1F6;--bz-edge:#C9D0DC;--deck:linear-gradient(#E6EAF0,#B7BFCB);--deck-r:0 0 10px 10px}
+.lid{position:relative;flex:1;min-height:0;width:100%;display:flex;flex-direction:column;padding:var(--bz-top) var(--bz) var(--bz-bottom);border-radius:var(--bz-r) var(--bz-r) 5px 5px;background:var(--bz-bg);box-shadow:inset 0 0 0 1px var(--bz-edge),0 0 0 1px var(--frame-line),0 40px 90px var(--frame-shade),var(--card-glow);transition:background-color .45s,padding .45s,border-radius .45s}
+/* Try it: the laptop's glow swells once and settles, to say "over here" */
+.lid.look{animation:look 1.3s ease-in-out}
+@keyframes look{35%{box-shadow:inset 0 0 0 1px var(--bz-edge),0 0 0 2px var(--neon),0 40px 90px var(--frame-shade),0 0 64px 4px rgba(79,195,247,.7),0 0 160px 10px rgba(79,195,247,.4)}}
+/* the camera: a notch on Omar's, a small dot on Nina's */
+.cam{position:absolute;z-index:2;top:0;left:50%;width:96px;height:12px;margin-left:-48px;border-radius:0 0 8px 8px;background:var(--bz-bg)}
+.cam::after{content:"";position:absolute;left:50%;top:3px;width:5px;height:5px;margin-left:-2.5px;border-radius:50%;background:#2A3346}
+.is-nina .cam{top:5px;width:5px;height:5px;margin-left:-2.5px;border-radius:50%;background:#7B8496}
+.is-nina .cam::after{display:none}
+/* Nina's chin carries a small maker's mark */
+.chin-mark{position:absolute;left:50%;bottom:11px;width:34px;height:7px;margin-left:-17px;border-radius:4px;background:#C3CAD6;opacity:0;transition:opacity .3s}
+.is-nina .chin-mark{opacity:1}
+.deck{position:relative;flex:none;width:104%;height:14px;border-radius:var(--deck-r);background:var(--deck);box-shadow:0 20px 40px var(--frame-shade)}
+.deck::before{content:"";position:absolute;left:50%;top:0;width:14%;height:5px;transform:translateX(-50%);border-radius:0 0 6px 6px;background:rgba(0,0,0,.28)}
+.is-nina .deck::before{width:18%;height:4px;background:rgba(0,0,0,.12)}
 /* each laptop is its own computer: Omar's a dark Mac-style window, Nina's a light blue Windows-style one,
    each with its own other tab open and its owner's avatar */
-.browser{--chrome:#DADDE6;--chrome-line:#C9CDD8;--tab-bg:var(--bg);--tab-ink:#30343C;--tab-dim:#5A5F6B;--url-bg:#F2F3F7;--url-ink:#4B4F5C}
-.browser.is-omar{--chrome:#2A2D35;--chrome-line:#16171C;--tab-bg:#3B3F4A;--tab-ink:#F2F3F7;--tab-dim:#A3A8B5;--url-bg:#1C1E24;--url-ink:#C9CDD8}
-.browser.is-nina{--chrome:#DCE6F7;--chrome-line:#C3D1EC;--tab-bg:#FFFFFF;--tab-ink:#1D2A44;--tab-dim:#55627E;--url-bg:#FFFFFF;--url-ink:#3B4A66}
+.laptop{--chrome:#DADDE6;--chrome-line:#C9CDD8;--tab-bg:var(--bg);--tab-ink:#30343C;--tab-dim:#5A5F6B;--url-bg:#F2F3F7;--url-ink:#4B4F5C}
+.laptop.is-omar{--chrome:#2A2D35;--chrome-line:#16171C;--tab-bg:#3B3F4A;--tab-ink:#F2F3F7;--tab-dim:#A3A8B5;--url-bg:#1C1E24;--url-ink:#C9CDD8}
+.laptop.is-nina{--chrome:#DCE6F7;--chrome-line:#C3D1EC;--tab-bg:#FFFFFF;--tab-ink:#1D2A44;--tab-dim:#55627E;--url-bg:#FFFFFF;--url-ink:#3B4A66}
 .b-bar{flex:none;display:flex;align-items:flex-end;gap:10px;height:42px;padding:0 14px;background:var(--chrome);border-bottom:1px solid var(--chrome-line);transition:background-color .4s,border-color .4s}
 .b-dots{display:flex;gap:7px;align-self:center}
 .b-dots i{width:12px;height:12px;border-radius:50%;background:#FF5F57}
@@ -124,13 +183,13 @@ body{overflow:auto;background:radial-gradient(var(--dot) 1px,transparent 1.3px) 
 /* the problem sits on the page, no box: the gold label, one number, then what it means.
    Only the solution is a card, so it's the one thing that stands out */
 .c-problem{margin:0 0 var(--card-gap)}
-.c-problem .c-label{display:flex;align-items:center;gap:8px;margin:0 0 14px;color:var(--gold)}
+.c-problem .c-label{display:flex;align-items:center;gap:8px;margin:0 0 14px;color:var(--gold-text)}
 .c-problem .c-label svg.i{width:16px;height:16px}
 /* every prototype's problem has a number: it leads, large and gold, beside the sentence it counts.
    The number is exactly two lines tall: in Bricolage, digits and ascenders are .70 of the font size,
    so the number is (1.28 + .70) / .70 = 2.83 × the sentence's size, and its margin lines its top up with the first line */
 .c-stat{--p-fs:clamp(19px,.95rem + .5vw,23px);display:flex;align-items:flex-start;gap:18px}
-.c-num{flex:none;margin:calc(2px - var(--p-fs) * .1) 0 0;font:650 calc(var(--p-fs) * 2.83)/1 var(--f-display);letter-spacing:-.035em;color:var(--gold);font-variation-settings:"opsz" 96}
+.c-num{flex:none;margin:calc(2px - var(--p-fs) * .1) 0 0;font:650 calc(var(--p-fs) * 2.83)/1 var(--f-display);letter-spacing:-.035em;color:var(--gold-text);font-variation-settings:"opsz" 96}
 .c-problem-txt{margin:2px 0 0;font:650 var(--p-fs)/1.28 var(--f-display);letter-spacing:-.015em;color:var(--ice)}
 /* the source belongs to the claim, so it sits right under it, from the number's left edge */
 .c-source{margin:10px 0 0;font-size:13px;line-height:1.5;color:var(--ice-muted)}
@@ -141,7 +200,7 @@ body{overflow:auto;background:radial-gradient(var(--dot) 1px,transparent 1.3px) 
 .c-spot::after{z-index:1;padding:1.5px;background:radial-gradient(260px circle at var(--sx) var(--sy),var(--spot),transparent 70%);-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude}
 .c-spot:hover::before,.c-spot:hover::after{opacity:1}
 /* the solution is the highlight of the page: the only card, flat blue with a thin blue border */
-.c-solution{margin:0 0 var(--card-gap);padding:24px 24px 26px;border-radius:22px;background:var(--neon-soft);border:1px solid rgba(79,195,247,.35)}
+.c-solution{margin:0 0 var(--card-gap);padding:24px 24px 26px;border-radius:22px;background:var(--neon-soft);border:1px solid var(--neon-line)}
 .c-solution .c-label{display:flex;align-items:center;gap:8px;margin:0 0 12px;color:var(--neon)}
 .c-solution .c-label svg.i{width:16px;height:16px}
 .c-why{margin:0;font:600 clamp(19px,.95rem + .55vw,24px)/1.36 var(--f-display);letter-spacing:-.015em;color:var(--ice-2)}
@@ -149,7 +208,7 @@ body{overflow:auto;background:radial-gradient(var(--dot) 1px,transparent 1.3px) 
 .c-why b{font-weight:700;color:var(--neon)}
 /* try it: points at the window; a click shows the next step there right away */
 .c-try{display:flex;align-items:center;gap:16px;width:100%;margin:0 0 var(--card-gap);padding:16px 16px 16px 20px;border:0;border-radius:14px;background:var(--neon);color:var(--neon-ink);text-align:left;cursor:pointer;box-shadow:inset 0 -2px 0 rgba(0,0,0,.18);transition:transform .18s var(--ease),box-shadow .18s}
-.c-try:hover{transform:translateY(-2px);box-shadow:inset 0 -2px 0 rgba(0,0,0,.18),0 12px 30px -10px rgba(79,195,247,.6)}
+.c-try:hover{transform:translateY(-2px);box-shadow:inset 0 -2px 0 rgba(0,0,0,.18),0 12px 30px -10px var(--try-glow)}
 .c-try:active{transform:scale(.98);transition-duration:.08s}
 .c-try-txt{flex:1;font-size:15px;line-height:1.45;font-weight:500}
 .c-try strong{display:block;margin-bottom:2px;font:700 20px/1.2 var(--f-display);letter-spacing:-.01em}
@@ -173,7 +232,7 @@ body{overflow:auto;background:radial-gradient(var(--dot) 1px,transparent 1.3px) 
 .g-full .c-cta p{font-size:19px}
 .g-full .c-cta-q{--ic:22px}
 .c-cta .row{display:flex;flex-wrap:wrap;gap:10px}
-.c-cta .g-btn{width:auto;flex:1 1 180px;padding:10px 18px;line-height:1.25;text-align:center}
+.c-cta .g-btn{width:auto;flex:1 1 auto;padding:10px 18px;line-height:1.25;text-align:center;white-space:nowrap}
 /* the icon sits inline at the start of the label, so a label that wraps keeps it on the first line */
 .c-cta .g-btn svg.i{display:inline-block;width:18px;height:18px;margin-right:8px;vertical-align:middle;fill:none;stroke-width:2}
 
@@ -183,7 +242,7 @@ body{overflow:auto;background:radial-gradient(var(--dot) 1px,transparent 1.3px) 
 .g-compact{display:flex;align-items:center;gap:10px;min-height:56px;padding:6px 8px 6px 12px;background:var(--navy-2);border:1px solid var(--navy-line);border-radius:14px;transition:border-radius .15s}
 /* open, the bar and the panel are one card: the bar squares off at the bottom and the panel grows out of it */
 .guide.open .g-compact{border-radius:14px 14px 0 0}
-.g-step{flex:none;padding:3px 8px;border-radius:7px;background:var(--neon-soft);border:1px solid rgba(79,195,247,.45);color:var(--neon);font:700 12px/1.4 var(--f-mono)}
+.g-step{flex:none;padding:3px 8px;border-radius:7px;background:var(--neon-soft);border:1px solid var(--neon-line);color:var(--neon);font:700 12px/1.4 var(--f-mono)}
 .g-who{flex:none;display:inline-flex;align-items:center;gap:6px;padding:3px 10px 3px 4px;border-radius:999px;background:var(--navy-3);font-size:12.5px;font-weight:600;color:var(--ice-2);white-space:nowrap}
 .g-ctitle{flex:1;min-width:0;margin:0;font:650 16px/1.3 var(--f-display);letter-spacing:-.01em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .g-show-sm{flex:none;display:inline-flex;align-items:center;gap:6px;min-height:40px;padding:0 14px;border:0;border-radius:10px;background:var(--neon);color:var(--neon-ink);font-size:14px;font-weight:600;cursor:pointer;box-shadow:inset 0 -2px 0 rgba(0,0,0,.18)}
@@ -194,7 +253,7 @@ body{overflow:auto;background:radial-gradient(var(--dot) 1px,transparent 1.3px) 
 .guide.open .g-expand svg{transform:rotate(180deg)}
 .guide.opening .g-expand svg{animation:turn .35s var(--ease-pop)}
 @keyframes turn{from{transform:none}}
-.g-full{display:none;position:absolute;top:100%;left:0;width:min(520px,100%);max-height:calc(100dvh - 140px);overflow-y:auto;flex-direction:column;gap:16px;padding:16px 18px;background:var(--navy-2);border:1px solid var(--navy-line);border-top:0;border-radius:0 0 14px 14px;box-shadow:0 2px 6px rgba(0,0,0,.4),0 36px 72px -18px rgba(0,0,0,.75);scrollbar-width:none}
+.g-full{display:none;position:absolute;top:100%;left:0;width:min(520px,100%);max-height:calc(100dvh - 140px);overflow-y:auto;flex-direction:column;gap:16px;padding:16px 18px;background:var(--navy-2);border:1px solid var(--navy-line);border-top:0;border-radius:0 0 14px 14px;box-shadow:var(--pop-shadow);scrollbar-width:none}
 .g-full .g-card{padding:0;background:none;border:0;border-radius:0}
 .g-full::-webkit-scrollbar{display:none}
 /* the panel unfolds from the bar and folds back up; while it's open the bar is just its header */
@@ -213,13 +272,13 @@ body{overflow:auto;background:radial-gradient(var(--dot) 1px,transparent 1.3px) 
 .g-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
 .g-name{margin:0;font:700 22px/1.2 var(--f-display);letter-spacing:-.02em}
 .g-dashes{display:flex;gap:5px}
-.g-dashes i{flex:1;height:4px;border-radius:2px;background:#24325E}
+.g-dashes i{flex:1;height:4px;border-radius:2px;background:var(--track)}
 .g-dashes i.done{background:var(--neon)}
-.g-dashes i.now{background:linear-gradient(90deg,var(--neon) 50%,#24325E 50%)}
+.g-dashes i.now{background:linear-gradient(90deg,var(--neon) 50%,var(--track) 50%)}
 .g-label{margin:0;font:600 .72rem/1.3 var(--f-mono);letter-spacing:.1em;text-transform:uppercase;color:var(--ice-muted)}
 .g-card{padding:18px;border-radius:14px;background:var(--navy-2);border:1px solid var(--navy-line)}
 .g-chip{display:inline-flex;align-items:center;gap:6px;padding:3px 10px 3px 4px;border-radius:999px;background:var(--navy-3);font-size:12.5px;font-weight:600;color:var(--ice)}
-.g-chip.ok{padding-left:10px;background:#103B33;color:#7FE0B5}
+.g-chip.ok{padding-left:10px;background:var(--ok-bg);color:var(--ok-ink)}
 .g-chip svg.i{width:16px;height:16px}
 .g-title{margin:12px 0 8px;font:700 23px/1.15 var(--f-display);letter-spacing:-.02em}
 .g-desc{margin:0 0 16px;font-size:15px;line-height:1.55;color:var(--ice-2)}
@@ -231,10 +290,14 @@ body{overflow:auto;background:radial-gradient(var(--dot) 1px,transparent 1.3px) 
 .g-btn:not(.ghost)::after,.g-show-sm::after{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(105deg,transparent 35%,rgba(255,255,255,.28) 50%,transparent 65%);transform:translateX(-110%)}
 .g-btn:not(.ghost):hover::after,.g-show-sm:hover::after{transform:translateX(110%);transition:transform .75s var(--ease-out)}
 .g-btn svg.i{width:16px;height:16px;fill:currentColor}
-.g-btn.ghost{background:transparent;color:var(--ice);border-color:var(--navy-line-2);box-shadow:none}
+.g-btn.ghost{background:transparent;color:var(--ice);border-color:var(--ghost-line);box-shadow:none}
 .g-btn.ghost:hover{border-color:var(--ice);background:var(--navy-2)}
 .g-btn[aria-disabled="true"],.g-show-sm[aria-disabled="true"]{opacity:.75;cursor:progress;transform:none;background-image:linear-gradient(100deg,transparent 30%,rgba(255,255,255,.55) 50%,transparent 70%);background-size:200% 100%;animation:shimmer 1.1s linear infinite}
 @keyframes shimmer{to{background-position:-200% 0}}
+/* on the wrong laptop, the steps bar's button takes you to the right one, with a slow glow to say "this first" */
+.g-btn.go,.g-show-sm.go{animation:goGlow 1.8s ease-in-out infinite}
+.g-btn.go svg.i{fill:none;stroke-width:2;width:18px;height:18px}
+@keyframes goGlow{50%{box-shadow:inset 0 -2px 0 rgba(0,0,0,.18),0 0 0 4px var(--neon-soft),0 0 22px 2px rgba(79,195,247,.45)}}
 .g-help{margin:10px 0 0;font-size:13px;line-height:1.45;color:var(--ice-muted);text-align:center}
 .g-stack{display:flex;flex-direction:column;gap:10px}
 .g-about{border:1px solid var(--navy-line);border-radius:14px}
@@ -266,7 +329,7 @@ body{overflow:auto;background:radial-gradient(var(--dot) 1px,transparent 1.3px) 
 .boot .c-eyebrow::before{animation:spinIn .8s var(--ease-pop) .2s backwards}
 .boot .c-title .w{animation:wordUp .95s var(--ease-out) backwards;animation-delay:calc(.12s + var(--wi,0) * 55ms)}
 .boot .concept>:nth-child(n+3){animation:rise .8s var(--ease-out) backwards;animation-delay:calc(.35s + var(--i,0) * 80ms)}
-.boot .browser{animation:winIn 1s var(--ease-out) .25s backwards}
+.boot .laptop{animation:winIn 1s var(--ease-out) .25s backwards}
 /* the steps bar when the task changes (--age keeps it smooth across re-renders) */
 .g-compact.swap{animation:glow 1s var(--ease-out) var(--age,0s)}
 .g-compact.swap .g-step{animation:pop .5s var(--ease-pop) var(--age,0s) backwards}
@@ -336,7 +399,7 @@ h1:focus,h2:focus{outline:none}
 .spinner{width:16px;height:16px;flex:none;border:2.5px solid #D6D3EA;border-top-color:var(--brand);border-radius:50%;animation:spin .8s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
 /* where an AI-drafted step came from: a source chip (a person-added step says so instead) */
-.src{display:inline-flex;align-items:flex-start;gap:5px;max-width:100%;padding:3px 9px 3px 7px;border:0;border-radius:999px;background:var(--brand-soft);color:var(--brand-ink);font-size:12px;font-weight:600;line-height:1.4;text-align:left;cursor:pointer;transition:background-color .15s}
+.src{display:inline-flex;align-items:flex-start;gap:5px;max-width:100%;padding:3px 9px 3px 7px;border:0;border-radius:7px;background:var(--brand-soft);color:var(--brand-ink);font-size:12px;font-weight:600;line-height:1.4;text-align:left;cursor:pointer;transition:background-color .15s}
 .src:hover{background:#E2DBFD}
 .src svg.i{width:14px;height:14px;margin-top:calc((1.4em - 14px) / 2)}
 .src b{font-weight:700}
@@ -379,7 +442,7 @@ h1:focus,h2:focus{outline:none}
 .add-form .input{min-height:38px;font-size:14px}
 .ideas-h{margin:0;color:var(--muted);font-size:12px;font-weight:600}
 .ideas{display:flex;flex-wrap:wrap;gap:6px}
-.idea{padding:4px 10px;border:1px solid var(--line-strong);border-radius:999px;background:var(--surface);font-size:12.5px;font-weight:600;cursor:pointer;text-align:left}
+.idea{padding:4px 10px;border:1px solid var(--line-strong);border-radius:8px;background:var(--surface);font-size:12.5px;font-weight:600;cursor:pointer;text-align:left}
 .idea:hover{border-color:var(--brand);color:var(--brand-ink)}
 .add-row{display:flex;gap:6px}
 .add-row .btn{flex:1;padding:0 8px}
@@ -508,12 +571,32 @@ mark{padding:1px 2px;border-radius:3px;background:var(--brand-soft);color:inheri
 .suggest{padding:0 20px 10px}
 .suggest-h{margin:0 0 6px;color:var(--muted);font-size:12px;font-weight:700}
 .q-chips{display:flex;flex-wrap:wrap;gap:6px}
-.q-chip{padding:7px 12px;border:1.5px solid var(--line-strong);border-radius:999px;background:var(--surface);font-size:13.5px;font-weight:600;text-align:left;cursor:pointer;transition:border-color .15s,color .15s,transform .12s}
+.q-chip{padding:7px 12px;border:1.5px solid var(--line-strong);border-radius:10px;background:var(--surface);font-size:13.5px;font-weight:600;text-align:left;cursor:pointer;transition:border-color .15s,color .15s,transform .12s}
 .q-chip:hover{border-color:var(--brand);color:var(--brand-ink)}
 .q-chip:active{transform:scale(.97)}
 .ask-form{display:flex;gap:8px;padding:12px 20px 16px;border-top:1px solid var(--line)}
 .ask-form .btn{flex:none;width:44px;padding:0}
-/* the message to Jordan, inside the window */
+/* Nina's People tab: who to ask about what */
+.people-body{overflow-y:auto}
+.people{flex:1;padding:22px}
+.people h1{margin:0;font-size:24px;line-height:1.25;letter-spacing:-.015em}
+.people-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px;margin:18px 0 0;padding:0;list-style:none}
+.person{display:flex;flex-direction:column;align-items:flex-start;gap:10px;padding:16px;border:1px solid var(--line);border-radius:14px;background:var(--surface);animation:rise .35s var(--ease-out) backwards}
+.person:nth-child(2){animation-delay:.05s}
+.person:nth-child(3){animation-delay:.1s}
+.person:nth-child(4){animation-delay:.15s}
+.pp-top{display:flex;align-items:center;gap:12px}
+.pp-name{margin:0;font-size:15.5px;font-weight:700}
+.pp-role{margin:0;color:var(--muted);font-size:13.5px}
+.pp-about{flex:1;margin:0;font-size:14px}
+.pp-about b{color:var(--muted);font-weight:600}
+.pp-tag{display:flex;align-items:flex-start;gap:6px;margin:0;padding:4px 9px;border-radius:7px;background:var(--human-soft);color:var(--human);font-size:12.5px;font-weight:600}
+.pp-tag svg.i{width:14px;height:14px;margin-top:calc((1.5em - 14px) / 2)}
+.avatar.priya{background:#FBE3EF;color:#8E2A5C}
+.avatar.it{background:#E6E8EE;color:#3B4152}
+.avatar.it svg.i{width:18px;height:18px}
+.avatar.it.sm svg.i{width:15px;height:15px}
+/* a message to anyone, inside the window */
 .modal-layer{position:absolute;inset:0;z-index:30;display:grid;place-items:center;padding:16px;background:rgba(14,16,32,.42);animation:fade .2s}
 .modal{width:min(460px,100%);padding:20px;border-radius:16px;background:var(--surface);box-shadow:0 24px 60px rgba(0,0,0,.3);animation:modalIn .25s var(--ease-out)}
 @keyframes modalIn{from{opacity:0;transform:translateY(12px) scale(.98)}}
@@ -575,8 +658,10 @@ mark{padding:1px 2px;border-radius:3px;background:var(--brand-soft);color:inheri
   .guide.open .g-compact{border-radius:0}
   .g-full .g-head{display:flex}
   .g-full .g-about,.g-full .g-cta{display:block}
-  .browser{border-radius:0;box-shadow:none}
-  .boot .browser{animation:none}
+  .lid{padding:0;border-radius:0;background:none;box-shadow:none}
+  .cam,.chin-mark,.deck{display:none}
+  .browser{border-radius:0}
+  .boot .laptop{animation:none}
   .b-bar{display:none}
 }
 @media (prefers-reduced-motion:reduce){
@@ -590,14 +675,21 @@ mark{padding:1px 2px;border-radius:3px;background:var(--brand-soft);color:inheri
   <section class="concept" id="intro" aria-labelledby="intro-title"></section>
   <main class="stage" id="stage">
     <aside class="guide" id="guide" aria-label="How to try this prototype"></aside>
-    <div class="browser" id="browser">
-      <div class="b-bar" id="b-bar" aria-hidden="true"></div>
-      <div class="screen" id="screen">
-        <div class="app" id="app" role="region" aria-label="Firstweek"></div>
-        <div class="toast" id="toast" aria-hidden="true"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg><span></span></div>
-        <div class="switch-layer" id="switch" aria-hidden="true"></div>
-        <div class="ring" id="ring" aria-hidden="true"></div>
+    <div class="laptop is-omar" id="laptop">
+      <div class="lid">
+        <span class="cam" aria-hidden="true"></span>
+        <div class="browser" id="browser">
+          <div class="b-bar" id="b-bar" aria-hidden="true"></div>
+          <div class="screen" id="screen">
+            <div class="app" id="app" role="region" aria-label="Firstweek"></div>
+            <div class="toast" id="toast" aria-hidden="true"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg><span></span></div>
+            <div class="switch-layer" id="switch" aria-hidden="true"></div>
+            <div class="ring" id="ring" aria-hidden="true"></div>
+          </div>
+        </div>
+        <span class="chin-mark" aria-hidden="true"></span>
       </div>
+      <div class="deck" aria-hidden="true"></div>
     </div>
   </main>
 </div>
@@ -623,6 +715,13 @@ const TASKS = ['t1', 't2', 't3', 't4', 't5', 't6', 't7'];
 const TASK_ROLE = { t1: 'omar', t2: 'omar', t3: 'omar', t4: 'nina', t5: 'nina', t6: 'nina', t7: 'omar', done: 'omar' };
 // everyone here is fictional
 const PEOPLE = { omar: { ini: 'OH', name: 'Omar Haddad' }, nina: { ini: 'NC', name: 'Nina Costa' }, jordan: { ini: 'JL', name: MANAGER } };
+// Nina's People tab: who to ask about what (all fictional); the IT desk is a team, so its name translates
+const DIR = [
+  { id: 'jordan', ini: 'JL', name: MANAGER, first: 'Jordan' },
+  { id: 'priya', ini: 'PN', name: 'Priya Nair', first: 'Priya' },
+  { id: 'omar', ini: 'OH', name: 'Omar Haddad', first: 'Omar' },
+  { id: 'it', ini: 'IT' }
+];
 const reduceMotion = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 const isMobile = () => window.matchMedia('(max-width: 899px)').matches;
 
@@ -630,23 +729,23 @@ const isMobile = () => window.matchMedia('(max-width: 899px)').matches;
 const STR = {
   en: {
     guideLabel: 'How to try this prototype', howTo: 'How to try it',
-    cEyebrow: 'Prototype 03 · Firstweek', cTitleA: 'Onboarding', cTitleB: 'that cites its sources', aSourceLabel: 'Source:',
+    cEyebrow: 'Prototype 02 · Firstweek', cTitleA: 'Onboarding', cTitleB: 'that cites its sources', aSourceLabel: 'Source:',
     cWhy: "How might we give new hires <b>answers they can trust</b>, straight from the company's own documents, and a person when the documents don't know?",
     cTryH: 'Try it', cTry: "Set up Nina's first week as Omar, then ask questions as Nina.", cSolH: 'The solution',
     problemNum: '47%', problemText: 'of digital workers struggle to find the information they need to do their jobs.',
     protoName: 'Firstweek',
-    langCode: 'EN', langLabel: 'EN, switch to Portuguese',
+    langCode: 'EN', langLabel: 'EN, switch to Portuguese', themeDark: 'Switch to dark theme', themeLight: 'Switch to light theme',
     taskOf: 'Task {n} of {total}', onOmar: "On Omar's laptop", onNina: "On Nina's laptop",
     showMe: 'Show me', showing: 'Showing…',
     helpRing: 'or do it yourself in the window: click where the blue outline appears.',
     expand: 'Show the instructions', collapse: 'Hide the instructions',
-    t1: "Check the AI's draft", t1d: "Nina Costa joins Acme's sales team on Monday. Omar, on the People team, is setting up Nina's first week, and the AI drafted it from Acme's documents. Click the VPN step's source to see where it came from.",
-    t2: 'Make it your own', t2d: 'Nina needs the sales tools from day 1, and they only open on the VPN. Move the VPN step to day 1, then add a lunch with a buddy on day 2.',
-    t3: 'Publish it to Nina', t3d: 'The week is ready. Publish it, and Nina sees day 1 when logging in on Monday.',
-    t4: 'Ask a question', t4d: "It's Monday, on Nina's laptop. Ask when Nina has to pick a health plan, then click the source number to check the answer.",
-    t5: 'Ask about vacation', t5d: "Two of Acme's documents disagree on vacation days. Ask how many Nina gets, and see how the answer handles it.",
-    t6: "Ask what the documents don't cover", t6d: 'Nina wants to bring a dog to the office. Ask, then send the question to Jordan, the manager.',
-    t7: 'Keep the answer', t7d: "Jordan answered, and it's back to Omar's laptop. Add Jordan's answer to the People handbook, so the next new hire gets it right away.",
+    t1: 'See where the VPN step came from', t1d: "Nina Costa joins Acme's sales team on Monday. Omar, on the People team, is setting up Nina's first week, and the AI drafted it from Acme's documents. Click the VPN step's source to see where it came from.",
+    t2: 'Move the VPN to day 1, add a lunch', t2d: 'Nina needs the sales tools from day 1, and they only open on the VPN. Move the VPN step to day 1, then add a lunch with a buddy on day 2.',
+    t3: 'Publish the week to Nina', t3d: 'The week is ready. Publish it, and Nina sees day 1 when logging in on Monday.',
+    t4: 'Ask when to pick a health plan', t4d: "It's Monday, Nina's first day. Go to Nina's laptop, ask when Nina has to pick a health plan, then click the source number to check the answer.",
+    t5: 'Ask how many vacation days Nina gets', t5d: "Two of Acme's documents disagree on vacation days. Ask how many Nina gets, and see how the answer handles it.",
+    t6: 'Ask about dogs, then ask Jordan', t6d: 'Nina wants to bring a dog to the office. Ask, then send the question to Jordan, the manager.',
+    t7: "Add Jordan's answer to the handbook", t7d: "Jordan answered. Go back to Omar's laptop and add Jordan's answer to the People handbook, so the next new hire gets it right away.",
     doneChip: 'Done', doneT: "Nina's first week is set",
     doneD: "The next new hire who asks about dogs gets Jordan's answer from the handbook, with its source. You did it in {time}.",
     doneDNoTime: "The next new hire who asks about dogs gets Jordan's answer from the handbook, with its source.",
@@ -698,13 +797,21 @@ const STR = {
     a3: "I couldn't find anything about dogs in Acme's documents, so I won't guess.", aUnknown: "I couldn't find this in Acme's documents, so I won't guess.",
     a3b: '{manager}, your manager, can tell you.',
     askJordan: 'Ask Jordan', jAsked: 'Sent to Jordan',
-    jTitle: 'Ask {manager}', jTo: 'To {manager} · your manager', jMsgLabel: 'Message',
     jMsg: "Hi Jordan! Can I bring my dog to the office? I couldn't find it in Acme's documents. Thanks, Nina",
     jMsgOther: "Hi Jordan! “{q}” I couldn't find it in Acme's documents. Thanks, Nina",
-    jNote: "Jordan's answer shows up here, marked as coming from a person, not a document.",
-    jSend: 'Send', jSent: 'Sent to Jordan. The answer will show up here.',
-    jFrom: 'Jordan Lee · a person, not a document', jReply: 'Yes, on Fridays, if your team agrees. Ask the office manager about the dog-friendly floor.',
-    jReplyGeneric: 'Good question. Let me find out, and I’ll get back to you today.', jToast: '{manager} answered.',
+    jReply: 'Yes, on Fridays, if your team agrees. Ask the office manager about the dog-friendly floor.',
+    jReplyGeneric: 'Good question. Let me find out, and I’ll get back to you today.',
+    goNina: "Go to Nina's laptop", goOmar: "Go to Omar's laptop",
+    mTitle: 'Message {name}', mTo: 'To {name} · {role}', mLabel: 'Message', mDraft: 'Hi {first}! ', mSend: 'Send',
+    mNote: 'The answer shows up in Ask about Acme, marked as coming from a person, not a document.',
+    mSent: 'Sent to {first}. The answer will show up here.', mFrom: '{name} · a person, not a document', mToast: '{name} answered.', mSentToast: 'Sent to {first}.',
+    peopleTitle: 'Your people at Acme', peopleSub: "When Acme's documents don't have the answer, Firstweek sends you to the right person.",
+    askAbout: 'Ask about', messageTo: 'Message {first}', lunchTag: 'Lunch together on day 2',
+    r_jordan_role: 'Your manager · Sales', r_priya_role: 'Your buddy · Sales', r_omar_role: 'People team', r_it_role: '3rd floor',
+    r_jordan_about: "your goals, your accounts, and office rules the documents don't cover.", r_priya_about: 'day-to-day questions, the CRM, and where to have lunch.',
+    r_omar_about: 'benefits, your contract, and your first-week plan.', r_it_about: 'your laptop, the VPN, and passwords.',
+    p_it_name: 'IT desk', p_it_first: 'IT desk',
+    reply_priya: "Welcome aboard! Let's have lunch, and I'll walk you through the CRM.", reply_omar: "Happy to help. I'll check and get back to you today.", reply_it: "We're on it. Drop by the 3rd floor anytime.",
     docSource: 'Source', docClose: 'Close the document', citedTag: 'The part the answer used',
     tabHr: 'Acme HR · People', tabWelcome: 'Welcome to Acme!',
     switchOmar: "Omar's laptop", switchNina: "Nina's laptop", whenMon: 'Monday, Oct 26 · 9:02 AM', whenLater: 'Monday, Oct 26 · 9:20 AM',
@@ -712,23 +819,23 @@ const STR = {
   },
   pt: {
     guideLabel: 'Como testar este protótipo', howTo: 'Como testar',
-    cEyebrow: 'Protótipo 03 · Firstweek', cTitleA: 'Onboarding', cTitleB: 'que cita as fontes', aSourceLabel: 'Fonte:',
+    cEyebrow: 'Protótipo 02 · Firstweek', cTitleA: 'Onboarding', cTitleB: 'que cita as fontes', aSourceLabel: 'Fonte:',
     cWhy: 'Como poderíamos dar a quem acabou de chegar <b>respostas confiáveis</b>, direto dos documentos da empresa, e uma pessoa quando os documentos não sabem?',
     cTryH: 'Teste', cTry: 'Monte a primeira semana da Nina como Omar e depois faça perguntas como Nina.', cSolH: 'A solução',
     problemNum: '47%', problemText: 'dos profissionais digitais têm dificuldade para encontrar as informações de que precisam para trabalhar.',
     protoName: 'Firstweek',
-    langCode: 'PT', langLabel: 'PT, mudar para inglês',
+    langCode: 'PT', langLabel: 'PT, mudar para inglês', themeDark: 'Ativar tema escuro', themeLight: 'Ativar tema claro',
     taskOf: 'Tarefa {n} de {total}', onOmar: 'No notebook do Omar', onNina: 'No notebook da Nina',
     showMe: 'Mostrar', showing: 'Mostrando…',
     helpRing: 'ou faça você mesmo na janela: clique onde aparecer o contorno azul.',
     expand: 'Mostrar as instruções', collapse: 'Ocultar as instruções',
-    t1: 'Confira o rascunho da IA', t1d: 'Nina Costa entra no time de vendas da Acme na segunda. Omar, do time de Pessoas, está montando a primeira semana da Nina, e a IA fez um rascunho a partir dos documentos da Acme. Clique na fonte da etapa da VPN para ver de onde ela veio.',
-    t2: 'Deixe com a cara da empresa', t2d: 'A Nina precisa das ferramentas de vendas desde o dia 1, e elas só abrem na VPN. Leve a etapa da VPN para o dia 1 e adicione um almoço com um buddy no dia 2.',
-    t3: 'Publique para a Nina', t3d: 'A semana está pronta. Publique, e a Nina vê o dia 1 ao entrar na segunda.',
-    t4: 'Faça uma pergunta', t4d: 'É segunda, no notebook da Nina. Pergunte até quando a Nina precisa escolher um plano de saúde e clique no número da fonte para conferir a resposta.',
-    t5: 'Pergunte sobre férias', t5d: 'Dois documentos da Acme discordam sobre os dias de férias. Pergunte quantos a Nina tem e veja como a resposta lida com isso.',
-    t6: 'Pergunte o que os documentos não cobrem', t6d: 'A Nina quer levar o cachorro para o escritório. Pergunte e depois mande a pergunta para o Jordan, o gestor.',
-    t7: 'Guarde a resposta', t7d: 'O Jordan respondeu, e voltamos ao notebook do Omar. Adicione a resposta do Jordan ao Manual de Pessoas, para a próxima pessoa contratada recebê-la na hora.',
+    t1: 'Veja de onde veio a etapa da VPN', t1d: 'Nina Costa entra no time de vendas da Acme na segunda. Omar, do time de Pessoas, está montando a primeira semana da Nina, e a IA fez um rascunho a partir dos documentos da Acme. Clique na fonte da etapa da VPN para ver de onde ela veio.',
+    t2: 'Leve a VPN ao dia 1 e adicione um almoço', t2d: 'A Nina precisa das ferramentas de vendas desde o dia 1, e elas só abrem na VPN. Leve a etapa da VPN para o dia 1 e adicione um almoço com um buddy no dia 2.',
+    t3: 'Publique a semana para a Nina', t3d: 'A semana está pronta. Publique, e a Nina vê o dia 1 ao entrar na segunda.',
+    t4: 'Pergunte o prazo do plano de saúde', t4d: 'É segunda, o primeiro dia da Nina. Vá para o notebook da Nina, pergunte até quando a Nina precisa escolher um plano de saúde e clique no número da fonte para conferir a resposta.',
+    t5: 'Pergunte quantos dias de férias a Nina tem', t5d: 'Dois documentos da Acme discordam sobre os dias de férias. Pergunte quantos a Nina tem e veja como a resposta lida com isso.',
+    t6: 'Pergunte sobre cachorros e chame o Jordan', t6d: 'A Nina quer levar o cachorro para o escritório. Pergunte e depois mande a pergunta para o Jordan, o gestor.',
+    t7: 'Adicione a resposta do Jordan ao manual', t7d: 'O Jordan respondeu. Volte para o notebook do Omar e adicione a resposta do Jordan ao Manual de Pessoas, para a próxima pessoa contratada recebê-la na hora.',
     doneChip: 'Pronto', doneT: 'A primeira semana da Nina está pronta',
     doneD: 'A próxima pessoa contratada que perguntar sobre cachorros recebe a resposta do Jordan pelo manual, com a fonte. Você fez tudo em {time}.',
     doneDNoTime: 'A próxima pessoa contratada que perguntar sobre cachorros recebe a resposta do Jordan pelo manual, com a fonte.',
@@ -780,13 +887,21 @@ const STR = {
     a3: 'Não achei nada sobre cachorros nos documentos da Acme, então não vou chutar.', aUnknown: 'Não achei isso nos documentos da Acme, então não vou chutar.',
     a3b: '{manager}, seu gestor, pode responder.',
     askJordan: 'Perguntar ao Jordan', jAsked: 'Enviada ao Jordan',
-    jTitle: 'Perguntar a {manager}', jTo: 'Para {manager} · seu gestor', jMsgLabel: 'Mensagem',
     jMsg: 'Oi, Jordan! Posso levar meu cachorro para o escritório? Não achei nos documentos da Acme. Valeu! Nina',
     jMsgOther: 'Oi, Jordan! “{q}” Não achei nos documentos da Acme. Valeu! Nina',
-    jNote: 'A resposta do Jordan aparece aqui, marcada como vinda de uma pessoa, não de um documento.',
-    jSend: 'Enviar', jSent: 'Enviada ao Jordan. A resposta vai aparecer aqui.',
-    jFrom: 'Jordan Lee · uma pessoa, não um documento', jReply: 'Pode sim, às sextas, se o seu time concordar. Fale com a gerência do escritório sobre o andar que aceita cachorros.',
-    jReplyGeneric: 'Boa pergunta. Vou descobrir e te respondo hoje.', jToast: '{manager} respondeu.',
+    jReply: 'Pode sim, às sextas, se o seu time concordar. Fale com a gerência do escritório sobre o andar que aceita cachorros.',
+    jReplyGeneric: 'Boa pergunta. Vou descobrir e te respondo hoje.',
+    goNina: 'Ir para o notebook da Nina', goOmar: 'Ir para o notebook do Omar',
+    mTitle: 'Mensagem para {name}', mTo: 'Para {name} · {role}', mLabel: 'Mensagem', mDraft: 'Oi, {first}! ', mSend: 'Enviar',
+    mNote: 'A resposta aparece em Pergunte sobre a Acme, marcada como vinda de uma pessoa, não de um documento.',
+    mSent: 'Enviada para {first}. A resposta vai aparecer aqui.', mFrom: '{name} · uma pessoa, não um documento', mToast: '{name} respondeu.', mSentToast: 'Enviada para {first}.',
+    peopleTitle: 'Suas pessoas na Acme', peopleSub: 'Quando os documentos da Acme não têm a resposta, o Firstweek leva você à pessoa certa.',
+    askAbout: 'Pergunte sobre', messageTo: 'Falar com {first}', lunchTag: 'Almoço juntos no dia 2',
+    r_jordan_role: 'Seu gestor · Vendas', r_priya_role: 'Seu buddy · Vendas', r_omar_role: 'Time de Pessoas', r_it_role: '3º andar',
+    r_jordan_about: 'suas metas, suas contas e regras do escritório que os documentos não cobrem.', r_priya_about: 'dúvidas do dia a dia, o CRM e onde almoçar.',
+    r_omar_about: 'benefícios, seu contrato e seu plano da primeira semana.', r_it_about: 'seu notebook, a VPN e senhas.',
+    p_it_name: 'Mesa de TI', p_it_first: 'mesa de TI',
+    reply_priya: 'Boas-vindas! Vamos almoçar, e eu te mostro o CRM.', reply_omar: 'Pode deixar. Vou ver e te respondo hoje.', reply_it: 'Estamos vendo. Passe no 3º andar quando quiser.',
     docSource: 'Fonte', docClose: 'Fechar o documento', citedTag: 'O trecho que a resposta usou',
     tabHr: 'RH da Acme · Pessoas', tabWelcome: 'Boas-vindas à Acme!',
     switchOmar: 'Notebook do Omar', switchNina: 'Notebook da Nina', whenMon: 'Segunda, 26 out · 9h02', whenLater: 'Segunda, 26 out · 9h20',
@@ -840,7 +955,8 @@ const ICON = {
   doc: '<path d="M6.5 3.5h7.5l4 4v13h-11.5z"/><path d="M14 3.5v4h4M9.5 12h5M9.5 15.5h5"/>',
   plus: '<path d="M12 5v14M5 12h14"/>',
   more: '<path d="M5.5 12h.01M12 12h.01M18.5 12h.01" stroke-width="3.2"/>',
-  trash: '<path d="M4.5 7h15M9.5 7V4.5h5V7M6.5 7l1 13h9l1-13"/>'
+  trash: '<path d="M4.5 7h15M9.5 7V4.5h5V7M6.5 7l1 13h9l1-13"/>',
+  laptop: '<rect x="4" y="5" width="16" height="11" rx="1.5"/><path d="M2.5 19h19"/>'
 };
 const icon = (name, cls = '') => `<svg class="i ${cls}" viewBox="0 0 24 24" aria-hidden="true">${ICON[name] || ''}</svg>`;
 // the same steps as the favicon: a first week, one step at a time
@@ -856,7 +972,7 @@ function newState(prev) {
     srcView: null, checkedSource: false, menu: null, adding: null, addDraft: '', addIdea: null, flash: null,
     moved: false, added: false, published: false,
     checked: {}, chat: [], asked: {}, answered: {}, q1Src: false, askDraft: '', doc: null,
-    modal: null, modalMsg: null, jDraft: '', jEdited: false, sentJordan: false, keep: null, switchQueued: false, docAdded: false,
+    ninaTab: 'week', modal: null, mDraft: '', mEdited: false, sentJordan: false, keep: null, docAdded: false,
     startedAt: null, finishMs: null, focus: null,
     guideOpen: false, aboutOpen: prev ? prev.aboutOpen : false, demo: false, lastTask: null
   };
@@ -882,6 +998,9 @@ const monthYear = iso => fmt(iso, { month: 'short', year: 'numeric' });
 // a day's column header: weekday, then date ("Mon 26")
 const dayDate = n => { const d = utc(START); d.setUTCDate(d.getUTCDate() + n - 1); const iso = d.toISOString().slice(0, 10); return `${fmt(iso, { weekday: 'short' })} ${fmt(iso, { day: 'numeric' })}`; };
 const docTitle = id => t('doc_' + id);
+// a person (or the IT desk) by id, with their name in the current language
+const person = id => { const d = DIR.find(x => x.id === id); return { ...d, name: d.name || t('p_it_name'), first: d.first || t('p_it_first') }; };
+const avatarHTML = (id, sm) => `<span class="avatar ${id}${sm ? ' sm' : ''}" aria-hidden="true">${id === 'it' ? icon('laptop') : person(id).ini}</span>`;
 const updatedText = id => (id === 'handbook' && state.docAdded ? t('updatedToday') : t('updated', { date: monthYear(DOCS[id].updated) }));
 // a step's name: the AI's steps translate; a step someone typed stays as typed
 const stepText = s => (s.custom ? (s.idea ? t('idea_' + s.idea) : s.title) : t('s_' + s.id));
@@ -907,6 +1026,30 @@ function currentTask() {
 function langButton() {
   return `<button class="tool lang-btn" type="button" data-action="lang" aria-label="${t('langLabel')}">
     <img class="lang-flag flag-br" src="flags/br.webp" alt="" width="20" height="14"><img class="lang-flag flag-us" src="flags/us.svg" alt="" width="20" height="14"><span class="lang-code">${t('langCode')}</span></button>`;
+}
+/* theme, as in the portfolio: follows the system until the button picks one, and the pick is remembered */
+const currentTheme = () => document.documentElement.getAttribute('data-theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+function themeButton() {
+  return `<button class="tool icon" type="button" data-action="theme" aria-label="${t(currentTheme() === 'dark' ? 'themeLight' : 'themeDark')}">
+    <svg class="i-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.5v2.2M12 19.3v2.2M4.6 4.6l1.6 1.6M17.8 17.8l1.6 1.6M2.5 12h2.2M19.3 12h2.2M4.6 19.4l1.6-1.6M17.8 6.2l1.6-1.6"/></svg>
+    <svg class="i-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 14.6A8.2 8.2 0 0 1 9.4 4a8.2 8.2 0 1 0 10.6 10.6Z"/></svg></button>`;
+}
+function setTheme(next, btn) {
+  const root = document.documentElement;
+  const apply = () => {
+    root.setAttribute('data-theme', next);
+    try { localStorage.setItem('vm-theme', next); } catch (e) {}
+    document.querySelectorAll('[data-action="theme"]').forEach(b => b.setAttribute('aria-label', t(next === 'dark' ? 'themeLight' : 'themeDark')));
+    const mc = document.querySelector('meta[name="theme-color"]'); if (mc) mc.content = next === 'dark' ? '#0A1430' : '#EEF3FA';
+  };
+  // the new theme opens in a circle from the button
+  const r = btn.getBoundingClientRect(), x = r.left + r.width / 2, y = r.top + r.height / 2;
+  if (document.startViewTransition && !reduceMotion()) {
+    const vt = document.startViewTransition(apply);
+    const rad = Math.hypot(Math.max(x, innerWidth - x), Math.max(y, innerHeight - y));
+    vt.ready.then(() => root.animate({ clipPath: [`circle(0px at ${x}px ${y}px)`, `circle(${rad}px at ${x}px ${y}px)`] },
+      { duration: 700, easing: 'cubic-bezier(.16, 1, .3, 1)', pseudoElement: '::view-transition-new(root)' })).catch(() => {});
+  } else apply();
 }
 /* Language switch, as in the portfolio: the text on screen types itself in again, top to bottom. Each block
    types as one stream; while a piece types it's a wrapper of the typed part and a hidden rest that keeps its
@@ -1026,7 +1169,7 @@ function renderIntro() {
   $('#intro').innerHTML = `
     <div class="c-top">
       <p class="c-eyebrow">${t('cEyebrow')}</p>
-      ${langButton()}
+      <div class="c-tools">${themeButton()}${langButton()}</div>
     </div>
     <h2 class="c-title" id="intro-title">${words(a, 0)} <em>${words(b, a.length)}</em></h2>
     ${problemCard()}
@@ -1077,6 +1220,8 @@ function renderGuide() {
   const idx = task === 'done' ? TASKS.length : TASKS.indexOf(task);
   const dashes = TASKS.map((_, i) => `<i class="${i < idx ? 'done' : i === idx ? 'now' : ''}"></i>`).join('');
   const running = state.demo, role = TASK_ROLE[task];
+  const away = task !== 'done' && !state.switching && state.role !== role;
+  const goLabel = t(role === 'nina' ? 'goNina' : 'goOmar');
   let card;
   if (task === 'done') {
     const desc = state.finishMs ? t('doneD', { time: fmtTime(state.finishMs) }) : t('doneDNoTime');
@@ -1097,8 +1242,9 @@ function renderGuide() {
         <span class="g-chip">${whoChip(role)}</span>
         <h2 class="g-title">${t(task)}</h2>
         <p class="g-desc">${t(task + 'd')}</p>
-        <button class="g-btn" type="button" data-action="demo" ${running ? 'aria-disabled="true"' : ''}>${icon('play')}${running ? t('showing') : t('showMe')}</button>
-        <p class="g-help">${t('helpRing')}</p>
+        ${away ? `<button class="g-btn go" type="button" data-action="go-laptop" data-role="${role}">${icon('laptop')}${goLabel}</button>`
+          : `<button class="g-btn" type="button" data-action="demo" ${running ? 'aria-disabled="true"' : ''}>${icon('play')}${running ? t('showing') : t('showMe')}</button>
+        <p class="g-help">${t('helpRing')}</p>`}
       </section>`;
   }
   const about = `
@@ -1121,13 +1267,14 @@ function renderGuide() {
       <p class="g-ctitle">${task === 'done' ? t('doneT') : t(task)}</p>
       ${task !== 'done' ? `<span class="g-who">${whoChip(role)}</span>` : ''}
       <p class="g-howto">${t('howTo')}</p>
-      ${task !== 'done' ? `<button class="g-show-sm" type="button" data-action="demo" ${running ? 'aria-disabled="true"' : ''}>${icon('play')}${running ? t('showing') : t('showMe')}</button>` : ''}
+      ${task === 'done' ? '' : away ? `<button class="g-show-sm go" type="button" data-action="go-laptop" data-role="${role}">${goLabel}</button>`
+        : `<button class="g-show-sm" type="button" data-action="demo" ${running ? 'aria-disabled="true"' : ''}>${icon('play')}${running ? t('showing') : t('showMe')}</button>`}
       <button class="g-expand" type="button" data-action="guide-toggle" aria-expanded="${state.guideOpen}" aria-controls="g-full" aria-label="${state.guideOpen ? t('collapse') : t('expand')}">${icon('expand')}</button>
     </div>
     <div class="g-full" id="g-full">
       <div class="g-head">
         <p class="g-name">${t('protoName')}</p>
-        ${langButton()}
+        <div class="c-tools">${themeButton()}${langButton()}</div>
       </div>
       <div class="g-dashes" aria-hidden="true">${dashes}</div>
       <p class="g-label">${task === 'done' ? t('doneChip') : t('taskOf', { n: idx + 1, total: TASKS.length })}</p>
@@ -1142,6 +1289,8 @@ function ringCandidates() {
   const task = currentTask();
   if (task === 'done' || state.switching) return [];
   if (state.role !== TASK_ROLE[task]) return [];
+  // Nina's tasks happen on My first week: point back there from People
+  if (state.role === 'nina' && state.ninaTab === 'people' && !state.modal) return ['[data-action="nav"][data-tab="week"]'];
   switch (task) {
     case 't1': return ['[data-action="step-src"][data-step="vpn"]'];
     case 't2':
@@ -1152,7 +1301,7 @@ function ringCandidates() {
     case 't4': return state.answered.q1 ? ['.msg.ai [data-action="cite"][data-q="q1"]'] : ['[data-action="ask-q"][data-q="q1"]'];
     case 't5': return ['[data-action="ask-q"][data-q="q2"]'];
     case 't6':
-      if (state.modal) return ['[data-action="send-jordan"]'];
+      if (state.modal) return state.modal.msgId ? ['[data-action="send-msg"]'] : [];
       return state.answered.q3 ? ['[data-action="ask-jordan"][data-q="q3"]'] : ['[data-action="ask-q"][data-q="q3"]'];
     case 't7': return state.keep === 'later' ? ['[data-action="keep-review"]'] : ['[data-action="keep-add"]'];
   }
@@ -1227,10 +1376,11 @@ async function demo() {
   if (state.guideOpen) closeGuide(); else renderGuide();
   startClock();
   const onRole = role => until(() => state.role === role && !state.switching, 12000);
-  // the task is on the other laptop and nothing is taking us there: go (for the last task, only once Jordan has answered)
-  if (task === 't7') await until(() => state.keep, 8000);
-  const need = TASK_ROLE[task];
-  if (state.role !== need && !state.switching && !state.switchQueued) switchTo(need, need === 'nina' ? 'whenMon' : 'whenLater');
+  // back from the People tab, and out of a message that isn't this task's
+  const toWeek = async () => {
+    if (state.modal && !state.modal.msgId) { state.modal = null; renderApp(); }
+    if (state.ninaTab === 'people') { await tap('[data-action="nav"][data-tab="week"]'); await wait(300); }
+  };
   try {
     switch (task) {
       case 't1':
@@ -1253,7 +1403,7 @@ async function demo() {
         break;
       case 't3': await tap('[data-action="publish"]'); break;
       case 't4':
-        await onRole('nina');
+        await onRole('nina'); await toWeek();
         if (!state.answered.q1) {
           if (!state.asked.q1) await tap('[data-action="ask-q"][data-q="q1"]');
           await until(() => state.answered.q1);
@@ -1261,12 +1411,12 @@ async function demo() {
         }
         await tap('.msg.ai [data-action="cite"][data-q="q1"]'); break;
       case 't5':
-        await onRole('nina');
+        await onRole('nina'); await toWeek();
         if (state.doc) { state.doc = null; renderApp(); await wait(250); }
         if (!state.asked.q2) await tap('[data-action="ask-q"][data-q="q2"]');
         await until(() => state.answered.q2); break;
       case 't6':
-        await onRole('nina');
+        await onRole('nina'); await toWeek();
         if (!state.answered.q3) {
           if (!state.asked.q3) await tap('[data-action="ask-q"][data-q="q3"]');
           await until(() => state.answered.q3);
@@ -1274,10 +1424,11 @@ async function demo() {
         }
         if (!state.modal) await tap('[data-action="ask-jordan"][data-q="q3"]');
         await wait(600);
-        await tap('[data-action="send-jordan"]'); break;
+        await tap('[data-action="send-msg"]'); break;
       case 't7':
         await onRole('omar');
-        await wait(400);
+        await until(() => state.keep, 8000);
+        await wait(300);
         if (state.keep === 'later') { await tap('[data-action="keep-review"]'); await wait(300); }
         await tap('[data-action="keep-add"]'); break;
     }
@@ -1302,13 +1453,13 @@ function focusKey(el) {
   const a = el.dataset && el.dataset.action;
   if (!a) return null;
   let sel = `[data-action="${a}"]`;
-  ['step', 'day', 'q', 'idea', 'doc', 'sec'].forEach(k => { if (el.dataset[k]) sel += `[data-${k}="${el.dataset[k]}"]`; });
+  ['step', 'day', 'q', 'idea', 'doc', 'sec', 'tab', 'to'].forEach(k => { if (el.dataset[k]) sel += `[data-${k}="${el.dataset[k]}"]`; });
   return sel;
 }
 function renderApp() {
   const app = $('#app');
   // scroll positions and focus survive the redraw
-  const keep = ['.board', '.chat', '.week', '.side', '.nina-body'].map(sel => { const el = app.querySelector(sel); return [sel, el ? el.scrollTop : 0, el ? el.scrollLeft : 0]; });
+  const keep = ['.board', '.chat', '.week', '.side', '.nina-body', '.people-body'].map(sel => { const el = app.querySelector(sel); return [sel, el ? el.scrollTop : 0, el ? el.scrollLeft : 0]; });
   const fk = focusKey(document.activeElement);
   const firstPaint = !app.firstElementChild || app.firstElementChild.dataset.role !== state.role;
   app.innerHTML = state.role === 'omar' ? omarHTML() : ninaHTML();
@@ -1328,7 +1479,8 @@ function renderApp() {
 function renderChrome() {
   const role = state.role, mac = role === 'omar';
   const b = $('#browser');
-  b.classList.toggle('is-omar', mac); b.classList.toggle('is-nina', !mac);
+  const lap = $('#laptop');
+  lap.classList.toggle('is-omar', mac); lap.classList.toggle('is-nina', !mac);
   const other = t(mac ? 'tabHr' : 'tabWelcome');
   $('#b-bar').innerHTML = `${mac ? '<span class="b-dots"><i></i><i></i><i></i></span>' : ''}
     <span class="b-tabs"><span class="b-tab dim"><span class="tab-ic"></span>${esc(other)}</span><span class="b-tab"><span class="mini-logo">${LOGO}</span>Firstweek · Acme</span></span>
@@ -1338,10 +1490,11 @@ function renderChrome() {
 }
 function headHTML(role) {
   const p = PEOPLE[role];
-  const nav = role === 'omar' ? [['navNewHires', true], ['navDocs'], ['navAnswers']] : [['navWeek', true], ['navPeople']];
+  const nav = role === 'omar' ? [['navNewHires', 'hires'], ['navDocs', 'docs'], ['navAnswers', 'answers']] : [['navWeek', 'week'], ['navPeople', 'people']];
+  const cur = role === 'omar' ? 'hires' : state.ninaTab;
   return `<header class="app-head">
       <div class="brand"><span class="logo">${LOGO}</span><span>Firstweek</span><span class="ws">Acme</span></div>
-      <nav class="nav" aria-label="${t('navLabel')}">${nav.map(([k, cur]) => `<button type="button" ${cur ? 'aria-current="page"' : 'data-action="stub"'}>${t(k)}</button>`).join('')}</nav>
+      <nav class="nav" aria-label="${t('navLabel')}">${nav.map(([k, id]) => `<button type="button" ${id === cur ? 'aria-current="page"' : `data-action="${role === 'nina' ? 'nav' : 'stub'}" data-tab="${id}"`}>${t(k)}</button>`).join('')}</nav>
       <div class="head-end"><span class="who"><b>${p.name}</b><span>${t(role === 'omar' ? 'roleOmar' : 'roleNina')}</span></span><span class="avatar ${role}" aria-hidden="true">${p.ini}</span></div>
     </header>`;
 }
@@ -1445,11 +1598,16 @@ function keepHTML() {
 
 /* Nina: day 1 on the left, and answers from Acme's documents on the right */
 function ninaHTML() {
-  const day1 = state.steps.filter(s => s.day === 1), day2 = state.steps.filter(s => s.day === 2);
-  const doneN = day1.filter(s => state.checked[s.id]).length;
   return `<div class="view nina" data-role="nina">
     ${headHTML('nina')}
-    <div class="body nina-body">
+    ${state.ninaTab === 'people' ? peopleHTML() : weekHTML()}
+    ${modalHTML()}
+  </div>`;
+}
+function weekHTML() {
+  const day1 = state.steps.filter(s => s.day === 1), day2 = state.steps.filter(s => s.day === 2);
+  const doneN = day1.filter(s => state.checked[s.id]).length;
+  return `<div class="body nina-body">
       <section class="week" aria-labelledby="week-title">
         <h1 id="week-title" tabindex="-1">${t('welcome')}</h1>
         <p class="meta">${t('dayOneMeta', { date: dateNice(START) })}</p>
@@ -1466,9 +1624,24 @@ function ninaHTML() {
         ${suggestHTML()}
         <form class="ask-form" id="ask-form"><label class="sr-only" for="ask-input">${t('askPh')}</label><input class="input" id="ask-input" name="ask" autocomplete="off" placeholder="${t('askPh')}" value="${esc(state.askDraft)}"><button class="btn btn-primary" type="submit" aria-label="${t('askSend')}">${icon('send')}</button></form>
       </section>
-    </div>
-    ${modalHTML()}
-  </div>`;
+    </div>`;
+}
+/* Nina's People tab: who to ask about what. A message to anyone comes back in Ask, as a person's answer */
+function peopleHTML() {
+  const lunch = state.steps.some(s => s.custom && s.idea === 'lunch' && s.day === 2);
+  return `<div class="body people-body"><section class="people" aria-labelledby="people-title">
+      <h1 id="people-title" tabindex="-1">${t('peopleTitle')}</h1>
+      <p class="meta">${t('peopleSub')}</p>
+      <ul class="people-grid">${DIR.map(d => {
+        const p = person(d.id);
+        return `<li class="person">
+          <div class="pp-top">${avatarHTML(d.id)}<div><p class="pp-name">${esc(p.name)}</p><p class="pp-role">${t('r_' + d.id + '_role')}</p></div></div>
+          <p class="pp-about"><b>${t('askAbout')}</b> ${t('r_' + d.id + '_about')}</p>
+          ${d.id === 'priya' && lunch ? `<p class="pp-tag">${icon('check')}<span>${t('lunchTag')}</span></p>` : ''}
+          <button class="btn btn-plain btn-sm" type="button" data-action="message" data-to="${d.id}">${icon('chat')}${t('messageTo', { first: esc(p.first) })}</button>
+        </li>`;
+      }).join('')}</ul>
+    </section></div>`;
 }
 function suggestHTML() {
   const qs = ['q1', 'q2', 'q3'].filter(q => !state.asked[q]);
@@ -1505,8 +1678,11 @@ function msgHTML(m) {
   const fresh = seenMsgs.has(m.id) ? '' : ' in';
   if (m.kind === 'me') return `<div class="msg me${fresh}"><p>${esc(m.text)}</p></div>`;
   if (m.kind === 'think') return `<div class="msg think${fresh}"><span class="spinner" aria-hidden="true"></span>${t('searching')}</div>`;
-  if (m.kind === 'sent') return `<p class="msg sys${fresh}">${icon('send')}<span>${t('jSent')}</span></p>`;
-  if (m.kind === 'human') return `<div class="msg human${fresh}"><span class="avatar jordan sm" aria-hidden="true">JL</span><div class="bubble"><p class="from">${t('jFrom')}</p><p>${t(m.generic ? 'jReplyGeneric' : 'jReply')}</p></div></div>`;
+  if (m.kind === 'sent') return `<p class="msg sys${fresh}">${icon('send')}<span>${t('mSent', { first: esc(person(m.to || 'jordan').first) })}</span></p>`;
+  if (m.kind === 'human') {
+    const from = m.from || 'jordan', text = !m.generic ? t('jReply') : from === 'jordan' ? t('jReplyGeneric') : t('reply_' + from);
+    return `<div class="msg human${fresh}">${avatarHTML(from, true)}<div class="bubble"><p class="from">${t('mFrom', { name: esc(person(from).name) })}</p><p>${text}</p></div></div>`;
+  }
   return `<div class="msg ai${fresh}"><div class="bubble"><p class="ai-label"><span class="logo">${LOGO}</span>Firstweek</p>${answerHTML(m)}</div></div>`;
 }
 function docViewerHTML() {
@@ -1525,13 +1701,14 @@ function docViewerHTML() {
 }
 function modalHTML() {
   if (!state.modal) return '';
+  const to = state.modal.to, p = person(to);
   return `<div class="modal-layer" data-action="modal-close"><div class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
-      <h2 id="modal-title">${t('jTitle', { manager: MANAGER })}</h2>
-      <p class="modal-to"><span class="avatar jordan sm" aria-hidden="true">JL</span>${t('jTo', { manager: MANAGER })}</p>
-      <label class="sr-only" for="j-msg">${t('jMsgLabel')}</label>
-      <textarea class="input" id="j-msg" name="jmsg" rows="4">${esc(state.jDraft)}</textarea>
-      <p class="modal-note">${t('jNote')}</p>
-      <div class="modal-row"><button class="btn btn-plain btn-sm" type="button" data-action="modal-close">${t('cancel')}</button><button class="btn btn-primary btn-sm" type="button" data-action="send-jordan">${icon('send')}${t('jSend')}</button></div>
+      <h2 id="modal-title">${t('mTitle', { name: esc(p.name) })}</h2>
+      <p class="modal-to">${avatarHTML(to, true)}${t('mTo', { name: esc(p.name), role: t('r_' + to + '_role') })}</p>
+      <label class="sr-only" for="m-msg">${t('mLabel')}</label>
+      <textarea class="input" id="m-msg" name="mmsg" rows="4">${esc(state.mDraft)}</textarea>
+      <p class="modal-note">${t('mNote')}</p>
+      <div class="modal-row"><button class="btn btn-plain btn-sm" type="button" data-action="modal-close">${t('cancel')}</button><button class="btn btn-primary btn-sm" type="button" data-action="send-msg">${icon('send')}${t('mSend')}</button></div>
     </div></div>`;
 }
 
@@ -1554,11 +1731,11 @@ function switchTo(role, when) {
   const run = state;
   state.switching = { role, when };
   state.menu = null; state.adding = null; state.modal = null;
-  renderSwitch();
+  renderSwitch(); renderGuide();
   announce(`${t(role === 'nina' ? 'switchNina' : 'switchOmar')}, ${t(when)}`);
   setTimeout(() => {
     if (state !== run) return;
-    state.role = role; state.srcView = null; state.doc = null;
+    state.role = role; state.srcView = null; state.doc = null; state.ninaTab = 'week';
     renderApp(); renderGuide();
   }, reduceMotion() ? 150 : 750);
   setTimeout(() => {
@@ -1609,13 +1786,10 @@ function addSave() {
   showToast(t('addedToast', { n }));
 }
 function publish() {
-  const run = state;
   startClock();
   state.published = true; state.menu = null; state.adding = null; state.srcView = null;
   renderApp(); renderGuide();
   showToast(t('publishedToast'));
-  state.switchQueued = true;
-  setTimeout(() => { if (state === run) { state.switchQueued = false; switchTo('nina', 'whenMon'); } }, reduceMotion() ? 600 : 1500);
 }
 function matchQuestion(text) {
   const s = text.toLowerCase();
@@ -1641,7 +1815,6 @@ function ask(q, text) {
     if (q !== 'other') state.answered[q] = true;
     if (state.role === 'nina') renderApp();
     renderGuide();
-    keepSwitch(reduceMotion() ? 900 : 2600);
     announce(t(q === 'q3' ? 'a3' : q === 'other' ? 'aUnknown' : 'sourcesH'));
   }, reduceMotion() ? 250 : 1100);
 }
@@ -1650,45 +1823,45 @@ function openDoc(doc, sec, q) {
   if (q === 'q1' && doc === 'benefits') state.q1Src = true;
   state.focus = '#doc-title';
   renderApp(); renderGuide();
-  keepSwitch(reduceMotion() ? 900 : 2600);
 }
-function openAskJordan(msgId) {
-  const m = state.chat.find(x => x.id === msgId);
-  state.modal = 'jordan'; state.modalMsg = msgId;
-  state.jDraft = m && m.q === 'other' ? t('jMsgOther', { q: m.text }) : t('jMsg'); state.jEdited = false;
-  state.focus = '#j-msg';
+// a message starts from an answer the documents couldn't give (to Jordan), or from the People tab (to anyone)
+function draftFor(modal) {
+  const m = modal.msgId && state.chat.find(x => x.id === modal.msgId);
+  if (modal.to === 'jordan' && m) return m.q === 'other' ? t('jMsgOther', { q: m.text }) : t('jMsg');
+  return t('mDraft', { first: person(modal.to).first });
+}
+function openMessage(to, msgId) {
+  state.modal = { to, msgId: msgId || null };
+  state.mDraft = draftFor(state.modal); state.mEdited = false;
+  state.focus = '#m-msg';
   renderApp();
+  const ta = $('#m-msg'); if (ta) ta.setSelectionRange(ta.value.length, ta.value.length);
 }
 function closeModal() {
+  const { to, msgId } = state.modal;
   state.modal = null;
-  state.focus = `[data-action="ask-jordan"][data-m="${state.modalMsg}"]`;
+  state.focus = msgId ? `[data-action="ask-jordan"][data-m="${msgId}"]` : `[data-action="message"][data-to="${to}"]`;
   renderApp();
 }
-function sendJordan() {
-  const run = state, m = state.chat.find(x => x.id === state.modalMsg), dog = !m || m.q === 'q3';
+function sendMessage() {
+  const run = state, { to, msgId } = state.modal, m = msgId && state.chat.find(x => x.id === msgId);
+  const dog = to === 'jordan' && !!m && m.q === 'q3';
   state.modal = null;
-  if (dog) state.sentJordan = true; else m.sent = true;
-  state.chat.push({ id: ++msgN, kind: 'sent' });
+  if (dog) state.sentJordan = true; else if (m) m.sent = true;
+  state.chat.push({ id: ++msgN, kind: 'sent', to });
+  state.focus = msgId ? '#ask-input' : `[data-action="message"][data-to="${to}"]`;
   renderApp(); renderGuide();
+  if (state.ninaTab === 'people') showToast(t('mSentToast', { first: person(to).first }));
   setTimeout(() => {
     if (state !== run) return;
-    state.chat.push({ id: ++msgN, kind: 'human', generic: !dog });
+    state.chat.push({ id: ++msgN, kind: 'human', from: to, generic: !dog });
     if (state.role === 'nina') renderApp();
-    showToast(t('jToast', { manager: MANAGER }));
+    showToast(t('mToast', { name: person(to).name }));
     if (!dog) return;
     // Jordan's answer reaches the People team as one to keep
     state.keep = 'pending';
     if (state.role === 'omar') renderApp();
-    keepSwitch(reduceMotion() ? 900 : 2600);
   }, reduceMotion() ? 600 : 2200);
-}
-// back to Omar's laptop for the answer to keep, once Nina's own tasks are done (asked out of order, it waits).
-// switchQueued marks a switch already on its way, so Show me doesn't start a second one
-function keepSwitch(delay) {
-  if (state.keep !== 'pending' || state.role !== 'nina' || state.switching || state.switchQueued || currentTask() !== 't7') return;
-  const run = state;
-  state.switchQueued = true;
-  setTimeout(() => { if (state === run) { state.switchQueued = false; if (state.role === 'nina' && !state.switching) switchTo('omar', 'whenLater'); } }, delay);
 }
 function keepAnswer() {
   state.keep = 'kept'; state.docAdded = true;
@@ -1721,20 +1894,21 @@ document.addEventListener('click', e => {
       state.lang = state.lang === 'en' ? 'pt' : 'en';
       // an idea picked for a new step, and an untouched message to Jordan, follow the language
       if (state.addIdea) state.addDraft = t('idea_' + state.addIdea);
-      if (state.modal && !state.jEdited) { const m = state.chat.find(x => x.id === state.modalMsg); state.jDraft = m && m.q === 'other' ? t('jMsgOther', { q: m.text }) : t('jMsg'); }
+      if (state.modal && !state.mEdited) state.mDraft = draftFor(state.modal);
       if (typing) typing.finish();
       renderIntro(); render();
       const b = document.querySelector(inPanel ? '#intro [data-action="lang"]' : '#guide [data-action="lang"]'); if (b) b.focus();
       if (!reduceMotion()) { document.querySelectorAll('.lang-btn').forEach(btn => replay(btn, 'is-flipping')); typeIn(); }
       break;
     }
+    case 'theme': setTheme(currentTheme() === 'dark' ? 'light' : 'dark', el); break;
     case 'restart': {
       const go = () => { state = newState(state); seenMsgs.clear(); msgN = 0; shownChat = 0; $('#toast').classList.remove('show'); render(); markActive(); };
       if (state.guideOpen) closeGuide(go); else go();
       break;
     }
     // Try it: the window glows and the steps panel opens with the current task
-    case 'hint': lastActivity = performance.now() - HINT_DELAY; hintScrollAt = 0; replay($('#browser'), 'look'); openGuide(); break;
+    case 'hint': lastActivity = performance.now() - HINT_DELAY; hintScrollAt = 0; replay($('#laptop .lid'), 'look'); openGuide(); break;
     case 'stub': showToast(t('protoOnly')); break;
     case 'step-src': startClock(); openSource(el.dataset.step); break;
     case 'src-close': state.srcView = null; state.focus = `[data-action="step-src"]`; renderApp(); break;
@@ -1763,9 +1937,12 @@ document.addEventListener('click', e => {
       const inp = $('#ask-input'); if (inp) inp.scrollIntoView({ block: 'nearest' });
       break;
     }
-    case 'ask-jordan': openAskJordan(Number(el.dataset.m)); break;
+    case 'ask-jordan': openMessage('jordan', Number(el.dataset.m)); break;
+    case 'message': openMessage(el.dataset.to, null); break;
+    case 'nav': state.ninaTab = el.dataset.tab; state.doc = null; state.focus = state.ninaTab === 'people' ? '#people-title' : '#week-title'; renderApp(); break;
+    case 'go-laptop': startClock(); switchTo(el.dataset.role, el.dataset.role === 'nina' ? 'whenMon' : 'whenLater'); break;
     case 'modal-close': if (el.classList.contains('modal-layer') && e.target !== el) break; closeModal(); break;
-    case 'send-jordan': sendJordan(); break;
+    case 'send-msg': sendMessage(); break;
     case 'keep-add': keepAnswer(); break;
     case 'keep-later': state.keep = 'later'; renderApp(); break;
     case 'keep-review': state.keep = 'pending'; state.focus = '[data-action="keep-add"]'; renderApp(); break;
@@ -1776,7 +1953,7 @@ document.addEventListener('input', e => {
   const el = e.target;
   if (el.name === 'ask') state.askDraft = el.value;
   else if (el.name === 'add') { state.addDraft = el.value; if (state.addIdea && el.value !== t('idea_' + state.addIdea)) state.addIdea = null; }
-  else if (el.name === 'jmsg') { state.jDraft = el.value; state.jEdited = true; }
+  else if (el.name === 'mmsg') { state.mDraft = el.value; state.mEdited = true; }
 });
 document.addEventListener('change', e => {
   if (e.target.name !== 'todo') return;

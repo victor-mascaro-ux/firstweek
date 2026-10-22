@@ -1,4 +1,4 @@
-# Firstweek · Prototype 03
+# Firstweek · Prototype 02
 
 Firstweek is a prototype you can try: onboarding where the company sets up a new hire's first week, and the new hire gets answers only from the company's own documents, with the source, and a person when the documents don't know.
 
