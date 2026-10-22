@@ -73,15 +73,33 @@ body{overflow:auto;background:radial-gradient(var(--dot) 1px,transparent 1.3px) 
 /* Try it: the window's glow swells once and settles, to say "over here" */
 .browser.look{animation:look 1.3s ease-in-out}
 @keyframes look{35%{box-shadow:0 0 0 2px var(--neon),0 40px 90px rgba(0,0,0,.5),0 0 64px 4px rgba(79,195,247,.7),0 0 160px 10px rgba(79,195,247,.4)}}
-.b-bar{flex:none;display:flex;align-items:flex-end;gap:10px;height:42px;padding:0 14px;background:#DADDE6;border-bottom:1px solid #C9CDD8}
+/* each laptop is its own computer: Omar's a dark Mac-style window, Nina's a light blue Windows-style one,
+   each with its own other tab open and its owner's avatar */
+.browser{--chrome:#DADDE6;--chrome-line:#C9CDD8;--tab-bg:var(--bg);--tab-ink:#30343C;--tab-dim:#5A5F6B;--url-bg:#F2F3F7;--url-ink:#4B4F5C}
+.browser.is-omar{--chrome:#2A2D35;--chrome-line:#16171C;--tab-bg:#3B3F4A;--tab-ink:#F2F3F7;--tab-dim:#A3A8B5;--url-bg:#1C1E24;--url-ink:#C9CDD8}
+.browser.is-nina{--chrome:#DCE6F7;--chrome-line:#C3D1EC;--tab-bg:#FFFFFF;--tab-ink:#1D2A44;--tab-dim:#55627E;--url-bg:#FFFFFF;--url-ink:#3B4A66}
+.b-bar{flex:none;display:flex;align-items:flex-end;gap:10px;height:42px;padding:0 14px;background:var(--chrome);border-bottom:1px solid var(--chrome-line);transition:background-color .4s,border-color .4s}
 .b-dots{display:flex;gap:7px;align-self:center}
 .b-dots i{width:12px;height:12px;border-radius:50%;background:#FF5F57}
 .b-dots i:nth-child(2){background:#FEBC2E}
 .b-dots i:nth-child(3){background:#28C840}
-.b-tab{display:flex;align-items:center;gap:8px;margin-left:10px;height:32px;padding:0 16px 0 12px;border-radius:9px 9px 0 0;background:var(--bg);font:600 13px/1 var(--font);color:#30343C}
+.b-tabs{display:flex;gap:2px;margin-left:4px;min-width:0}
+.b-tab{display:flex;align-items:center;gap:8px;height:32px;padding:0 16px 0 12px;border-radius:9px 9px 0 0;background:var(--tab-bg);font:600 13px/1 var(--font);color:var(--tab-ink);white-space:nowrap}
+.b-tab.dim{background:transparent;color:var(--tab-dim);font-weight:500}
 .b-tab .mini-logo{display:grid;place-items:center;width:16px;height:16px;border-radius:4px;background:var(--brand);color:#fff}
 .b-tab .mini-logo svg{width:11px;height:11px}
-.b-url{align-self:center;margin-left:8px;padding:5px 12px;border-radius:999px;background:#F2F3F7;font:500 12.5px/1 var(--font);color:#4B4F5C;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+.b-tab .tab-ic{width:14px;height:14px;border-radius:4px;background:currentColor;opacity:.45}
+.b-url{align-self:center;margin-left:6px;padding:5px 12px;border-radius:999px;background:var(--url-bg);font:500 12.5px/1 var(--font);color:var(--url-ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+.b-who{align-self:center;margin-left:auto}
+.b-who .mini-av{width:24px;height:24px}
+/* Windows-style controls: minimize, maximize, close */
+.b-win{display:flex;align-self:stretch;margin:0 -14px 0 0}
+.b-win i{position:relative;width:42px;color:var(--tab-dim)}
+.b-win i::before,.b-win i::after{content:"";position:absolute;left:50%;top:50%;transform:translate(-50%,-50%)}
+.b-win .min::before{width:10px;height:1.5px;background:currentColor}
+.b-win .max::before{width:9px;height:9px;border:1.5px solid currentColor;border-radius:1px}
+.b-win .x::before,.b-win .x::after{width:12px;height:1.5px;background:currentColor;transform:translate(-50%,-50%) rotate(45deg)}
+.b-win .x::after{transform:translate(-50%,-50%) rotate(-45deg)}
 .screen{position:relative;flex:1;min-height:0;overflow:hidden;background:var(--bg);color:var(--ink);font:15px/1.5 var(--font);container:app/inline-size}
 
 /* ================= Context (left) ================= */
@@ -573,7 +591,7 @@ mark{padding:1px 2px;border-radius:3px;background:var(--brand-soft);color:inheri
   <main class="stage" id="stage">
     <aside class="guide" id="guide" aria-label="How to try this prototype"></aside>
     <div class="browser" id="browser">
-      <div class="b-bar" aria-hidden="true"><span class="b-dots"><i></i><i></i><i></i></span><span class="b-tab"><span class="mini-logo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 18.5h4.5V14H14V9.5h4.5V5"/></svg></span>Firstweek · Acme</span><span class="b-url" id="b-url">acme.firstweek.app/new-hires/nina-costa</span></div>
+      <div class="b-bar" id="b-bar" aria-hidden="true"></div>
       <div class="screen" id="screen">
         <div class="app" id="app" role="region" aria-label="Firstweek"></div>
         <div class="toast" id="toast" aria-hidden="true"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg><span></span></div>
@@ -655,7 +673,7 @@ const STR = {
     srcTitle: 'Where this step came from', backToDocs: 'All documents', srcNote: 'The AI wrote this step from this passage. Edit the step and the document stays as it is.',
     s_laptop: 'Pick up your laptop', s_contract: 'Sign your contract and tax forms', s_meet: 'Meet Jordan, your manager', s_vpn: 'Set up the VPN', s_playbook: 'Read the sales playbook', s_health: 'Pick your health plan', s_shadow: 'Shadow a sales call', s_checkin: 'First-week check-in with Jordan',
     doc_handbook: 'People handbook', doc_vacation: 'Vacation policy update', doc_it: 'IT setup guide', doc_benefits: 'Benefits guide 2026', doc_sales: 'Sales team guide',
-    h_contract: 'Your first day', p_contract: 'On your first day, sign your employment contract and tax forms in Workday. Your People partner sends the links before you start.',
+    h_contract: 'Your first day', p_contract: 'On your first day, sign your employment contract and tax forms in the HR portal. Your People partner sends the links before you start.',
     h_vacation: 'Vacation', p_vac_old: 'Full-time employees get 15 vacation days a year, plus public holidays.',
     h_checkin: 'Your first week', p_checkin: 'At the end of the first week, new hires meet their manager to talk about what is working and what comes next.',
     h_dogs: 'Dogs at the office', p_dogs: 'Dogs are welcome in the office on Fridays, if your team agrees. Ask the office manager about the dog-friendly floor.',
@@ -688,6 +706,7 @@ const STR = {
     jFrom: 'Jordan Lee · a person, not a document', jReply: 'Yes, on Fridays, if your team agrees. Ask the office manager about the dog-friendly floor.',
     jReplyGeneric: 'Good question. Let me find out, and I’ll get back to you today.', jToast: '{manager} answered.',
     docSource: 'Source', docClose: 'Close the document', citedTag: 'The part the answer used',
+    tabHr: 'Acme HR · People', tabWelcome: 'Welcome to Acme!',
     switchOmar: "Omar's laptop", switchNina: "Nina's laptop", whenMon: 'Monday, Oct 26 · 9:02 AM', whenLater: 'Monday, Oct 26 · 9:20 AM',
     close: 'Close'
   },
@@ -736,7 +755,7 @@ const STR = {
     srcTitle: 'De onde veio esta etapa', backToDocs: 'Todos os documentos', srcNote: 'A IA escreveu esta etapa a partir deste trecho. Se você editar a etapa, o documento continua igual.',
     s_laptop: 'Retirar o notebook', s_contract: 'Assinar o contrato e os documentos fiscais', s_meet: 'Conhecer o Jordan, seu gestor', s_vpn: 'Configurar a VPN', s_playbook: 'Ler o playbook de vendas', s_health: 'Escolher o plano de saúde', s_shadow: 'Acompanhar uma ligação de vendas', s_checkin: 'Conversa de fim de semana com o Jordan',
     doc_handbook: 'Manual de Pessoas', doc_vacation: 'Atualização da política de férias', doc_it: 'Guia de configuração de TI', doc_benefits: 'Guia de benefícios 2026', doc_sales: 'Guia do time de vendas',
-    h_contract: 'Seu primeiro dia', p_contract: 'No primeiro dia, assine o contrato de trabalho e os documentos fiscais no Workday. Sua pessoa de referência em Pessoas manda os links antes de você começar.',
+    h_contract: 'Seu primeiro dia', p_contract: 'No primeiro dia, assine o contrato de trabalho e os documentos fiscais no portal de RH. Sua pessoa de referência em Pessoas manda os links antes de você começar.',
     h_vacation: 'Férias', p_vac_old: 'Funcionários em tempo integral têm 15 dias de férias por ano, além dos feriados.',
     h_checkin: 'Sua primeira semana', p_checkin: 'No fim da primeira semana, quem chegou conversa com o gestor sobre o que está funcionando e o que vem a seguir.',
     h_dogs: 'Cachorros no escritório', p_dogs: 'Cachorros são bem-vindos no escritório às sextas, se o seu time concordar. Fale com a gerência do escritório sobre o andar que aceita cachorros.',
@@ -769,6 +788,7 @@ const STR = {
     jFrom: 'Jordan Lee · uma pessoa, não um documento', jReply: 'Pode sim, às sextas, se o seu time concordar. Fale com a gerência do escritório sobre o andar que aceita cachorros.',
     jReplyGeneric: 'Boa pergunta. Vou descobrir e te respondo hoje.', jToast: '{manager} respondeu.',
     docSource: 'Fonte', docClose: 'Fechar o documento', citedTag: 'O trecho que a resposta usou',
+    tabHr: 'RH da Acme · Pessoas', tabWelcome: 'Boas-vindas à Acme!',
     switchOmar: 'Notebook do Omar', switchNina: 'Notebook da Nina', whenMon: 'Segunda, 26 out · 9h02', whenLater: 'Segunda, 26 out · 9h20',
     close: 'Fechar'
   }
@@ -1302,7 +1322,19 @@ function renderApp() {
   const f = (state.focus && app.querySelector(state.focus)) || (fk && app.querySelector(fk));
   state.focus = null;
   if (f) f.focus({ preventScroll: true });
-  $('#b-url').textContent = state.role === 'omar' ? 'acme.firstweek.app/new-hires/nina-costa' : 'acme.firstweek.app/my-first-week';
+  renderChrome();
+}
+/* the window around the app says whose computer it is */
+function renderChrome() {
+  const role = state.role, mac = role === 'omar';
+  const b = $('#browser');
+  b.classList.toggle('is-omar', mac); b.classList.toggle('is-nina', !mac);
+  const other = t(mac ? 'tabHr' : 'tabWelcome');
+  $('#b-bar').innerHTML = `${mac ? '<span class="b-dots"><i></i><i></i><i></i></span>' : ''}
+    <span class="b-tabs"><span class="b-tab dim"><span class="tab-ic"></span>${esc(other)}</span><span class="b-tab"><span class="mini-logo">${LOGO}</span>Firstweek · Acme</span></span>
+    <span class="b-url">${mac ? 'acme.firstweek.app/new-hires/nina-costa' : 'acme.firstweek.app/my-first-week'}</span>
+    <span class="b-who"><span class="mini-av${mac ? '' : ' nina'}">${PEOPLE[role].ini}</span></span>
+    ${mac ? '' : '<span class="b-win"><i class="min"></i><i class="max"></i><i class="x"></i></span>'}`;
 }
 function headHTML(role) {
   const p = PEOPLE[role];
