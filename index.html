@@ -1,0 +1,1842 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Firstweek · Prototype 03 · Victor Mascaro</title>
+<meta name="description" content="A prototype you can try: onboarding where the company sets up the first week and new hires get answers only from the company's own documents, with sources. By Victor Mascaro, UX/AI designer.">
+<meta name="theme-color" content="#0A1430">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Firstweek: onboarding that cites its sources · Prototype by Victor Mascaro">
+<meta property="og:description" content="47% of digital workers struggle to find the information they need. Try a prototype where new hires get answers from the company's own documents, with sources.">
+<meta property="og:image" content="https://victor-mascaro-ux.github.io/firstweek/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="627">
+<meta property="og:url" content="https://victor-mascaro-ux.github.io/firstweek/">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<style>
+@font-face{font-family:"Bricolage Grotesque";src:url("fonts/bricolage-grotesque-latin-standard-normal.woff2") format("woff2-variations"),url("fonts/bricolage-grotesque-latin-standard-normal.woff2") format("woff2");font-weight:200 800;font-stretch:75% 100%;font-display:swap}
+@font-face{font-family:"Instrument Sans";src:url("fonts/instrument-sans-latin-standard-normal.woff2") format("woff2-variations"),url("fonts/instrument-sans-latin-standard-normal.woff2") format("woff2");font-weight:400 700;font-stretch:75% 100%;font-display:swap}
+@font-face{font-family:"JetBrains Mono";src:url("fonts/jetbrains-mono-latin-wght-normal.woff2") format("woff2-variations"),url("fonts/jetbrains-mono-latin-wght-normal.woff2") format("woff2");font-weight:100 800;font-display:swap}
+:root{
+  /* app (fictional Firstweek product, used by Acme) */
+  --bg:#F6F6F9; --surface:#FFFFFF; --ink:#17181D; --muted:#5E6272; --line:#E4E5EC; --line-strong:#BCC0CC; --well:#EEEFF4;
+  --brand:#5B3FD6; --brand-hover:#4A30BD; --brand-soft:#EEEAFE; --brand-ink:#3A2598;
+  --warn-bg:#FFF5DB; --warn-line:#E8C77A; --warn-ink:#6B4700;
+  --human:#0E6B4E; --human-soft:#E6F3ED; --human-line:#A9D5C1;
+  --error:#B42318; --focus:#2457D6;
+  --font:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  /* page: Victor's portfolio design system (dark theme) */
+  --navy:#0A1430; --navy-2:#111E43; --navy-3:#16264F; --navy-line:#1E2C56; --navy-line-2:#2A3A69;
+  --ice:#EEF3FF; --ice-2:#C5D0EA; --ice-muted:#8E9CC2;
+  --neon:#4FC3F7; --neon-ink:#06122B; --neon-soft:#102E57; --gold:#FFC83D;
+  --dot:rgba(120,170,255,.10); --glow:rgba(79,195,247,.12);
+  --card-glow:0 0 48px -4px rgba(79,195,247,.42),0 0 130px -16px rgba(79,195,247,.3);
+  --f-display:"Bricolage Grotesque","Avenir Next","Segoe UI",system-ui,sans-serif;
+  --f-body:"Instrument Sans","Segoe UI",system-ui,-apple-system,"Helvetica Neue",sans-serif;
+  --f-mono:"JetBrains Mono",ui-monospace,"SFMono-Regular",Menlo,Consolas,monospace;
+  --ease:cubic-bezier(.2,.8,.2,1); --ease-out:cubic-bezier(.16,1,.3,1); --ease-pop:cubic-bezier(.34,1.56,.64,1);
+  --card-gap:32px; /* one gap between every block in the concept */
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{margin:0;color:var(--ice);font:17px/1.6 var(--f-body);-webkit-font-smoothing:antialiased}
+button,input,select,textarea{font:inherit;color:inherit}
+a{color:inherit}
+[hidden]{display:none!important}
+:focus-visible{outline:3px solid var(--focus);outline-offset:2px;border-radius:6px}
+::selection{background:#FFD84D;color:#382800}
+.sr-only{position:absolute!important;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+svg.i{width:20px;height:20px;flex:none;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+/* design system rule: an icon next to text sits on the text's first line, never centered on the whole block.
+   Align the row to the top (align-items:flex-start) and nudge the icon down by half the difference
+   between the line height and the icon size: margin-top:calc((line-height - icon size) / 2). */
+
+/* ================= Page layout ================= */
+/* desktop: left: the context · right: steps bar above a browser window. A dotted canvas with a glow that follows the pointer, like the portfolio */
+body{overflow:auto;background:radial-gradient(var(--dot) 1px,transparent 1.3px) 0 0/24px 24px,var(--navy)}
+.page{position:relative;isolation:isolate;display:grid;grid-template-columns:clamp(320px,27vw,440px) minmax(0,1fr);grid-template-rows:minmax(0,1fr);grid-template-areas:"panel stage";column-gap:clamp(32px,3.5vw,56px);max-width:1760px;margin:0 auto;padding:20px 28px;height:100vh;height:100dvh}
+.page::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;background:radial-gradient(560px circle at var(--gx,80%) var(--gy,37%),var(--glow),transparent 65%)}
+/* language button: the portfolio's tool button, with the current language's flag and code */
+.tool{display:inline-flex;align-items:center;gap:8px;height:38px;padding:0 12px;border:1px solid var(--navy-line);border-radius:10px;background:var(--navy-2);color:var(--ice);font-size:.8125rem;font-weight:600;cursor:pointer;transition:background-color .18s,border-color .18s,color .18s,transform .18s var(--ease)}
+.tool:hover{border-color:var(--navy-line-2)}
+.tool.lang-btn{gap:7px;padding:0 11px 0 10px}
+.lang-flag{width:20px;height:14px;object-fit:cover;object-position:left center;border-radius:3px;box-shadow:0 0 0 1px var(--navy-line);flex:none}
+.lang-code{font-family:var(--f-mono);font-size:.74rem;font-weight:700;letter-spacing:.04em}
+.flag-br:not(:lang(pt-BR)),.flag-us:lang(pt-BR){display:none}
+.stage{grid-area:stage;position:relative;display:flex;flex-direction:column;gap:12px;min-width:0;min-height:0}
+.mini-av{display:inline-grid;place-items:center;width:22px;height:22px;border-radius:50%;background:#FDE7D9;color:#8A3B12;font-size:10px;font-weight:700}
+.mini-av.nina{background:#E2EEFF;color:#1D4E9E}
+/* the browser window: Firstweek is a desktop web app */
+.browser{position:relative;flex:1;min-height:0;display:flex;flex-direction:column;border-radius:14px;overflow:hidden;background:#E3E5EC;box-shadow:0 0 0 1px #2B3557,0 40px 90px rgba(0,0,0,.5),var(--card-glow)}
+/* Try it: the window's glow swells once and settles, to say "over here" */
+.browser.look{animation:look 1.3s ease-in-out}
+@keyframes look{35%{box-shadow:0 0 0 2px var(--neon),0 40px 90px rgba(0,0,0,.5),0 0 64px 4px rgba(79,195,247,.7),0 0 160px 10px rgba(79,195,247,.4)}}
+.b-bar{flex:none;display:flex;align-items:flex-end;gap:10px;height:42px;padding:0 14px;background:#DADDE6;border-bottom:1px solid #C9CDD8}
+.b-dots{display:flex;gap:7px;align-self:center}
+.b-dots i{width:12px;height:12px;border-radius:50%;background:#FF5F57}
+.b-dots i:nth-child(2){background:#FEBC2E}
+.b-dots i:nth-child(3){background:#28C840}
+.b-tab{display:flex;align-items:center;gap:8px;margin-left:10px;height:32px;padding:0 16px 0 12px;border-radius:9px 9px 0 0;background:var(--bg);font:600 13px/1 var(--font);color:#30343C}
+.b-tab .mini-logo{display:grid;place-items:center;width:16px;height:16px;border-radius:4px;background:var(--brand);color:#fff}
+.b-tab .mini-logo svg{width:11px;height:11px}
+.b-url{align-self:center;margin-left:8px;padding:5px 12px;border-radius:999px;background:#F2F3F7;font:500 12.5px/1 var(--font);color:#4B4F5C;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+.screen{position:relative;flex:1;min-height:0;overflow:hidden;background:var(--bg);color:var(--ink);font:15px/1.5 var(--font);container:app/inline-size}
+
+/* ================= Context (left) ================= */
+/* scrolls without a visible bar; the bottom edge fades to show there's more */
+.concept{grid-area:panel;min-height:0;overflow-y:auto;padding:24px 8px 56px 0;color:var(--ice);scrollbar-width:none;-webkit-mask-image:linear-gradient(#000 calc(100% - 56px),transparent);mask-image:linear-gradient(#000 calc(100% - 56px),transparent)}
+.concept::-webkit-scrollbar{display:none}
+.concept :focus-visible{outline-color:var(--neon)}
+.concept a{color:var(--neon);text-underline-offset:3px;transition:text-underline-offset .18s var(--ease)}
+.concept a:hover{text-underline-offset:5px}
+.concept a.g-btn{color:var(--neon-ink)}
+.concept a.g-btn.ghost{color:var(--ice)}
+.c-top{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:0 0 20px}
+.c-eyebrow,.c-label{margin:0;font:600 .72rem/1.4 var(--f-mono);letter-spacing:.1em;text-transform:uppercase;color:var(--ice-muted)}
+.c-eyebrow{display:inline-flex;align-items:center;gap:10px}
+/* rotated, the diamond is wider than its box; the 2px keeps its left tip inside the scrolling panel */
+.c-eyebrow::before{content:"";width:8px;height:8px;margin-left:2px;border-radius:2px;background:var(--gold);transform:rotate(45deg);flex:none}
+/* the title is the headline; the medium comes second, in the accent with the portfolio's gold underline */
+.c-title{margin:0 0 40px;font:700 clamp(36px,1.2rem + 2.3vw,58px)/.98 var(--f-display);letter-spacing:-.03em;font-variation-settings:"opsz" 96;text-wrap:balance}
+.c-title .w{display:inline-block}
+.c-title em{font-style:normal;color:var(--neon);padding-bottom:.08em;background-image:linear-gradient(var(--gold),var(--gold)),repeating-linear-gradient(90deg,var(--navy-line-2) 0 calc(10% - 3px),transparent calc(10% - 3px) 10%);background-repeat:no-repeat;background-position:0 96%,0 96%;background-size:0% .09em,100% .09em;-webkit-box-decoration-break:clone;box-decoration-break:clone;animation:xpfill 1.4s var(--ease-out) 1.1s forwards}
+@keyframes xpfill{to{background-size:100% .09em,100% .09em}}
+/* the problem sits on the page, no box: the gold label, one number, then what it means.
+   Only the solution is a card, so it's the one thing that stands out */
+.c-problem{margin:0 0 var(--card-gap)}
+.c-problem .c-label{display:flex;align-items:center;gap:8px;margin:0 0 14px;color:var(--gold)}
+.c-problem .c-label svg.i{width:16px;height:16px}
+/* every prototype's problem has a number: it leads, large and gold, beside the sentence it counts.
+   The number is exactly two lines tall: in Bricolage, digits and ascenders are .70 of the font size,
+   so the number is (1.28 + .70) / .70 = 2.83 × the sentence's size, and its margin lines its top up with the first line */
+.c-stat{--p-fs:clamp(19px,.95rem + .5vw,23px);display:flex;align-items:flex-start;gap:18px}
+.c-num{flex:none;margin:calc(2px - var(--p-fs) * .1) 0 0;font:650 calc(var(--p-fs) * 2.83)/1 var(--f-display);letter-spacing:-.035em;color:var(--gold);font-variation-settings:"opsz" 96}
+.c-problem-txt{margin:2px 0 0;font:650 var(--p-fs)/1.28 var(--f-display);letter-spacing:-.015em;color:var(--ice)}
+/* the source belongs to the claim, so it sits right under it, from the number's left edge */
+.c-source{margin:10px 0 0;font-size:13px;line-height:1.5;color:var(--ice-muted)}
+/* cards with the portfolio's spotlight and border light that follow the pointer */
+.c-spot{position:relative;isolation:isolate;--sx:50%;--sy:50%;--spot:var(--neon);--spot-glow:var(--glow)}
+.c-spot::before,.c-spot::after{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;opacity:0;transition:opacity .35s}
+.c-spot::before{z-index:-1;background:radial-gradient(420px circle at var(--sx) var(--sy),var(--spot-glow),transparent 60%)}
+.c-spot::after{z-index:1;padding:1.5px;background:radial-gradient(260px circle at var(--sx) var(--sy),var(--spot),transparent 70%);-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude}
+.c-spot:hover::before,.c-spot:hover::after{opacity:1}
+/* the solution is the highlight of the page: the only card, flat blue with a thin blue border */
+.c-solution{margin:0 0 var(--card-gap);padding:24px 24px 26px;border-radius:22px;background:var(--neon-soft);border:1px solid rgba(79,195,247,.35)}
+.c-solution .c-label{display:flex;align-items:center;gap:8px;margin:0 0 12px;color:var(--neon)}
+.c-solution .c-label svg.i{width:16px;height:16px}
+.c-why{margin:0;font:600 clamp(19px,.95rem + .55vw,24px)/1.36 var(--f-display);letter-spacing:-.015em;color:var(--ice-2)}
+/* highlights are colored words, no underline, one per block: blue in the solution (the problem's gold is its number) */
+.c-why b{font-weight:700;color:var(--neon)}
+/* try it: points at the window; a click shows the next step there right away */
+.c-try{display:flex;align-items:center;gap:16px;width:100%;margin:0 0 var(--card-gap);padding:16px 16px 16px 20px;border:0;border-radius:14px;background:var(--neon);color:var(--neon-ink);text-align:left;cursor:pointer;box-shadow:inset 0 -2px 0 rgba(0,0,0,.18);transition:transform .18s var(--ease),box-shadow .18s}
+.c-try:hover{transform:translateY(-2px);box-shadow:inset 0 -2px 0 rgba(0,0,0,.18),0 12px 30px -10px rgba(79,195,247,.6)}
+.c-try:active{transform:scale(.98);transition-duration:.08s}
+.c-try-txt{flex:1;font-size:15px;line-height:1.45;font-weight:500}
+.c-try strong{display:block;margin-bottom:2px;font:700 20px/1.2 var(--f-display);letter-spacing:-.01em}
+.c-try-go{flex:none;display:grid;place-items:center;width:46px;height:46px;border-radius:50%;background:var(--neon-ink);color:var(--neon);animation:nudge 1.1s var(--ease) 2.4s 5}
+.c-try-go svg.i{width:22px;height:22px;stroke-width:2.2}
+.c-try:hover .c-try-go{animation:nudge 1.1s var(--ease) infinite}
+@keyframes nudge{50%{transform:translateX(6px)}}
+/* design decisions: a plain list on the page, no box; the numbers are quiet mono, on the title's first line */
+.c-decisions{margin:0 0 var(--card-gap)}
+.c-decisions .c-label{display:flex;align-items:center;gap:8px;margin:0 0 16px}
+.c-decisions .c-label svg.i{width:16px;height:16px}
+.c-list{display:grid;gap:18px;margin:0;padding:0;list-style:none}
+.c-list li{display:flex;align-items:flex-start;gap:12px;font-size:15px;line-height:1.5;color:var(--ice-2)}
+.c-list b{display:block;margin-bottom:3px;font:650 17px/1.3 var(--f-display);letter-spacing:-.01em;color:var(--ice)}
+.c-n{flex:none;min-width:20px;font:700 12px/22px var(--f-mono);color:var(--ice-muted)}
+.c-cta{padding:22px;border-radius:22px;background:var(--navy-2);border:1px solid var(--navy-line)}
+.c-cta p{margin:0 0 14px;font:650 21px/1.25 var(--f-display);letter-spacing:-.015em}
+.c-cta-q{display:flex;align-items:flex-start;gap:10px;--ic:24px}
+.c-cta-q svg.i{width:var(--ic);height:var(--ic);margin-top:calc((1.25em - var(--ic)) / 2);color:var(--neon)}
+/* in the steps panel the question takes the panel cards' text size; the layout stays the same */
+.g-full .c-cta p{font-size:19px}
+.g-full .c-cta-q{--ic:22px}
+.c-cta .row{display:flex;flex-wrap:wrap;gap:10px}
+.c-cta .g-btn{width:auto;flex:1 1 180px;padding:10px 18px;line-height:1.25;text-align:center}
+/* the icon sits inline at the start of the label, so a label that wraps keeps it on the first line */
+.c-cta .g-btn svg.i{display:inline-block;width:18px;height:18px;margin-right:8px;vertical-align:middle;fill:none;stroke-width:2}
+
+/* ================= Steps bar (above the window, like the mobile view) ================= */
+.guide{position:relative;z-index:60;flex:none;color:var(--ice);animation:rise .8s var(--ease-out) .55s backwards}
+.guide :focus-visible{outline-color:var(--neon)}
+.g-compact{display:flex;align-items:center;gap:10px;min-height:56px;padding:6px 8px 6px 12px;background:var(--navy-2);border:1px solid var(--navy-line);border-radius:14px;transition:border-radius .15s}
+/* open, the bar and the panel are one card: the bar squares off at the bottom and the panel grows out of it */
+.guide.open .g-compact{border-radius:14px 14px 0 0}
+.g-step{flex:none;padding:3px 8px;border-radius:7px;background:var(--neon-soft);border:1px solid rgba(79,195,247,.45);color:var(--neon);font:700 12px/1.4 var(--f-mono)}
+.g-who{flex:none;display:inline-flex;align-items:center;gap:6px;padding:3px 10px 3px 4px;border-radius:999px;background:var(--navy-3);font-size:12.5px;font-weight:600;color:var(--ice-2);white-space:nowrap}
+.g-ctitle{flex:1;min-width:0;margin:0;font:650 16px/1.3 var(--f-display);letter-spacing:-.01em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.g-show-sm{flex:none;display:inline-flex;align-items:center;gap:6px;min-height:40px;padding:0 14px;border:0;border-radius:10px;background:var(--neon);color:var(--neon-ink);font-size:14px;font-weight:600;cursor:pointer;box-shadow:inset 0 -2px 0 rgba(0,0,0,.18)}
+.g-show-sm svg.i{display:none}
+.g-expand{flex:none;display:grid;place-items:center;width:44px;height:44px;border:0;border-radius:10px;background:transparent;color:var(--ice);cursor:pointer;transition:background-color .18s}
+.g-expand:hover{background:var(--navy-3)}
+.g-expand svg{transition:transform .35s var(--ease-pop)}
+.guide.open .g-expand svg{transform:rotate(180deg)}
+.guide.opening .g-expand svg{animation:turn .35s var(--ease-pop)}
+@keyframes turn{from{transform:none}}
+.g-full{display:none;position:absolute;top:100%;left:0;width:min(520px,100%);max-height:calc(100dvh - 140px);overflow-y:auto;flex-direction:column;gap:16px;padding:16px 18px;background:var(--navy-2);border:1px solid var(--navy-line);border-top:0;border-radius:0 0 14px 14px;box-shadow:0 2px 6px rgba(0,0,0,.4),0 36px 72px -18px rgba(0,0,0,.75);scrollbar-width:none}
+.g-full .g-card{padding:0;background:none;border:0;border-radius:0}
+.g-full::-webkit-scrollbar{display:none}
+/* the panel unfolds from the bar and folds back up; while it's open the bar is just its header */
+.guide.open .g-full{display:flex}
+.guide.opening .g-full{animation:unfold .32s var(--ease-out)}
+.guide.closing .g-full{animation:fold .28s cubic-bezier(.4,0,.2,1) forwards}
+.guide.settling .g-ctitle,.guide.settling .g-show-sm,.guide.settling .g-who{animation:swapin .3s var(--ease-out)}
+.guide.closing .g-expand svg{transform:none}
+.g-howto{display:none;flex:1;min-width:0;margin:0;font:650 16px/1.3 var(--f-display);letter-spacing:-.01em}
+.guide.open .g-ctitle,.guide.open .g-show-sm,.guide.open .g-who{display:none}
+.guide.open .g-howto{display:block}
+.guide.opening .g-howto{animation:swapin .3s var(--ease-out)}
+@keyframes unfold{from{clip-path:inset(0 0 100% 0)}to{clip-path:inset(0)}}
+@keyframes fold{to{clip-path:inset(0 0 100% 0)}}
+.g-full .g-head,.g-full .g-about,.g-full .g-cta{display:none}
+.g-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
+.g-name{margin:0;font:700 22px/1.2 var(--f-display);letter-spacing:-.02em}
+.g-dashes{display:flex;gap:5px}
+.g-dashes i{flex:1;height:4px;border-radius:2px;background:#24325E}
+.g-dashes i.done{background:var(--neon)}
+.g-dashes i.now{background:linear-gradient(90deg,var(--neon) 50%,#24325E 50%)}
+.g-label{margin:0;font:600 .72rem/1.3 var(--f-mono);letter-spacing:.1em;text-transform:uppercase;color:var(--ice-muted)}
+.g-card{padding:18px;border-radius:14px;background:var(--navy-2);border:1px solid var(--navy-line)}
+.g-chip{display:inline-flex;align-items:center;gap:6px;padding:3px 10px 3px 4px;border-radius:999px;background:var(--navy-3);font-size:12.5px;font-weight:600;color:var(--ice)}
+.g-chip.ok{padding-left:10px;background:#103B33;color:#7FE0B5}
+.g-chip svg.i{width:16px;height:16px}
+.g-title{margin:12px 0 8px;font:700 23px/1.15 var(--f-display);letter-spacing:-.02em}
+.g-desc{margin:0 0 16px;font-size:15px;line-height:1.55;color:var(--ice-2)}
+/* buttons: the portfolio's lift, press and shine sweep */
+.g-btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;min-height:48px;padding:0 22px;border:1.5px solid transparent;border-radius:12px;background:var(--neon);color:var(--neon-ink);font-size:15px;font-weight:600;cursor:pointer;text-decoration:none;box-shadow:inset 0 -2px 0 rgba(0,0,0,.18)}
+.g-btn,.g-show-sm{position:relative;overflow:hidden;transition:transform .18s var(--ease),background-color .18s,border-color .18s,box-shadow .18s}
+.g-btn:hover,.g-show-sm:hover{transform:translateY(-2px)}
+.g-btn:active,.g-show-sm:active{transform:scale(.96);transition-duration:.08s}
+.g-btn:not(.ghost)::after,.g-show-sm::after{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(105deg,transparent 35%,rgba(255,255,255,.28) 50%,transparent 65%);transform:translateX(-110%)}
+.g-btn:not(.ghost):hover::after,.g-show-sm:hover::after{transform:translateX(110%);transition:transform .75s var(--ease-out)}
+.g-btn svg.i{width:16px;height:16px;fill:currentColor}
+.g-btn.ghost{background:transparent;color:var(--ice);border-color:var(--navy-line-2);box-shadow:none}
+.g-btn.ghost:hover{border-color:var(--ice);background:var(--navy-2)}
+.g-btn[aria-disabled="true"],.g-show-sm[aria-disabled="true"]{opacity:.75;cursor:progress;transform:none;background-image:linear-gradient(100deg,transparent 30%,rgba(255,255,255,.55) 50%,transparent 70%);background-size:200% 100%;animation:shimmer 1.1s linear infinite}
+@keyframes shimmer{to{background-position:-200% 0}}
+.g-help{margin:10px 0 0;font-size:13px;line-height:1.45;color:var(--ice-muted);text-align:center}
+.g-stack{display:flex;flex-direction:column;gap:10px}
+.g-about{border:1px solid var(--navy-line);border-radius:14px}
+.g-about summary{display:flex;align-items:center;justify-content:space-between;min-height:48px;padding:0 14px;cursor:pointer;font-size:14px;font-weight:600;list-style:none}
+.g-about summary::-webkit-details-marker{display:none}
+.g-about summary svg{transition:transform .35s var(--ease-pop)}
+.g-about[open] summary svg{transform:rotate(180deg)}
+/* the drawer shows the same parts as the left panel, a little tighter */
+.g-about .in{padding:0 12px 12px;color:var(--ice-2)}
+.g-about a{color:var(--neon)}
+.g-about .c-solution{padding:18px}
+.g-about .c-decisions{margin:0}
+.g-about .c-why{font-size:19px}
+.g-foot{margin-top:auto;display:flex;flex-direction:column;gap:12px;padding-top:4px}
+.g-restart{display:flex;align-items:center;justify-content:center;gap:8px;min-height:44px;border:0;background:none;color:var(--ice-muted);font-size:14px;font-weight:600;cursor:pointer;transition:color .18s}
+.g-restart:hover{color:var(--ice)}
+.g-restart svg{transition:transform .5s var(--ease-out)}
+.g-restart:hover svg{transform:rotate(-200deg)}
+
+/* pulsing ring (guide layer, drawn over the window) */
+.ring{position:absolute;z-index:35;pointer-events:none;border:3px solid var(--neon);border-radius:14px;opacity:0;transition:opacity .3s;box-shadow:0 0 0 0 rgba(79,195,247,.55);animation:pulse 1.5s ease-out infinite}
+.ring.on{opacity:1}
+@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(79,195,247,.55)}100%{box-shadow:0 0 0 14px rgba(79,195,247,0)}}
+.demo-press{transform:scale(.96);transition:transform .12s}
+
+/* ================= Page motion ================= */
+/* one orchestrated entrance (like the portfolio's hero), then small responses to input */
+.boot .c-top{animation:rise .7s var(--ease-out) .05s backwards}
+.boot .c-eyebrow::before{animation:spinIn .8s var(--ease-pop) .2s backwards}
+.boot .c-title .w{animation:wordUp .95s var(--ease-out) backwards;animation-delay:calc(.12s + var(--wi,0) * 55ms)}
+.boot .concept>:nth-child(n+3){animation:rise .8s var(--ease-out) backwards;animation-delay:calc(.35s + var(--i,0) * 80ms)}
+.boot .browser{animation:winIn 1s var(--ease-out) .25s backwards}
+/* the steps bar when the task changes (--age keeps it smooth across re-renders) */
+.g-compact.swap{animation:glow 1s var(--ease-out) var(--age,0s)}
+.g-compact.swap .g-step{animation:pop .5s var(--ease-pop) var(--age,0s) backwards}
+.g-compact.swap .g-ctitle,.g-compact.swap .g-who{animation:swapin .45s var(--ease-out) var(--age,0s) backwards}
+/* language switch, as in the portfolio: the flag flips over like a card, the code rolls in,
+   and the text on screen types itself in again; the part not yet typed keeps its space, headings carry a caret */
+.lang-btn.is-flipping .lang-flag{animation:flagFlip .7s var(--ease-pop) both}
+.lang-btn.is-flipping .lang-code{display:inline-block;animation:codeRoll .5s var(--ease-out) .12s both}
+.tw-off{visibility:hidden}
+.tw-head .tw-on{position:relative}
+.tw-head.is-typing .tw-on::after{content:"";position:absolute;right:-3px;top:.08em;bottom:.02em;width:2px;border-radius:1px;background:var(--neon);animation:caretBlink .45s steps(1) infinite}
+@keyframes flagFlip{from{transform:perspective(80px) rotateY(-180deg) scale(.8)}}
+@keyframes codeRoll{from{opacity:0;transform:translateY(80%)}}
+@keyframes caretBlink{50%{opacity:0}}
+@keyframes rise{from{opacity:0;transform:translateY(16px)}}
+@keyframes wordUp{from{opacity:0;transform:translateY(.5em) rotate(3deg);filter:blur(8px)}}
+@keyframes spinIn{from{transform:rotate(-135deg) scale(.3)}}
+@keyframes winIn{from{opacity:0;transform:translate3d(0,40px,0) scale(.97)}}
+@keyframes swapin{from{opacity:0;transform:translateY(8px)}}
+@keyframes glow{from{border-color:var(--neon);box-shadow:0 0 0 0 rgba(79,195,247,.45)}to{box-shadow:0 0 0 12px rgba(79,195,247,0)}}
+@keyframes pop{from{opacity:0;transform:scale(.4)}}
+@keyframes fade{from{opacity:0}to{opacity:1}}
+@keyframes fadeout{to{opacity:0}}
+
+/* ================= App (fictional product: Firstweek, at Acme) ================= */
+.app{position:absolute;inset:0;display:flex;flex-direction:column}
+.view{flex:1;min-height:0;display:flex;flex-direction:column}
+.view.in{animation:fade .3s ease-out}
+.app-head{flex:none;display:flex;align-items:center;gap:20px;height:56px;padding:0 20px;background:var(--surface);border-bottom:1px solid var(--line)}
+.brand{display:flex;align-items:center;gap:8px;font-weight:700;font-size:16px;letter-spacing:-.01em}
+.logo{display:grid;place-items:center;width:28px;height:28px;border-radius:8px;background:var(--brand);color:#fff}
+.logo svg{width:18px;height:18px}
+.ws{padding:2px 8px;border-radius:6px;background:var(--well);color:var(--muted);font-size:12.5px;font-weight:600}
+.nav{display:flex;gap:2px;align-self:stretch}
+.nav button{padding:0 12px;border:0;background:none;color:var(--muted);font-size:14px;font-weight:600;cursor:pointer;box-shadow:inset 0 -2px 0 transparent;transition:color .15s}
+.nav button:hover{color:var(--ink)}
+.nav button[aria-current="page"]{color:var(--ink);box-shadow:inset 0 -2px 0 var(--brand);cursor:default}
+.head-end{margin-left:auto;display:flex;align-items:center;gap:10px;min-width:0}
+.who{display:flex;flex-direction:column;align-items:flex-end;font-size:13px;line-height:1.3;color:var(--muted);white-space:nowrap}
+.who b{color:var(--ink);font-weight:600}
+.avatar{display:grid;place-items:center;width:34px;height:34px;flex:none;border-radius:50%;background:#FDE7D9;color:#8A3B12;font-weight:700;font-size:12.5px}
+.avatar.nina{background:#E2EEFF;color:#1D4E9E}
+.avatar.jordan{background:#DDE7E2;color:#0B4F3A}
+.avatar.sm{width:28px;height:28px;font-size:11px}
+.avatar.big{width:64px;height:64px;font-size:22px}
+.body{flex:1;min-height:0;display:flex;position:relative}
+h1:focus,h2:focus{outline:none}
+.meta{margin:2px 0 0;color:var(--muted);font-size:14px}
+.pill{display:inline-flex;align-items:center;gap:6px;padding:5px 11px;border-radius:999px;font-size:13px;font-weight:600;white-space:nowrap}
+.pill svg.i{width:15px;height:15px}
+.pill.ai{background:var(--brand-soft);color:var(--brand-ink)}
+.pill.ok{background:var(--human-soft);color:var(--human);animation:pop .45s var(--ease-pop)}
+.pill.sm{padding:2px 8px;font-size:11.5px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:44px;padding:0 18px;border:0;border-radius:10px;font-size:15px;font-weight:600;cursor:pointer;text-align:center;line-height:1.2;white-space:nowrap;transition:background-color .15s,border-color .15s,transform .12s}
+.btn:active{transform:scale(.97)}
+.btn svg.i{width:18px;height:18px}
+.btn-primary{background:var(--brand);color:#fff}
+.btn-primary:hover{background:var(--brand-hover)}
+.btn-plain{background:var(--surface);color:var(--ink);border:1.5px solid var(--line-strong)}
+.btn-plain:hover{border-color:var(--ink)}
+.btn-sm{min-height:38px;padding:0 14px;font-size:14px}
+.link-btn{padding:0;border:0;background:none;color:var(--brand-ink);font:inherit;font-weight:600;text-decoration:underline;text-underline-offset:2px;cursor:pointer}
+.icon-btn{display:grid;place-items:center;width:36px;height:36px;flex:none;border:0;border-radius:10px;background:transparent;color:var(--ink);cursor:pointer;transition:background-color .15s}
+.icon-btn:hover{background:var(--well)}
+.input{width:100%;min-height:42px;padding:9px 12px;border:1.5px solid var(--line-strong);border-radius:10px;background:var(--surface);font-size:15px;transition:border-color .15s}
+.input:focus{border-color:var(--focus);outline:3px solid rgba(36,87,214,.22);outline-offset:0}
+.spinner{width:16px;height:16px;flex:none;border:2.5px solid #D6D3EA;border-top-color:var(--brand);border-radius:50%;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+/* where an AI-drafted step came from: a source chip (a person-added step says so instead) */
+.src{display:inline-flex;align-items:flex-start;gap:5px;max-width:100%;padding:3px 9px 3px 7px;border:0;border-radius:999px;background:var(--brand-soft);color:var(--brand-ink);font-size:12px;font-weight:600;line-height:1.4;text-align:left;cursor:pointer;transition:background-color .15s}
+.src:hover{background:#E2DBFD}
+.src svg.i{width:14px;height:14px;margin-top:calc((1.4em - 14px) / 2)}
+.src b{font-weight:700}
+.src.custom{background:var(--well);color:var(--muted);cursor:default}
+
+/* Omar's side: the first-week board */
+.plan{flex:1;min-width:0;display:flex;flex-direction:column}
+.plan-head{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;padding:18px 18px 14px 22px}
+.plan-head h1{margin:0;font-size:22px;line-height:1.25;letter-spacing:-.015em}
+.ph-end{display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:flex-end}
+/* rows size to their content, so a long day scrolls the board instead of squeezing its cards */
+.board{flex:1;min-height:0;display:grid;grid-auto-flow:column;grid-auto-columns:minmax(150px,1fr);grid-auto-rows:max-content;gap:10px;align-items:start;padding:2px 18px 22px;overflow:auto}
+.day{display:flex;flex-direction:column;gap:8px;min-height:220px;padding:10px;border-radius:14px;background:var(--well);border:2px solid transparent;transition:border-color .15s,background-color .15s}
+.day.drop{border-color:var(--brand);border-style:dashed;background:var(--brand-soft)}
+.day-h{display:flex;align-items:baseline;justify-content:space-between;gap:6px;margin:0 2px;font-size:13px;font-weight:700}
+.day-h span{color:var(--muted);font-weight:600}
+.steps{display:flex;flex-direction:column;gap:8px;margin:0;padding:0;list-style:none}
+.step{position:relative;padding:10px 10px 10px 12px;border:1px solid var(--line);border-radius:12px;background:var(--surface);box-shadow:0 1px 2px rgba(16,24,40,.05);cursor:grab}
+.step:active{cursor:grabbing}
+.step.dragging{opacity:.4}
+.step.flash{animation:flash 1.4s ease-out}
+@keyframes flash{0%{background:#E6E0FD;border-color:var(--brand)}}
+.step-t{margin:0 26px 8px 0;font-size:14px;font-weight:600;line-height:1.35}
+.step-menu-btn{position:absolute;top:5px;right:4px;width:30px;height:30px;display:grid;place-items:center;border:0;border-radius:8px;background:none;color:var(--muted);cursor:pointer}
+.step-menu-btn:hover,.step-menu-btn[aria-expanded="true"]{background:var(--well);color:var(--ink)}
+.step-menu-btn svg.i{width:18px;height:18px}
+.menu{position:absolute;z-index:20;top:36px;right:4px;width:200px;padding:8px;border:1px solid var(--line);border-radius:12px;background:var(--surface);box-shadow:0 12px 32px rgba(16,24,40,.18);animation:drop .18s var(--ease-out)}
+@keyframes drop{from{opacity:0;transform:translateY(-6px)}}
+.menu-h{margin:0 4px 6px;color:var(--muted);font-size:12px;font-weight:600}
+.menu-days{display:grid;grid-template-columns:repeat(5,1fr);gap:4px;margin-bottom:6px}
+.menu-days button{min-height:34px;border:1px solid var(--line);border-radius:8px;background:var(--surface);font-size:13px;font-weight:700;cursor:pointer}
+.menu-days button:hover{border-color:var(--brand);color:var(--brand-ink)}
+.menu-days button[aria-disabled="true"]{background:var(--brand-soft);border-color:transparent;color:var(--brand-ink);cursor:default}
+.menu-rm{display:flex;align-items:center;gap:8px;width:100%;min-height:34px;padding:0 6px;border:0;border-top:1px solid var(--line);background:none;color:var(--error);font-size:13.5px;font-weight:600;cursor:pointer}
+.menu-rm svg.i{width:16px;height:16px}
+.add-btn{display:flex;align-items:center;justify-content:center;gap:6px;min-height:38px;border:1.5px dashed var(--line-strong);border-radius:10px;background:none;color:var(--muted);font-size:13.5px;font-weight:600;cursor:pointer;transition:border-color .15s,color .15s}
+.add-btn:hover{border-color:var(--brand);color:var(--brand-ink)}
+.add-btn svg.i{width:16px;height:16px}
+.add-form{display:flex;flex-direction:column;gap:8px;padding:10px;border:1.5px solid var(--brand);border-radius:12px;background:var(--surface);animation:drop .18s var(--ease-out)}
+.add-form .input{min-height:38px;font-size:14px}
+.ideas-h{margin:0;color:var(--muted);font-size:12px;font-weight:600}
+.ideas{display:flex;flex-wrap:wrap;gap:6px}
+.idea{padding:4px 10px;border:1px solid var(--line-strong);border-radius:999px;background:var(--surface);font-size:12.5px;font-weight:600;cursor:pointer;text-align:left}
+.idea:hover{border-color:var(--brand);color:var(--brand-ink)}
+.add-row{display:flex;gap:6px}
+.add-row .btn{flex:1;padding:0 8px}
+.shake{animation:shake .4s}
+@keyframes shake{20%{transform:translateX(-6px)}40%{transform:translateX(5px)}60%{transform:translateX(-3px)}80%{transform:translateX(2px)}}
+/* the answer Jordan gave, waiting to be kept for the next new hire */
+.keep{display:flex;align-items:flex-start;gap:14px;margin:0 22px 14px;padding:14px 16px;border:1px solid var(--human-line);border-radius:14px;background:var(--human-soft);animation:rise .4s var(--ease-out)}
+.keep-ic{display:grid;place-items:center;width:34px;height:34px;flex:none;border-radius:10px;background:var(--human);color:#fff}
+.keep-ic svg.i{width:18px;height:18px}
+.keep-h{margin:0 0 4px;font-size:16px}
+.keep p{margin:0 0 4px;font-size:14px}
+.keep .keep-why{margin:6px 0 10px;color:var(--muted)}
+.keep-row{display:flex;flex-wrap:wrap;gap:8px}
+.keep-mini,.keep-done{display:flex;align-items:flex-start;gap:8px;margin:0 22px 14px;padding:10px 14px;border-radius:12px;background:var(--human-soft);color:var(--human);font-size:14px;font-weight:600}
+.keep-mini{justify-content:space-between;align-items:center}
+.keep-mini span,.keep-done{display:flex;gap:8px}
+.keep-mini svg.i,.keep-done svg.i{width:18px;height:18px;margin-top:calc((1.5em - 18px) / 2)}
+.keep-done{animation:rise .4s var(--ease-out)}
+/* the side panel: the documents the AI drafted from, or one step's source */
+.side{flex:none;width:300px;overflow-y:auto;padding:18px;border-left:1px solid var(--line);background:var(--surface)}
+.side.open{animation:sideIn .28s var(--ease-out)}
+@keyframes sideIn{from{opacity:0;transform:translateX(16px)}}
+.side-label{margin:0 0 10px;color:var(--muted);font-size:12px;font-weight:700;letter-spacing:.04em;text-transform:uppercase}
+.side-title{margin:0 0 12px;font-size:18px;line-height:1.3}
+.link-back{display:inline-flex;align-items:center;gap:6px;margin:0 0 14px;padding:0;border:0;background:none;color:var(--brand-ink);font-size:13.5px;font-weight:600;cursor:pointer}
+.link-back svg.i{width:16px;height:16px}
+.docs{display:flex;flex-direction:column;gap:2px;margin:0 0 14px;padding:0;list-style:none}
+.docs li{display:flex;align-items:flex-start;gap:10px;padding:9px 6px;border-bottom:1px solid var(--line)}
+.docs li>svg.i{width:18px;height:18px;color:var(--brand);margin-top:1px}
+.docs li span{display:flex;flex-direction:column;min-width:0;flex:1;font-size:13px;color:var(--muted)}
+.docs li b{color:var(--ink);font-size:14px;font-weight:600}
+.side-note{display:flex;gap:8px;margin:0;color:var(--muted);font-size:13px}
+.side-note svg.i{width:16px;height:16px;color:var(--brand);margin-top:calc((1.5em - 16px) / 2)}
+.doc-card{margin:0 0 14px;padding:14px;border:1px solid var(--line);border-radius:12px;background:var(--bg)}
+.doc-name{display:flex;align-items:flex-start;gap:6px;margin:0;font-weight:700;font-size:14px}
+.doc-name svg.i{width:16px;height:16px;color:var(--brand);margin-top:calc((1.5em - 16px) / 2)}
+.doc-upd{margin:0 0 10px;color:var(--muted);font-size:12.5px}
+.doc-sec{margin:0 0 4px;font-size:13px}
+/* the passage a step or an answer used: one bar down its left side, the words lightly marked */
+.doc-pass{margin:0;padding-left:10px;border-left:3px solid var(--brand);font-size:14px}
+mark{padding:1px 2px;border-radius:3px;background:var(--brand-soft);color:inherit;-webkit-box-decoration-break:clone;box-decoration-break:clone}
+
+/* Nina's side: day 1 on the left, Ask on the right */
+.nina-body{display:grid;grid-template-columns:minmax(250px,.85fr) minmax(330px,1.15fr);grid-template-rows:minmax(0,1fr)}
+.week{grid-column:1;grid-row:1;min-height:0;overflow-y:auto;padding:22px}
+.week h1{margin:0;font-size:24px;line-height:1.25;letter-spacing:-.015em}
+.progress{height:6px;margin:14px 0 6px;border-radius:3px;background:var(--well);overflow:hidden}
+.progress span{display:block;width:calc(var(--p) * 100%);height:100%;border-radius:3px;background:var(--brand);transition:width .4s var(--ease-out)}
+.meta.sm{font-size:13px}
+.checklist{display:flex;flex-direction:column;gap:8px;margin:14px 0 22px;padding:0;list-style:none}
+.check{display:flex;align-items:flex-start;gap:12px;padding:11px 12px;border:1px solid var(--line);border-radius:12px;background:var(--surface);cursor:pointer;transition:border-color .15s}
+.check:hover{border-color:var(--line-strong)}
+.check input{position:absolute;opacity:0;width:1px;height:1px}
+.check .box{display:grid;place-items:center;width:20px;height:20px;flex:none;margin-top:1px;border:1.5px solid var(--line-strong);border-radius:6px;color:transparent;transition:background-color .15s,border-color .15s}
+.check .box svg.i{width:14px;height:14px;stroke-width:2.6}
+.check input:checked + .box{background:var(--brand);border-color:var(--brand);color:#fff;animation:pop .3s var(--ease-pop)}
+.check input:focus-visible + .box{outline:3px solid var(--focus);outline-offset:2px}
+.check input:checked ~ .ct .ct-t{color:var(--muted);text-decoration:line-through}
+.ct{display:flex;flex-direction:column;min-width:0}
+.ct-t{font-weight:600;font-size:14.5px}
+.ct-s{color:var(--muted);font-size:12.5px}
+.week .h2{margin:0 0 8px;font-size:14px;color:var(--muted)}
+.upcoming{margin:0;padding:0 0 0 18px;font-size:14px;color:var(--muted)}
+.upcoming li{margin-bottom:4px}
+/* the document opens in day 1's place (the same grid cell), so the answer and its source sit side by side */
+.doc{grid-column:1;grid-row:1;position:relative;z-index:12;min-height:0;overflow-y:auto;padding:18px 22px 28px;background:var(--surface);border-right:1px solid var(--line);animation:sideIn .28s var(--ease-out)}
+.doc-top{display:flex;align-items:center;justify-content:space-between;margin:0 0 4px}
+.doc-top .side-label{margin:0}
+.doc-title{margin:0;font-size:20px;line-height:1.3}
+.doc-s{margin:0 0 14px;padding:12px 14px;border-radius:12px}
+.doc-s h3{margin:0 0 4px;font-size:14px}
+.doc-s p{margin:0;font-size:14.5px}
+.doc-s.cited{background:var(--brand-soft)}
+.doc-s.cited mark{background:transparent;box-shadow:none;padding:0;font-weight:600}
+.doc-s.added{border:1px dashed var(--human-line)}
+.cited-tag{display:flex;align-items:flex-start;gap:6px;margin:8px 0 0!important;color:var(--brand-ink);font-size:12.5px!important;font-weight:700}
+.cited-tag svg.i{width:14px;height:14px;margin-top:calc((1.5em - 14px) / 2)}
+.added-tag{margin:6px 0 0!important;color:var(--human);font-size:12.5px!important;font-weight:600}
+.ask{grid-column:2;grid-row:1;display:flex;flex-direction:column;min-height:0;background:var(--surface);border-left:1px solid var(--line)}
+.ask-head{padding:16px 20px 12px;border-bottom:1px solid var(--line)}
+.ask-head h2{display:flex;align-items:center;gap:8px;margin:0;font-size:17px}
+.ask-head h2 svg.i{width:18px;height:18px;color:var(--brand)}
+.ask-head p{margin:2px 0 0;color:var(--muted);font-size:13.5px}
+.chat{flex:1;min-height:0;overflow-y:auto;display:flex;flex-direction:column;gap:12px;padding:16px 20px}
+.chat-empty{margin:auto 0;color:var(--muted);font-size:14px;text-align:center;padding:0 12px}
+.msg{max-width:88%}
+.msg.in{animation:msgIn .35s var(--ease-out)}
+@keyframes msgIn{from{opacity:0;transform:translateY(10px)}}
+.msg p{margin:0}
+.msg.me{align-self:flex-end;padding:9px 13px;border-radius:16px 16px 4px 16px;background:var(--brand);color:#fff}
+.msg.ai{align-self:flex-start;max-width:94%}
+.msg.ai .bubble{padding:11px 14px;border:1px solid #E3DFF7;border-radius:4px 16px 16px 16px;background:#F6F4FE}
+.msg.think{display:flex;align-items:center;gap:8px;padding:10px 14px;border-radius:4px 16px 16px 16px;background:#F6F4FE;color:var(--muted);font-size:14px}
+.ai-label{display:flex;align-items:center;gap:6px;margin:0 0 4px!important;color:var(--brand-ink);font-size:12px;font-weight:700}
+.ai-label .logo{width:18px;height:18px;border-radius:5px}
+.ai-label .logo svg{width:12px;height:12px}
+.msg.ai p + p{margin-top:6px}
+.cite{display:inline-grid;place-items:center;min-width:20px;height:19px;margin:0 1px 0 3px;padding:0 5px;border:0;border-radius:6px;background:var(--brand);color:#fff;font:700 11px/1 var(--font);vertical-align:2px;cursor:pointer;transition:transform .12s}
+.cite:hover{transform:scale(1.12)}
+.sources{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin-top:10px}
+.sources-h{margin:0 2px 0 0!important;color:var(--muted);font-size:12px;font-weight:700}
+.sources .src b{display:inline-grid;place-items:center;min-width:16px;height:16px;margin-right:2px;border-radius:4px;background:var(--brand);color:#fff;font-size:10.5px}
+/* two documents disagree: both side by side, the newer one used */
+.conflict{margin-top:10px;padding:10px;border:1px solid var(--warn-line);border-radius:12px;background:var(--warn-bg)}
+.conflict-h{display:flex;align-items:flex-start;gap:6px;margin:0 0 8px!important;color:var(--warn-ink);font-size:13px;font-weight:700}
+.conflict-h svg.i{width:16px;height:16px;margin-top:calc((1.5em - 16px) / 2)}
+.cf-row{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.cf{display:flex;flex-direction:column;gap:2px;padding:9px 10px;border-radius:10px;background:var(--surface);border:1px solid var(--line);font-size:12.5px;color:var(--muted)}
+.cf b{color:var(--ink);font-size:17px}
+.cf.old b{color:var(--muted);text-decoration:line-through}
+.cf.new{border-color:var(--brand)}
+.cf-tag{display:inline-flex;align-items:center;gap:4px;font-weight:700;font-size:11.5px;text-transform:uppercase;letter-spacing:.03em}
+.cf.new .cf-tag{color:var(--brand-ink)}
+.cf-tag svg.i{width:13px;height:13px;stroke-width:2.6}
+.cf-why{margin:8px 0 0!important;font-size:13.5px;color:var(--ink)}
+.handoff{color:var(--muted)}
+.msg.ai .btn{margin-top:10px}
+.sent-note{display:flex;align-items:flex-start;gap:6px;margin-top:8px!important;color:var(--human);font-size:13.5px;font-weight:600}
+.sent-note svg.i{width:16px;height:16px;margin-top:calc((1.5em - 16px) / 2)}
+.msg.sys{align-self:center;display:flex;align-items:flex-start;gap:6px;max-width:100%;color:var(--muted);font-size:13px;text-align:center}
+.msg.sys svg.i{width:15px;height:15px;margin-top:calc((1.5em - 15px) / 2)}
+/* a person's answer looks different from the AI's, and says where it came from */
+.msg.human{align-self:flex-start;display:flex;align-items:flex-start;gap:8px;max-width:94%}
+.msg.human .bubble{padding:10px 14px;border:1px solid var(--human-line);border-radius:4px 16px 16px 16px;background:var(--human-soft)}
+.msg.human .from{margin-bottom:3px;color:var(--human);font-size:12px;font-weight:700}
+.suggest{padding:0 20px 10px}
+.suggest-h{margin:0 0 6px;color:var(--muted);font-size:12px;font-weight:700}
+.q-chips{display:flex;flex-wrap:wrap;gap:6px}
+.q-chip{padding:7px 12px;border:1.5px solid var(--line-strong);border-radius:999px;background:var(--surface);font-size:13.5px;font-weight:600;text-align:left;cursor:pointer;transition:border-color .15s,color .15s,transform .12s}
+.q-chip:hover{border-color:var(--brand);color:var(--brand-ink)}
+.q-chip:active{transform:scale(.97)}
+.ask-form{display:flex;gap:8px;padding:12px 20px 16px;border-top:1px solid var(--line)}
+.ask-form .btn{flex:none;width:44px;padding:0}
+/* the message to Jordan, inside the window */
+.modal-layer{position:absolute;inset:0;z-index:30;display:grid;place-items:center;padding:16px;background:rgba(14,16,32,.42);animation:fade .2s}
+.modal{width:min(460px,100%);padding:20px;border-radius:16px;background:var(--surface);box-shadow:0 24px 60px rgba(0,0,0,.3);animation:modalIn .25s var(--ease-out)}
+@keyframes modalIn{from{opacity:0;transform:translateY(12px) scale(.98)}}
+.modal h2{margin:0 0 8px;font-size:19px}
+.modal-to{display:flex;align-items:center;gap:8px;margin:0 0 12px;color:var(--muted);font-size:14px}
+.modal textarea{min-height:104px;resize:vertical;line-height:1.5}
+.modal-note{margin:8px 0 14px;color:var(--muted);font-size:13px}
+.modal-row{display:flex;justify-content:flex-end;gap:8px}
+/* switching laptops: whose screen this is, and when */
+.switch-layer{position:absolute;inset:0;z-index:40;display:none;place-items:center;background:rgba(10,20,48,.78);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
+.switch-layer.on{display:grid;animation:fade .25s ease-out}
+.switch-layer.out{animation:fadeout .25s ease-in forwards}
+.switch-card{display:flex;flex-direction:column;align-items:center;gap:6px;padding:26px 34px;border-radius:20px;background:var(--surface);box-shadow:0 30px 80px rgba(0,0,0,.4);text-align:center;animation:modalIn .4s var(--ease-pop)}
+.sw-name{margin:8px 0 0;font-size:19px;font-weight:700}
+.sw-when{margin:0;color:var(--muted);font-size:14px}
+.toast{position:absolute;z-index:32;left:50%;bottom:18px;display:flex;align-items:flex-start;gap:10px;max-width:min(440px,calc(100% - 32px));padding:11px 14px;border-radius:12px;background:var(--ink);color:#fff;font-size:14.5px;box-shadow:0 8px 24px rgba(0,0,0,.2);opacity:0;transform:translate(-50%,8px);transition:opacity .2s,transform .2s;pointer-events:none}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+.toast svg.i{margin-top:calc((1.5em - 20px) / 2);color:#7FE0B5}
+.toast.show svg.i{animation:pop .45s var(--ease-pop) .1s backwards}
+
+/* the window narrower than a laptop: the source panel slides over, then everything stacks */
+@container app (max-width:1000px){
+  .side:not(.open){display:none}
+  .side.open{position:absolute;top:0;right:0;bottom:0;z-index:15;width:min(320px,100%);box-shadow:-14px 0 32px rgba(16,24,40,.16)}
+  /* with a source open over the board, the header makes room so Publish stays in view */
+  .body:has(.side.open) .plan-head{flex-direction:column;padding-right:340px}
+  .body:has(.side.open) .ph-end{justify-content:flex-start}
+  .who{display:none}
+}
+@container app (max-width:760px){
+  .nav{display:none}
+  .app-head{gap:12px;padding:0 14px}
+  .plan{overflow-y:auto}
+  .plan-head{flex-direction:column;padding:16px 14px 12px}
+  .ph-end{justify-content:flex-start}
+  .body:has(.side.open) .plan-head{padding-right:14px}
+  .side.open{width:100%}
+  .board{flex:none;grid-auto-flow:row;grid-template-columns:1fr;grid-auto-columns:auto;padding:2px 14px 20px;overflow:visible}
+  .day{min-height:0}
+  .keep,.keep-mini,.keep-done{margin:0 14px 12px}
+  /* one column that scrolls: day 1, then Ask; a document covers both, from the top */
+  .nina-body{grid-template-columns:1fr;grid-template-rows:auto auto;overflow-y:auto}
+  .week{overflow:visible;padding:18px 14px}
+  .doc{grid-row:1 / span 2;border-right:0}
+  .ask{grid-column:1;grid-row:2;border-left:0;border-top:1px solid var(--line);min-height:560px}
+  .chat{min-height:280px}
+  .cf-row{grid-template-columns:1fr}
+}
+
+/* ================= Phone: steps bar on top, the app full screen ================= */
+@media (max-width:899px){
+  body{overflow:hidden}
+  .page{display:flex;flex-direction:column;height:100vh;height:100dvh;padding:0;gap:0;max-width:none}
+  .concept{display:none}
+  .stage{flex:1;gap:0;overflow:hidden}
+  .g-compact{border:0;border-bottom:1px solid var(--navy-line);border-radius:0;background:var(--navy)}
+  .g-who{display:none}
+  .g-full{top:100%;width:auto;right:0;max-height:calc(100dvh - 72px);padding-top:12px;border:0;border-bottom:1px solid var(--navy-line);border-radius:0;background:var(--navy)}
+  .guide.open .g-compact{border-radius:0}
+  .g-full .g-head{display:flex}
+  .g-full .g-about,.g-full .g-cta{display:block}
+  .browser{border-radius:0;box-shadow:none}
+  .boot .browser{animation:none}
+  .b-bar{display:none}
+}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.001ms!important;animation-delay:0s!important;animation-iteration-count:1!important;transition-duration:.001ms!important}
+  .ring{animation:none;box-shadow:0 0 0 6px rgba(79,195,247,.35)}
+}
+</style>
+</head>
+<body>
+<div class="page boot">
+  <section class="concept" id="intro" aria-labelledby="intro-title"></section>
+  <main class="stage" id="stage">
+    <aside class="guide" id="guide" aria-label="How to try this prototype"></aside>
+    <div class="browser" id="browser">
+      <div class="b-bar" aria-hidden="true"><span class="b-dots"><i></i><i></i><i></i></span><span class="b-tab"><span class="mini-logo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 18.5h4.5V14H14V9.5h4.5V5"/></svg></span>Firstweek · Acme</span><span class="b-url" id="b-url">acme.firstweek.app/new-hires/nina-costa</span></div>
+      <div class="screen" id="screen">
+        <div class="app" id="app" role="region" aria-label="Firstweek"></div>
+        <div class="toast" id="toast" aria-hidden="true"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg><span></span></div>
+        <div class="switch-layer" id="switch" aria-hidden="true"></div>
+        <div class="ring" id="ring" aria-hidden="true"></div>
+      </div>
+    </div>
+  </main>
+</div>
+<div class="sr-only" id="live" role="status" aria-live="polite"></div>
+<noscript><p style="padding:24px">This prototype needs JavaScript to run.</p></noscript>
+
+<script>
+(() => {
+'use strict';
+
+/* ---------------- Config ---------------- */
+const LINKS = {
+  linkedin: 'https://www.linkedin.com/in/victor-mascaro/',
+  portfolio: 'https://victor-mascaro-ux.github.io/my-portfolio/',
+  source: 'https://www.gartner.com/en/newsroom/press-releases/2023-05-10-gartner-survey-reveals-47-percent-of-digital-workers-struggle-to-find-the-information-needed-to-effectively-perform-their-jobs'
+};
+const MANAGER = 'Jordan Lee';
+const START = '2026-10-26';           // Nina's first day, a Monday
+const HEALTH_DEADLINE = '2026-11-25'; // 30 days after it, from the benefits guide
+const HINT_DELAY = 4000;
+const TASKS = ['t1', 't2', 't3', 't4', 't5', 't6', 't7'];
+// whose laptop each task happens on
+const TASK_ROLE = { t1: 'omar', t2: 'omar', t3: 'omar', t4: 'nina', t5: 'nina', t6: 'nina', t7: 'omar', done: 'omar' };
+// everyone here is fictional
+const PEOPLE = { omar: { ini: 'OH', name: 'Omar Haddad' }, nina: { ini: 'NC', name: 'Nina Costa' }, jordan: { ini: 'JL', name: MANAGER } };
+const reduceMotion = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+const isMobile = () => window.matchMedia('(max-width: 899px)').matches;
+
+/* ---------------- Copy (EN + PT-BR) ---------------- */
+const STR = {
+  en: {
+    guideLabel: 'How to try this prototype', howTo: 'How to try it',
+    cEyebrow: 'Prototype 03 · Firstweek', cTitleA: 'Onboarding', cTitleB: 'that cites its sources', aSourceLabel: 'Source:',
+    cWhy: "How might we give new hires <b>answers they can trust</b>, straight from the company's own documents, and a person when the documents don't know?",
+    cTryH: 'Try it', cTry: "Set up Nina's first week as Omar, then ask questions as Nina.", cSolH: 'The solution',
+    problemNum: '47%', problemText: 'of digital workers struggle to find the information they need to do their jobs.',
+    protoName: 'Firstweek',
+    langCode: 'EN', langLabel: 'EN, switch to Portuguese',
+    taskOf: 'Task {n} of {total}', onOmar: "On Omar's laptop", onNina: "On Nina's laptop",
+    showMe: 'Show me', showing: 'Showing…',
+    helpRing: 'or do it yourself in the window: click where the blue outline appears.',
+    expand: 'Show the instructions', collapse: 'Hide the instructions',
+    t1: "Check the AI's draft", t1d: "Nina Costa joins Acme's sales team on Monday. Omar, on the People team, is setting up Nina's first week, and the AI drafted it from Acme's documents. Click the VPN step's source to see where it came from.",
+    t2: 'Make it your own', t2d: 'Nina needs the sales tools from day 1, and they only open on the VPN. Move the VPN step to day 1, then add a lunch with a buddy on day 2.',
+    t3: 'Publish it to Nina', t3d: 'The week is ready. Publish it, and Nina sees day 1 when logging in on Monday.',
+    t4: 'Ask a question', t4d: "It's Monday, on Nina's laptop. Ask when Nina has to pick a health plan, then click the source number to check the answer.",
+    t5: 'Ask about vacation', t5d: "Two of Acme's documents disagree on vacation days. Ask how many Nina gets, and see how the answer handles it.",
+    t6: "Ask what the documents don't cover", t6d: 'Nina wants to bring a dog to the office. Ask, then send the question to Jordan, the manager.',
+    t7: 'Keep the answer', t7d: "Jordan answered, and it's back to Omar's laptop. Add Jordan's answer to the People handbook, so the next new hire gets it right away.",
+    doneChip: 'Done', doneT: "Nina's first week is set",
+    doneD: "The next new hire who asks about dogs gets Jordan's answer from the handbook, with its source. You did it in {time}.",
+    doneDNoTime: "The next new hire who asks about dogs gets Jordan's answer from the handbook, with its source.",
+    about: 'About this concept', aProblemH: 'The problem',
+    aSource: 'Gartner survey of 4,861 full-time digital workers in the US, UK, India and China, May 2023.', aSourceLink: 'Read it',
+    aDecH: 'Design decisions',
+    d1: '<b>Every answer shows its source.</b> Click the number to read the exact passage, and see when it was last updated.',
+    d2: '<b>Documents disagree? It says so.</b> It shows both, and goes with the newer one.',
+    d3: "<b>“I don't know” is an answer.</b> When the documents don't cover it, the AI hands you to your manager instead of guessing.",
+    d4: '<b>The company owns the steps.</b> The AI drafts the first week from your documents; the People team makes it its own.',
+    ctaAsk: 'Want something like this for your product?', ctaLinkedIn: 'Message me on LinkedIn', ctaPortfolio: 'See my portfolio', restart: 'Start over',
+    timeSec: '{s} s', timeMin: '{m} min {s} s',
+    navLabel: 'Firstweek', navNewHires: 'New hires', navDocs: 'Documents', navAnswers: 'Answers', navWeek: 'My first week', navPeople: 'People',
+    roleOmar: 'People team', roleNina: 'Sales · first week', protoOnly: 'Not part of this prototype.',
+    planTitle: "Nina Costa's first week", planMeta: 'Sales · starts {date} · Manager: {manager}',
+    draftPill: 'AI draft from {n} documents', publish: 'Publish to Nina', publishedPill: 'Published to Nina',
+    boardLabel: 'The days of the first week', dayN: 'Day {n}', addStep: 'Add step',
+    srcAria: 'Source: {doc}', stepAdded: 'Added by you', moveTo: 'Move to day', moveLabel: 'Move or remove this step', stepMenu: 'Options for {step}', remove: 'Remove',
+    addStepPh: 'Name the step', ideasH: 'Ideas', addSave: 'Add', cancel: 'Cancel',
+    idea_lunch: 'Lunch with your buddy', idea_team: 'Meet the sales team', idea_tour: 'Tour the office',
+    movedToast: 'Moved to day {n}.', addedToast: 'Added to day {n}.', removedToast: 'Step removed.', publishedToast: 'Published. Nina sees day 1 when logging in on Monday.',
+    docsTitle: 'Drafted from {n} documents', docsNote: "Firstweek drafts the steps, and answers new hires' questions, only from these documents.",
+    updated: 'Updated {date}', updatedToday: 'Updated today',
+    srcTitle: 'Where this step came from', backToDocs: 'All documents', srcNote: 'The AI wrote this step from this passage. Edit the step and the document stays as it is.',
+    s_laptop: 'Pick up your laptop', s_contract: 'Sign your contract and tax forms', s_meet: 'Meet Jordan, your manager', s_vpn: 'Set up the VPN', s_playbook: 'Read the sales playbook', s_health: 'Pick your health plan', s_shadow: 'Shadow a sales call', s_checkin: 'First-week check-in with Jordan',
+    doc_handbook: 'People handbook', doc_vacation: 'Vacation policy update', doc_it: 'IT setup guide', doc_benefits: 'Benefits guide 2026', doc_sales: 'Sales team guide',
+    h_contract: 'Your first day', p_contract: 'On your first day, sign your employment contract and tax forms in Workday. Your People partner sends the links before you start.',
+    h_vacation: 'Vacation', p_vac_old: 'Full-time employees get 15 vacation days a year, plus public holidays.',
+    h_checkin: 'Your first week', p_checkin: 'At the end of the first week, new hires meet their manager to talk about what is working and what comes next.',
+    h_dogs: 'Dogs at the office', p_dogs: 'Dogs are welcome in the office on Fridays, if your team agrees. Ask the office manager about the dog-friendly floor.',
+    dogsAdded: "Added {date} from {manager}'s answer to a new hire.",
+    h_vac26: 'Vacation from 2026', p_vac_new: 'From January 1, 2026, full-time employees get 20 vacation days a year, plus public holidays. This replaces the vacation section of the People handbook.',
+    h_laptop: 'Your laptop', p_laptop: 'Pick up your laptop at the IT desk on the 3rd floor, on your first morning.',
+    h_vpn: 'VPN', p_vpn: 'Set up the VPN before you work with customer data. The CRM and the sales tools only open on the VPN.',
+    h_enroll: 'Choosing a health plan', p_enroll: 'New employees have 30 days from their start date to choose a health plan. Until then, you are covered by the basic plan.',
+    h_first: 'Your first week in sales', p_first: 'In your first week, meet your manager, read the sales playbook and shadow at least one customer call.',
+    keepTitle: '1 new answer to keep', keepAsked: '{name} asked:', keepAnswered: '{name} answered:', keepWhy: 'Add it to the People handbook, and the next new hire gets this answer from Firstweek, with its source.',
+    keepAdd: 'Add to the handbook', keepLater: 'Not now', keepWaiting: '1 answer waiting to be kept', keepReview: 'Review',
+    keptToast: 'Added to the People handbook.', keptLine: "Added to the People handbook. The next new hire who asks gets Jordan's answer, with its source.",
+    welcome: 'Welcome, Nina', dayOneMeta: 'Day 1 · {date}', doneOf: '{d} of {n} done', comingUp: 'Coming up on day 2', todoLabel: 'Day 1 steps',
+    askTitle: 'Ask about Acme', askSub: "Answers come only from Acme's documents, with the source.", askPh: 'Ask anything about Acme…', askSend: 'Ask',
+    chatEmpty: "Ask about benefits, tools or rules. If Acme's documents don't say, you'll hear that too.",
+    suggestH: 'New hires often ask', q1: 'When do I have to pick a health plan?', q2: 'How many vacation days do I get?', q3: 'Can I bring my dog to the office?',
+    searching: "Searching Acme's documents…", sourcesH: 'Sources', citeAria: 'Source {n}: {doc}',
+    a1: 'You have 30 days from your start date to pick one, so until <b>{deadline}</b>. Until then, you are on the basic plan.{c1}',
+    a2: 'You get <b>20 vacation days</b> a year, plus public holidays.{c2}',
+    conflictH: 'Two documents disagree', cfOld: 'Older', cfNew: 'Newer · used', cfOldVal: '15 days', cfNewVal: '20 days',
+    cfWhy: 'The People handbook says 15,{c1} but the January 2026 update replaced that section.{c2}',
+    a3: "I couldn't find anything about dogs in Acme's documents, so I won't guess.", aUnknown: "I couldn't find this in Acme's documents, so I won't guess.",
+    a3b: '{manager}, your manager, can tell you.',
+    askJordan: 'Ask Jordan', jAsked: 'Sent to Jordan',
+    jTitle: 'Ask {manager}', jTo: 'To {manager} · your manager', jMsgLabel: 'Message',
+    jMsg: "Hi Jordan! Can I bring my dog to the office? I couldn't find it in Acme's documents. Thanks, Nina",
+    jMsgOther: "Hi Jordan! “{q}” I couldn't find it in Acme's documents. Thanks, Nina",
+    jNote: "Jordan's answer shows up here, marked as coming from a person, not a document.",
+    jSend: 'Send', jSent: 'Sent to Jordan. The answer will show up here.',
+    jFrom: 'Jordan Lee · a person, not a document', jReply: 'Yes, on Fridays, if your team agrees. Ask the office manager about the dog-friendly floor.',
+    jReplyGeneric: 'Good question. Let me find out, and I’ll get back to you today.', jToast: '{manager} answered.',
+    docSource: 'Source', docClose: 'Close the document', citedTag: 'The part the answer used',
+    switchOmar: "Omar's laptop", switchNina: "Nina's laptop", whenMon: 'Monday, Oct 26 · 9:02 AM', whenLater: 'Monday, Oct 26 · 9:20 AM',
+    close: 'Close'
+  },
+  pt: {
+    guideLabel: 'Como testar este protótipo', howTo: 'Como testar',
+    cEyebrow: 'Protótipo 03 · Firstweek', cTitleA: 'Onboarding', cTitleB: 'que cita as fontes', aSourceLabel: 'Fonte:',
+    cWhy: 'Como poderíamos dar a quem acabou de chegar <b>respostas confiáveis</b>, direto dos documentos da empresa, e uma pessoa quando os documentos não sabem?',
+    cTryH: 'Teste', cTry: 'Monte a primeira semana da Nina como Omar e depois faça perguntas como Nina.', cSolH: 'A solução',
+    problemNum: '47%', problemText: 'dos profissionais digitais têm dificuldade para encontrar as informações de que precisam para trabalhar.',
+    protoName: 'Firstweek',
+    langCode: 'PT', langLabel: 'PT, mudar para inglês',
+    taskOf: 'Tarefa {n} de {total}', onOmar: 'No notebook do Omar', onNina: 'No notebook da Nina',
+    showMe: 'Mostrar', showing: 'Mostrando…',
+    helpRing: 'ou faça você mesmo na janela: clique onde aparecer o contorno azul.',
+    expand: 'Mostrar as instruções', collapse: 'Ocultar as instruções',
+    t1: 'Confira o rascunho da IA', t1d: 'Nina Costa entra no time de vendas da Acme na segunda. Omar, do time de Pessoas, está montando a primeira semana da Nina, e a IA fez um rascunho a partir dos documentos da Acme. Clique na fonte da etapa da VPN para ver de onde ela veio.',
+    t2: 'Deixe com a cara da empresa', t2d: 'A Nina precisa das ferramentas de vendas desde o dia 1, e elas só abrem na VPN. Leve a etapa da VPN para o dia 1 e adicione um almoço com um buddy no dia 2.',
+    t3: 'Publique para a Nina', t3d: 'A semana está pronta. Publique, e a Nina vê o dia 1 ao entrar na segunda.',
+    t4: 'Faça uma pergunta', t4d: 'É segunda, no notebook da Nina. Pergunte até quando a Nina precisa escolher um plano de saúde e clique no número da fonte para conferir a resposta.',
+    t5: 'Pergunte sobre férias', t5d: 'Dois documentos da Acme discordam sobre os dias de férias. Pergunte quantos a Nina tem e veja como a resposta lida com isso.',
+    t6: 'Pergunte o que os documentos não cobrem', t6d: 'A Nina quer levar o cachorro para o escritório. Pergunte e depois mande a pergunta para o Jordan, o gestor.',
+    t7: 'Guarde a resposta', t7d: 'O Jordan respondeu, e voltamos ao notebook do Omar. Adicione a resposta do Jordan ao Manual de Pessoas, para a próxima pessoa contratada recebê-la na hora.',
+    doneChip: 'Pronto', doneT: 'A primeira semana da Nina está pronta',
+    doneD: 'A próxima pessoa contratada que perguntar sobre cachorros recebe a resposta do Jordan pelo manual, com a fonte. Você fez tudo em {time}.',
+    doneDNoTime: 'A próxima pessoa contratada que perguntar sobre cachorros recebe a resposta do Jordan pelo manual, com a fonte.',
+    about: 'Sobre este conceito', aProblemH: 'O problema',
+    aSource: 'Pesquisa Gartner com 4.861 profissionais digitais em tempo integral nos EUA, Reino Unido, Índia e China, mai 2023.', aSourceLink: 'Ler a pesquisa',
+    aDecH: 'Decisões de design',
+    d1: '<b>Toda resposta mostra a fonte.</b> Clique no número para ler o trecho exato e ver quando ele foi atualizado.',
+    d2: '<b>Documentos discordam? A IA avisa.</b> Mostra os dois e fica com o mais novo.',
+    d3: '<b>“Não sei” também é resposta.</b> Quando os documentos não cobrem o assunto, a IA leva você ao seu gestor em vez de chutar.',
+    d4: '<b>A empresa decide as etapas.</b> A IA faz o rascunho da primeira semana a partir dos documentos; o time de Pessoas deixa do seu jeito.',
+    ctaAsk: 'Quer algo assim no seu produto?', ctaLinkedIn: 'Falar comigo no LinkedIn', ctaPortfolio: 'Ver meu portfólio', restart: 'Começar de novo',
+    timeSec: '{s} s', timeMin: '{m} min {s} s',
+    navLabel: 'Firstweek', navNewHires: 'Contratações', navDocs: 'Documentos', navAnswers: 'Respostas', navWeek: 'Minha primeira semana', navPeople: 'Pessoas',
+    roleOmar: 'Time de Pessoas', roleNina: 'Vendas · primeira semana', protoOnly: 'Não faz parte deste protótipo.',
+    planTitle: 'Primeira semana de Nina Costa', planMeta: 'Vendas · começa {date} · Gestor: {manager}',
+    draftPill: 'Rascunho da IA a partir de {n} documentos', publish: 'Publicar para a Nina', publishedPill: 'Publicado para a Nina',
+    boardLabel: 'Os dias da primeira semana', dayN: 'Dia {n}', addStep: 'Adicionar etapa',
+    srcAria: 'Fonte: {doc}', stepAdded: 'Adicionada por você', moveTo: 'Mover para o dia', moveLabel: 'Mover ou remover esta etapa', stepMenu: 'Opções de {step}', remove: 'Remover',
+    addStepPh: 'Nome da etapa', ideasH: 'Ideias', addSave: 'Adicionar', cancel: 'Cancelar',
+    idea_lunch: 'Almoço com seu buddy', idea_team: 'Conhecer o time de vendas', idea_tour: 'Tour pelo escritório',
+    movedToast: 'Movida para o dia {n}.', addedToast: 'Adicionada ao dia {n}.', removedToast: 'Etapa removida.', publishedToast: 'Publicado. A Nina vê o dia 1 ao entrar na segunda.',
+    docsTitle: 'Rascunho a partir de {n} documentos', docsNote: 'O Firstweek monta as etapas, e responde às perguntas de quem chega, só com base nestes documentos.',
+    updated: 'Atualizado em {date}', updatedToday: 'Atualizado hoje',
+    srcTitle: 'De onde veio esta etapa', backToDocs: 'Todos os documentos', srcNote: 'A IA escreveu esta etapa a partir deste trecho. Se você editar a etapa, o documento continua igual.',
+    s_laptop: 'Retirar o notebook', s_contract: 'Assinar o contrato e os documentos fiscais', s_meet: 'Conhecer o Jordan, seu gestor', s_vpn: 'Configurar a VPN', s_playbook: 'Ler o playbook de vendas', s_health: 'Escolher o plano de saúde', s_shadow: 'Acompanhar uma ligação de vendas', s_checkin: 'Conversa de fim de semana com o Jordan',
+    doc_handbook: 'Manual de Pessoas', doc_vacation: 'Atualização da política de férias', doc_it: 'Guia de configuração de TI', doc_benefits: 'Guia de benefícios 2026', doc_sales: 'Guia do time de vendas',
+    h_contract: 'Seu primeiro dia', p_contract: 'No primeiro dia, assine o contrato de trabalho e os documentos fiscais no Workday. Sua pessoa de referência em Pessoas manda os links antes de você começar.',
+    h_vacation: 'Férias', p_vac_old: 'Funcionários em tempo integral têm 15 dias de férias por ano, além dos feriados.',
+    h_checkin: 'Sua primeira semana', p_checkin: 'No fim da primeira semana, quem chegou conversa com o gestor sobre o que está funcionando e o que vem a seguir.',
+    h_dogs: 'Cachorros no escritório', p_dogs: 'Cachorros são bem-vindos no escritório às sextas, se o seu time concordar. Fale com a gerência do escritório sobre o andar que aceita cachorros.',
+    dogsAdded: 'Adicionado em {date} a partir da resposta de {manager} a uma pessoa recém-contratada.',
+    h_vac26: 'Férias a partir de 2026', p_vac_new: 'A partir de 1º de janeiro de 2026, funcionários em tempo integral têm 20 dias de férias por ano, além dos feriados. Isto substitui a seção de férias do Manual de Pessoas.',
+    h_laptop: 'Seu notebook', p_laptop: 'Retire seu notebook na mesa de TI do 3º andar, na primeira manhã.',
+    h_vpn: 'VPN', p_vpn: 'Configure a VPN antes de trabalhar com dados de clientes. O CRM e as ferramentas de vendas só abrem na VPN.',
+    h_enroll: 'Escolha do plano de saúde', p_enroll: 'Novos funcionários têm 30 dias a partir da data de início para escolher um plano de saúde. Até lá, você fica no plano básico.',
+    h_first: 'Sua primeira semana em vendas', p_first: 'Na primeira semana, converse com seu gestor, leia o playbook de vendas e acompanhe pelo menos uma ligação com cliente.',
+    keepTitle: '1 resposta nova para guardar', keepAsked: '{name} perguntou:', keepAnswered: '{name} respondeu:', keepWhy: 'Adicione ao Manual de Pessoas, e a próxima pessoa contratada recebe esta resposta pelo Firstweek, com a fonte.',
+    keepAdd: 'Adicionar ao manual', keepLater: 'Agora não', keepWaiting: '1 resposta esperando para ser guardada', keepReview: 'Revisar',
+    keptToast: 'Adicionada ao Manual de Pessoas.', keptLine: 'Adicionada ao Manual de Pessoas. A próxima pessoa contratada que perguntar recebe a resposta do Jordan, com a fonte.',
+    welcome: 'Boas-vindas, Nina', dayOneMeta: 'Dia 1 · {date}', doneOf: '{d} de {n} feitas', comingUp: 'No dia 2', todoLabel: 'Etapas do dia 1',
+    askTitle: 'Pergunte sobre a Acme', askSub: 'As respostas vêm só dos documentos da Acme, com a fonte.', askPh: 'Pergunte qualquer coisa sobre a Acme…', askSend: 'Perguntar',
+    chatEmpty: 'Pergunte sobre benefícios, ferramentas ou regras. Se os documentos da Acme não disserem, você fica sabendo também.',
+    suggestH: 'Quem chega costuma perguntar', q1: 'Até quando preciso escolher um plano de saúde?', q2: 'Quantos dias de férias eu tenho?', q3: 'Posso levar meu cachorro para o escritório?',
+    searching: 'Procurando nos documentos da Acme…', sourcesH: 'Fontes', citeAria: 'Fonte {n}: {doc}',
+    a1: 'Você tem 30 dias a partir da data de início para escolher, ou seja, até <b>{deadline}</b>. Até lá, você fica no plano básico.{c1}',
+    a2: 'Você tem <b>20 dias de férias</b> por ano, além dos feriados.{c2}',
+    conflictH: 'Dois documentos discordam', cfOld: 'Mais antigo', cfNew: 'Mais novo · usado', cfOldVal: '15 dias', cfNewVal: '20 dias',
+    cfWhy: 'O Manual de Pessoas diz 15,{c1} mas a atualização de janeiro de 2026 substituiu essa seção.{c2}',
+    a3: 'Não achei nada sobre cachorros nos documentos da Acme, então não vou chutar.', aUnknown: 'Não achei isso nos documentos da Acme, então não vou chutar.',
+    a3b: '{manager}, seu gestor, pode responder.',
+    askJordan: 'Perguntar ao Jordan', jAsked: 'Enviada ao Jordan',
+    jTitle: 'Perguntar a {manager}', jTo: 'Para {manager} · seu gestor', jMsgLabel: 'Mensagem',
+    jMsg: 'Oi, Jordan! Posso levar meu cachorro para o escritório? Não achei nos documentos da Acme. Valeu! Nina',
+    jMsgOther: 'Oi, Jordan! “{q}” Não achei nos documentos da Acme. Valeu! Nina',
+    jNote: 'A resposta do Jordan aparece aqui, marcada como vinda de uma pessoa, não de um documento.',
+    jSend: 'Enviar', jSent: 'Enviada ao Jordan. A resposta vai aparecer aqui.',
+    jFrom: 'Jordan Lee · uma pessoa, não um documento', jReply: 'Pode sim, às sextas, se o seu time concordar. Fale com a gerência do escritório sobre o andar que aceita cachorros.',
+    jReplyGeneric: 'Boa pergunta. Vou descobrir e te respondo hoje.', jToast: '{manager} respondeu.',
+    docSource: 'Fonte', docClose: 'Fechar o documento', citedTag: 'O trecho que a resposta usou',
+    switchOmar: 'Notebook do Omar', switchNina: 'Notebook da Nina', whenMon: 'Segunda, 26 out · 9h02', whenLater: 'Segunda, 26 out · 9h20',
+    close: 'Fechar'
+  }
+};
+
+/* ---------------- Data (fictional) ---------------- */
+// Acme's documents: what the AI drafts the week from and answers with
+const DOCS = {
+  handbook: { updated: '2024-03-04', sections: [{ id: 'contract', h: 'h_contract', p: 'p_contract' }, { id: 'vac_old', h: 'h_vacation', p: 'p_vac_old' }, { id: 'checkin', h: 'h_checkin', p: 'p_checkin' }] },
+  vacation: { updated: '2026-01-12', sections: [{ id: 'vac_new', h: 'h_vac26', p: 'p_vac_new' }] },
+  it: { updated: '2026-09-08', sections: [{ id: 'laptop', h: 'h_laptop', p: 'p_laptop' }, { id: 'vpn', h: 'h_vpn', p: 'p_vpn' }] },
+  benefits: { updated: '2026-08-20', sections: [{ id: 'enroll', h: 'h_enroll', p: 'p_enroll' }] },
+  sales: { updated: '2026-07-15', sections: [{ id: 'first', h: 'h_first', p: 'p_first' }] }
+};
+const DOC_ORDER = ['handbook', 'vacation', 'it', 'benefits', 'sales'];
+// added to the handbook from Jordan's answer, in the last task
+const DOG_SECTION = { id: 'dogs', h: 'h_dogs', p: 'p_dogs', added: true };
+// the week the AI drafted: each step points at the passage it came from
+const STEPS = [
+  { id: 'laptop', day: 1, src: ['it', 'laptop'] },
+  { id: 'contract', day: 1, src: ['handbook', 'contract'] },
+  { id: 'meet', day: 1, src: ['sales', 'first'] },
+  { id: 'vpn', day: 2, src: ['it', 'vpn'] },
+  { id: 'playbook', day: 2, src: ['sales', 'first'] },
+  { id: 'health', day: 3, src: ['benefits', 'enroll'] },
+  { id: 'shadow', day: 4, src: ['sales', 'first'] },
+  { id: 'checkin', day: 5, src: ['handbook', 'checkin'] }
+];
+const IDEAS = ['lunch', 'team', 'tour'];
+
+/* ---------------- Icons ---------------- */
+const ICON = {
+  check: '<path d="M5 12.5l4.5 4.5L19 7.5"/>',
+  back: '<path d="M19 12H5M11 6l-6 6 6 6"/>',
+  close: '<path d="M6 6l12 12M18 6L6 18"/>',
+  alert: '<circle cx="12" cy="12" r="9"/><path d="M12 7.5v5.5M12 16.5h.01"/>',
+  send: '<path d="M4 12l16-8-6 16-2.5-6.5z"/><path d="M11.5 13.5L20 4"/>',
+  expand: '<path d="M6 9l6 6 6-6"/>',
+  restart: '<path d="M4 12a8 8 0 1 0 2.4-5.7"/><path d="M4 4v4h4"/>',
+  play: '<path d="M7 5l12 7-12 7z"/>',
+  person: '<circle cx="12" cy="7.5" r="3.5"/><path d="M5 20.5a7 7 0 0 1 14 0"/>',
+  arrow: '<path d="M4 12h15M13 6l6 6-6 6"/>',
+  grid: '<rect x="4" y="4" width="7" height="7" rx="1.5"/><rect x="13" y="4" width="7" height="7" rx="1.5"/><rect x="4" y="13" width="7" height="7" rx="1.5"/><rect x="13" y="13" width="7" height="7" rx="1.5"/>',
+  chat: '<path d="M5 4.5h14A1.5 1.5 0 0 1 20.5 6v9a1.5 1.5 0 0 1-1.5 1.5h-9l-5 4v-4A1.5 1.5 0 0 1 3.5 15V6A1.5 1.5 0 0 1 5 4.5z"/><path d="M8 9h8M8 12.5h5"/>',
+  // the portfolio's own LinkedIn icon, from its contact band
+  linkedin: '<rect x="3.5" y="3.5" width="17" height="17" rx="3"/><path d="M8 10.5V16M8 7.8v.1M11.5 16v-3.2c0-1.4 1-2.3 2.2-2.3s2 .9 2 2.3V16M11.5 10.5V16"/>',
+  portfolio: '<rect x="3.5" y="7.5" width="17" height="12" rx="2"/><path d="M9 7.5V6a1.5 1.5 0 0 1 1.5-1.5h3A1.5 1.5 0 0 1 15 6v1.5M3.5 12.5h17"/>',
+  spark: '<path d="M12 3.5l1.9 5.1 5.1 1.9-5.1 1.9L12 17.5l-1.9-5.1L5 10.5l5.1-1.9z"/><path d="M18.5 16l.7 1.8 1.8.7-1.8.7-.7 1.8-.7-1.8-1.8-.7 1.8-.7z"/>',
+  doc: '<path d="M6.5 3.5h7.5l4 4v13h-11.5z"/><path d="M14 3.5v4h4M9.5 12h5M9.5 15.5h5"/>',
+  plus: '<path d="M12 5v14M5 12h14"/>',
+  more: '<path d="M5.5 12h.01M12 12h.01M18.5 12h.01" stroke-width="3.2"/>',
+  trash: '<path d="M4.5 7h15M9.5 7V4.5h5V7M6.5 7l1 13h9l1-13"/>'
+};
+const icon = (name, cls = '') => `<svg class="i ${cls}" viewBox="0 0 24 24" aria-hidden="true">${ICON[name] || ''}</svg>`;
+// the same steps as the favicon: a first week, one step at a time
+const LOGO = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 18.5h4.5V14H14V9.5h4.5V5"/></svg>';
+
+/* ---------------- State ---------------- */
+const detectLang = () => ((navigator.language || 'en').toLowerCase().startsWith('pt') ? 'pt' : 'en');
+function newState(prev) {
+  return {
+    lang: prev ? prev.lang : detectLang(),
+    role: 'omar', switching: null,
+    steps: STEPS.map(s => ({ ...s })), customN: 0,
+    srcView: null, checkedSource: false, menu: null, adding: null, addDraft: '', addIdea: null, flash: null,
+    moved: false, added: false, published: false,
+    checked: {}, chat: [], asked: {}, answered: {}, q1Src: false, askDraft: '', doc: null,
+    modal: null, modalMsg: null, jDraft: '', jEdited: false, sentJordan: false, keep: null, switchQueued: false, docAdded: false,
+    startedAt: null, finishMs: null, focus: null,
+    guideOpen: false, aboutOpen: prev ? prev.aboutOpen : false, demo: false, lastTask: null
+  };
+}
+let state = newState();
+let guideSwapAt = -1e9, lastActivity = performance.now(), hintScrollAt = 0, msgN = 0, shownChat = 0, dragId = null;
+const seenMsgs = new Set();
+
+/* ---------------- Helpers ---------------- */
+const $ = (sel, root = document) => root.querySelector(sel);
+const wait = ms => new Promise(r => setTimeout(r, ms));
+const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const loc = () => (state.lang === 'pt' ? 'pt-BR' : 'en-US');
+function t(key, vars = {}) {
+  const s = (STR[state.lang] && STR[state.lang][key]) ?? STR.en[key] ?? key;
+  return s.replace(/\{(\w+)\}/g, (_, k) => (vars[k] ?? ''));
+}
+const utc = iso => new Date(iso + 'T12:00:00Z');
+const fmt = (iso, o) => new Intl.DateTimeFormat(loc(), { ...o, timeZone: 'UTC' }).format(utc(iso));
+const dateShort = iso => fmt(iso, { month: 'short', day: 'numeric' });
+const dateNice = iso => fmt(iso, { weekday: 'long', month: 'short', day: 'numeric' });
+const monthYear = iso => fmt(iso, { month: 'short', year: 'numeric' });
+// a day's column header: weekday, then date ("Mon 26")
+const dayDate = n => { const d = utc(START); d.setUTCDate(d.getUTCDate() + n - 1); const iso = d.toISOString().slice(0, 10); return `${fmt(iso, { weekday: 'short' })} ${fmt(iso, { day: 'numeric' })}`; };
+const docTitle = id => t('doc_' + id);
+const updatedText = id => (id === 'handbook' && state.docAdded ? t('updatedToday') : t('updated', { date: monthYear(DOCS[id].updated) }));
+// a step's name: the AI's steps translate; a step someone typed stays as typed
+const stepText = s => (s.custom ? (s.idea ? t('idea_' + s.idea) : s.title) : t('s_' + s.id));
+function fmtTime(ms) {
+  const secs = Math.max(1, Math.round(ms / 1000));
+  return secs < 60 ? t('timeSec', { s: secs }) : t('timeMin', { m: Math.floor(secs / 60), s: String(secs % 60).padStart(2, '0') });
+}
+function announce(msg) { const l = $('#live'); l.textContent = ''; setTimeout(() => { l.textContent = msg; }, 60); }
+function startClock() { if (!state.startedAt) state.startedAt = Date.now(); }
+function replay(el, cls) { if (!el || reduceMotion()) return; el.classList.remove(cls); void el.offsetWidth; el.classList.add(cls); }
+function markActive() { lastActivity = performance.now(); hintScrollAt = 0; }
+
+/* ================= GUIDE (outside the product) ================= */
+function currentTask() {
+  if (!state.published) return !state.checkedSource ? 't1' : !(state.moved && state.added) ? 't2' : 't3';
+  if (!(state.answered.q1 && state.q1Src)) return 't4';
+  if (!state.answered.q2) return 't5';
+  if (!state.sentJordan) return 't6';
+  if (!state.docAdded) return 't7';
+  return 'done';
+}
+/* language button, as in the portfolio: the current language's flag and code */
+function langButton() {
+  return `<button class="tool lang-btn" type="button" data-action="lang" aria-label="${t('langLabel')}">
+    <img class="lang-flag flag-br" src="flags/br.webp" alt="" width="20" height="14"><img class="lang-flag flag-us" src="flags/us.svg" alt="" width="20" height="14"><span class="lang-code">${t('langCode')}</span></button>`;
+}
+/* Language switch, as in the portfolio: the text on screen types itself in again, top to bottom. Each block
+   types as one stream; while a piece types it's a wrapper of the typed part and a hidden rest that keeps its
+   space, so nothing reflows, and when done it goes back to plain text. Headings type slower and carry a caret. */
+let typing = null;
+function typeIn() {
+  if (typing) typing.finish();
+  const vh = innerHeight, groups = [], byBlock = new Map();
+  const blockOf = el => {
+    while (el.parentElement && el !== document.body && /^(inline|contents)/.test(getComputedStyle(el).display)) el = el.parentElement;
+    return el;
+  };
+  const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
+  for (let n; (n = walker.nextNode());) {
+    const el = n.parentElement;
+    if (!n.nodeValue.trim() || !el || el.closest('script, style, svg, .sr-only, textarea, [aria-hidden="true"]')) continue;
+    const r = el.getBoundingClientRect();
+    if (!r.width || r.bottom <= 0 || r.top >= vh) continue;
+    const block = blockOf(el);
+    let g = byBlock.get(block);
+    if (!g) {
+      const br = block.getBoundingClientRect();
+      g = { nodes: [], top: Math.round(br.top), left: br.left, head: !!block.closest('h1, h2, h3') };
+      byBlock.set(block, g); groups.push(g);
+    }
+    g.nodes.push(n);
+  }
+  if (!groups.length) return;
+  groups.sort((a, b) => a.top - b.top || a.left - b.left);
+  groups.forEach((g, gi) => {
+    let sum = 0;
+    g.parts = g.nodes.map(node => {
+      const full = node.nodeValue, w = document.createElement('span'), on = document.createElement('span'), off = document.createElement('span');
+      w.className = 'tw' + (g.head ? ' tw-head' : ''); on.className = 'tw-on'; off.className = 'tw-off'; off.textContent = full;
+      w.append(on, off);
+      node.parentNode.replaceChild(w, node);
+      const part = { w, on, off, full, from: sum, k: 0 };
+      sum += full.length;
+      return part;
+    });
+    g.total = sum; g.K = -1;
+    g.delay = Math.min(gi * 14, 280);
+    g.dur = g.head ? Math.max(180, Math.min(sum * 24, 520)) : Math.max(100, Math.min(sum * 6, 420));
+  });
+  const t0 = performance.now();
+  let raf = 0;
+  const restore = g => {
+    g.done = true;
+    g.parts.forEach(pt => { if (pt.w.parentNode) pt.w.parentNode.replaceChild(document.createTextNode(pt.full), pt.w); });
+  };
+  const frame = now => {
+    let busy = 0;
+    groups.forEach(g => {
+      if (g.done) return;
+      const p = (now - t0 - g.delay) / g.dur;
+      if (p >= 1) { restore(g); return; }
+      busy++;
+      if (p <= 0) return;
+      const K = Math.round(g.total * p);
+      if (K === g.K) return;
+      g.K = K;
+      g.parts.forEach(pt => {
+        const k = Math.max(0, Math.min(pt.full.length, K - pt.from));
+        if (k !== pt.k) { pt.k = k; pt.on.textContent = pt.full.slice(0, k); pt.off.textContent = pt.full.slice(k); }
+        // the caret sits on the piece being typed now
+        pt.w.classList.toggle('is-typing', K > pt.from && K <= pt.from + pt.full.length);
+      });
+    });
+    if (busy) raf = requestAnimationFrame(frame); else typing = null;
+  };
+  const job = { finish() { cancelAnimationFrame(raf); clearTimeout(safety); groups.forEach(g => { if (!g.done) restore(g); }); if (typing === job) typing = null; } };
+  // if frames stall (a tab in the background), the text still comes back
+  const safety = setTimeout(() => job.finish(), 1500);
+  typing = job;
+  raf = requestAnimationFrame(frame);
+}
+/* the concept's parts, shared by the left panel and the mobile "About this concept" drawer */
+function problemCard() {
+  return `
+    <section class="c-problem">
+      <p class="c-label">${icon('alert')}${t('aProblemH')}</p>
+      <div class="c-stat">
+        <p class="c-num">${t('problemNum')}</p>
+        <p class="c-problem-txt">${t('problemText')}</p>
+      </div>
+      <p class="c-source">${t('aSourceLabel')} ${t('aSource')} <a href="${LINKS.source}" target="_blank" rel="noopener">${t('aSourceLink')}</a></p>
+    </section>`;
+}
+function solutionCard() {
+  return `
+    <section class="c-solution c-spot">
+      <p class="c-label">${icon('spark')}${t('cSolH')}</p>
+      <p class="c-why">${t('cWhy')}</p>
+    </section>`;
+}
+/* the contact card, the same in the left panel and at the end of the mobile steps panel */
+function ctaCard(extra = '') {
+  return `
+    <div class="c-cta c-spot ${extra}">
+      <p class="c-cta-q">${icon('chat')}<span>${t('ctaAsk')}</span></p>
+      <div class="row">
+        <a class="g-btn" href="${LINKS.linkedin}" target="_blank" rel="noopener"><span>${icon('linkedin')}${t('ctaLinkedIn')}</span></a>
+        <a class="g-btn ghost" href="${LINKS.portfolio}" target="_blank" rel="noopener"><span>${icon('portfolio')}${t('ctaPortfolio')}</span></a>
+      </div>
+    </div>`;
+}
+function decisions() {
+  return `
+    <section class="c-decisions">
+      <h3 class="c-label">${icon('grid')}${t('aDecH')}</h3>
+      <ol class="c-list">${['d1', 'd2', 'd3', 'd4'].map((k, i) => `<li><span class="c-n" aria-hidden="true">0${i + 1}</span><span>${t(k)}</span></li>`).join('')}</ol>
+    </section>`;
+}
+function renderIntro() {
+  const a = t('cTitleA').split(' '), b = t('cTitleB').split(' ');
+  const words = (list, from) => list.map((w, i) => `<span class="w" style="--wi:${from + i}">${w}</span>`).join(' ');
+  $('#intro').innerHTML = `
+    <div class="c-top">
+      <p class="c-eyebrow">${t('cEyebrow')}</p>
+      ${langButton()}
+    </div>
+    <h2 class="c-title" id="intro-title">${words(a, 0)} <em>${words(b, a.length)}</em></h2>
+    ${problemCard()}
+    ${solutionCard()}
+    ${decisions()}
+    <button class="c-try" type="button" data-action="hint">
+      <span class="c-try-txt"><strong>${t('cTryH')}</strong>${t('cTry')}</span>
+      <span class="c-try-go" aria-hidden="true">${icon('arrow')}</span>
+    </button>
+    ${ctaCard()}`;
+  [...$('#intro').children].forEach((el, i) => el.style.setProperty('--i', i));
+}
+/* unfolds the steps panel (or keeps it, if it was just starting to fold) */
+function openGuide() {
+  if (guideClosing) { clearTimeout(guideClosing); guideClosing = null; $('#guide').classList.remove('closing'); return; }
+  if (state.guideOpen) return;
+  state.guideOpen = true; renderGuide();
+  const g = $('#guide'); replay(g, 'opening'); setTimeout(() => g.classList.remove('opening'), 400);
+}
+/* folds the steps panel back up, then redraws the bar with its title and Show me */
+let guideClosing = null;
+function closeGuide(after) {
+  const g = $('#guide');
+  if (!state.guideOpen || guideClosing) return;
+  const done = () => {
+    guideClosing = null; state.guideOpen = false; renderGuide();
+    // the bar's title and Show me come back in, rather than popping
+    if (g && !reduceMotion()) { replay(g, 'settling'); setTimeout(() => g.classList.remove('settling'), 400); }
+    if (after) after();
+  };
+  if (reduceMotion() || !g) { done(); return; }
+  g.classList.add('closing');
+  guideClosing = setTimeout(done, 280);
+}
+function whoChip(role) {
+  return `<span class="mini-av${role === 'nina' ? ' nina' : ''}" aria-hidden="true">${PEOPLE[role].ini}</span>${t(role === 'nina' ? 'onNina' : 'onOmar')}`;
+}
+function renderGuide() {
+  const task = currentTask();
+  if (state.lastTask !== task) {
+    if (state.lastTask) {
+      announce(task === 'done' ? t('doneT') : `${t('taskOf', { n: TASKS.indexOf(task) + 1, total: TASKS.length })}: ${t(task)}`);
+      guideSwapAt = performance.now();
+    }
+    state.lastTask = task;
+  }
+  const swapAge = performance.now() - guideSwapAt, swap = swapAge < 1000 && !reduceMotion();
+  const idx = task === 'done' ? TASKS.length : TASKS.indexOf(task);
+  const dashes = TASKS.map((_, i) => `<i class="${i < idx ? 'done' : i === idx ? 'now' : ''}"></i>`).join('');
+  const running = state.demo, role = TASK_ROLE[task];
+  let card;
+  if (task === 'done') {
+    const desc = state.finishMs ? t('doneD', { time: fmtTime(state.finishMs) }) : t('doneDNoTime');
+    card = `
+      <section class="g-card" aria-live="polite">
+        <span class="g-chip ok">${icon('check')}${t('doneChip')}</span>
+        <h2 class="g-title">${t('doneT')}</h2>
+        <p class="g-desc">${desc}</p>
+        <p class="g-desc" style="color:var(--ice);font-weight:600;margin-bottom:12px">${t('ctaAsk')}</p>
+        <div class="g-stack">
+          <a class="g-btn" href="${LINKS.linkedin}" target="_blank" rel="noopener">${t('ctaLinkedIn')}</a>
+          <a class="g-btn ghost" href="${LINKS.portfolio}" target="_blank" rel="noopener">${t('ctaPortfolio')}</a>
+        </div>
+      </section>`;
+  } else {
+    card = `
+      <section class="g-card" aria-live="polite">
+        <span class="g-chip">${whoChip(role)}</span>
+        <h2 class="g-title">${t(task)}</h2>
+        <p class="g-desc">${t(task + 'd')}</p>
+        <button class="g-btn" type="button" data-action="demo" ${running ? 'aria-disabled="true"' : ''}>${icon('play')}${running ? t('showing') : t('showMe')}</button>
+        <p class="g-help">${t('helpRing')}</p>
+      </section>`;
+  }
+  const about = `
+    <details class="g-about" ${state.aboutOpen ? 'open' : ''}>
+      <summary>${t('about')}${icon('expand')}</summary>
+      <div class="in">${problemCard()}${solutionCard()}${decisions()}</div>
+    </details>`;
+  const foot = `
+    <div class="g-foot">
+      ${task !== 'done' ? ctaCard('g-cta') : ''}
+      <button class="g-restart" type="button" data-action="restart">${icon('restart')}${t('restart')}</button>
+    </div>`;
+  const guide = $('#guide');
+  guide.setAttribute('aria-label', t('guideLabel'));
+  guide.classList.toggle('open', state.guideOpen);
+  guide.classList.remove('closing');
+  guide.innerHTML = `
+    <div class="g-compact${swap ? ' swap' : ''}"${swap ? ` style="--age:-${Math.round(swapAge)}ms"` : ''}>
+      <span class="g-step">${task === 'done' ? '✓' : `${idx + 1}/${TASKS.length}`}</span>
+      <p class="g-ctitle">${task === 'done' ? t('doneT') : t(task)}</p>
+      ${task !== 'done' ? `<span class="g-who">${whoChip(role)}</span>` : ''}
+      <p class="g-howto">${t('howTo')}</p>
+      ${task !== 'done' ? `<button class="g-show-sm" type="button" data-action="demo" ${running ? 'aria-disabled="true"' : ''}>${icon('play')}${running ? t('showing') : t('showMe')}</button>` : ''}
+      <button class="g-expand" type="button" data-action="guide-toggle" aria-expanded="${state.guideOpen}" aria-controls="g-full" aria-label="${state.guideOpen ? t('collapse') : t('expand')}">${icon('expand')}</button>
+    </div>
+    <div class="g-full" id="g-full">
+      <div class="g-head">
+        <p class="g-name">${t('protoName')}</p>
+        ${langButton()}
+      </div>
+      <div class="g-dashes" aria-hidden="true">${dashes}</div>
+      <p class="g-label">${task === 'done' ? t('doneChip') : t('taskOf', { n: idx + 1, total: TASKS.length })}</p>
+      ${card}
+      ${about}
+      ${foot}
+    </div>`;
+}
+
+/* Pulsing ring: points at the next control in the window */
+function ringCandidates() {
+  const task = currentTask();
+  if (task === 'done' || state.switching) return [];
+  if (state.role !== TASK_ROLE[task]) return [];
+  switch (task) {
+    case 't1': return ['[data-action="step-src"][data-step="vpn"]'];
+    case 't2':
+      if (!state.moved) return state.menu === 'vpn' ? ['[data-action="move-to"][data-step="vpn"][data-day="1"]'] : ['[data-action="step-menu"][data-step="vpn"]'];
+      if (state.adding === 2) return state.addDraft.trim() ? ['[data-action="add-save"]'] : ['[data-action="idea"][data-idea="lunch"]'];
+      return ['[data-action="add-step"][data-day="2"]'];
+    case 't3': return ['[data-action="publish"]'];
+    case 't4': return state.answered.q1 ? ['.msg.ai [data-action="cite"][data-q="q1"]'] : ['[data-action="ask-q"][data-q="q1"]'];
+    case 't5': return ['[data-action="ask-q"][data-q="q2"]'];
+    case 't6':
+      if (state.modal) return ['[data-action="send-jordan"]'];
+      return state.answered.q3 ? ['[data-action="ask-jordan"][data-q="q3"]'] : ['[data-action="ask-q"][data-q="q3"]'];
+    case 't7': return state.keep === 'later' ? ['[data-action="keep-review"]'] : ['[data-action="keep-add"]'];
+  }
+  return [];
+}
+// is the element inside every scrolling box around it (the board, the chat, a column)?
+function inView(el) {
+  const r = el.getBoundingClientRect();
+  for (let p = el.parentElement; p && p.id !== 'screen'; p = p.parentElement) {
+    const cs = getComputedStyle(p);
+    if (!/(auto|scroll|hidden)/.test(cs.overflowY + cs.overflowX)) continue;
+    const pr = p.getBoundingClientRect();
+    if (r.top < pr.top - 2 || r.bottom > pr.bottom + 2 || r.left < pr.left - 2 || r.right > pr.right + 2) return false;
+  }
+  return true;
+}
+function placeRing() {
+  const ring = $('#ring'), screen = $('#screen');
+  if (!ring || !screen) return;
+  // the hint waits until the person has been idle for a few seconds
+  const now = performance.now();
+  if (state.guideOpen || state.demo || now - lastActivity < HINT_DELAY) { ring.classList.remove('on'); return; }
+  const sRect = screen.getBoundingClientRect();
+  let target = null;
+  for (const sel of ringCandidates()) {
+    const el = screen.querySelector(sel);
+    if (!el) continue;
+    const r = el.getBoundingClientRect();
+    if (!r.width) continue;
+    if (inView(el)) { target = { el, r }; break; }
+    // the next step is scrolled out of view: bring it in once, and wait for it rather than ring something further along
+    if (!hintScrollAt) { hintScrollAt = now; el.scrollIntoView({ block: 'center', inline: 'nearest', behavior: reduceMotion() ? 'auto' : 'smooth' }); }
+    if (now - hintScrollAt < 900) break;
+  }
+  if (!target) { ring.classList.remove('on'); return; }
+  const pad = 5, { r, el } = target;
+  const radius = parseFloat(getComputedStyle(el).borderRadius) || 10;
+  ring.style.left = (r.left - sRect.left - pad) + 'px';
+  ring.style.top = (r.top - sRect.top - pad) + 'px';
+  ring.style.width = (r.width + pad * 2) + 'px';
+  ring.style.height = (r.height + pad * 2) + 'px';
+  ring.style.borderRadius = (Math.min(radius, r.height / 2) + pad) + 'px';
+  ring.classList.add('on');
+}
+function ringLoop() { placeRing(); requestAnimationFrame(ringLoop); }
+
+/* "Show me": does the current task in the window, slowly enough to follow */
+async function tap(sel) {
+  const el = $('#screen').querySelector(sel);
+  if (!el) return false;
+  if (!inView(el)) {
+    el.scrollIntoView({ block: 'center', inline: 'nearest', behavior: reduceMotion() ? 'auto' : 'smooth' });
+    await wait(reduceMotion() ? 50 : 450);
+  }
+  await wait(320);
+  el.classList.add('demo-press');
+  await wait(140);
+  el.classList.remove('demo-press');
+  el.click();
+  await wait(250);
+  return true;
+}
+async function until(test, ms = 8000) {
+  for (let i = 0; i < ms / 100; i++) { if (test()) return true; await wait(100); }
+  return false;
+}
+async function demo() {
+  if (state.demo) return;
+  const task = currentTask();
+  if (task === 'done') return;
+  state.demo = true;
+  if (state.guideOpen) closeGuide(); else renderGuide();
+  startClock();
+  const onRole = role => until(() => state.role === role && !state.switching, 12000);
+  // the task is on the other laptop and nothing is taking us there: go (for the last task, only once Jordan has answered)
+  if (task === 't7') await until(() => state.keep, 8000);
+  const need = TASK_ROLE[task];
+  if (state.role !== need && !state.switching && !state.switchQueued) switchTo(need, need === 'nina' ? 'whenMon' : 'whenLater');
+  try {
+    switch (task) {
+      case 't1':
+        if (state.srcView) { state.srcView = null; renderApp(); await wait(250); }
+        await tap('[data-action="step-src"][data-step="vpn"]'); break;
+      case 't2':
+        if (!state.moved) {
+          if (state.menu !== 'vpn') await tap('[data-action="step-menu"][data-step="vpn"]');
+          await wait(250);
+          await tap('[data-action="move-to"][data-step="vpn"][data-day="1"]');
+          await wait(450);
+        }
+        if (!state.added) {
+          if (state.adding !== 2) await tap('[data-action="add-step"][data-day="2"]');
+          await wait(250);
+          await tap('[data-action="idea"][data-idea="lunch"]');
+          await wait(300);
+          await tap('[data-action="add-save"]');
+        }
+        break;
+      case 't3': await tap('[data-action="publish"]'); break;
+      case 't4':
+        await onRole('nina');
+        if (!state.answered.q1) {
+          if (!state.asked.q1) await tap('[data-action="ask-q"][data-q="q1"]');
+          await until(() => state.answered.q1);
+          await wait(500);
+        }
+        await tap('.msg.ai [data-action="cite"][data-q="q1"]'); break;
+      case 't5':
+        await onRole('nina');
+        if (state.doc) { state.doc = null; renderApp(); await wait(250); }
+        if (!state.asked.q2) await tap('[data-action="ask-q"][data-q="q2"]');
+        await until(() => state.answered.q2); break;
+      case 't6':
+        await onRole('nina');
+        if (!state.answered.q3) {
+          if (!state.asked.q3) await tap('[data-action="ask-q"][data-q="q3"]');
+          await until(() => state.answered.q3);
+          await wait(500);
+        }
+        if (!state.modal) await tap('[data-action="ask-jordan"][data-q="q3"]');
+        await wait(600);
+        await tap('[data-action="send-jordan"]'); break;
+      case 't7':
+        await onRole('omar');
+        await wait(400);
+        if (state.keep === 'later') { await tap('[data-action="keep-review"]'); await wait(300); }
+        await tap('[data-action="keep-add"]'); break;
+    }
+  } finally {
+    state.demo = false;
+    markActive();
+    renderGuide();
+  }
+}
+
+/* ================= PRODUCT (Firstweek, at Acme) ================= */
+function render() {
+  document.documentElement.lang = state.lang === 'pt' ? 'pt-BR' : 'en';
+  renderGuide();
+  renderApp();
+  renderSwitch();
+}
+// what had focus before a redraw, so the same control gets it back after
+function focusKey(el) {
+  if (!el || !el.closest || !el.closest('#app')) return null;
+  if (el.id) return '#' + el.id;
+  const a = el.dataset && el.dataset.action;
+  if (!a) return null;
+  let sel = `[data-action="${a}"]`;
+  ['step', 'day', 'q', 'idea', 'doc', 'sec'].forEach(k => { if (el.dataset[k]) sel += `[data-${k}="${el.dataset[k]}"]`; });
+  return sel;
+}
+function renderApp() {
+  const app = $('#app');
+  // scroll positions and focus survive the redraw
+  const keep = ['.board', '.chat', '.week', '.side', '.nina-body'].map(sel => { const el = app.querySelector(sel); return [sel, el ? el.scrollTop : 0, el ? el.scrollLeft : 0]; });
+  const fk = focusKey(document.activeElement);
+  const firstPaint = !app.firstElementChild || app.firstElementChild.dataset.role !== state.role;
+  app.innerHTML = state.role === 'omar' ? omarHTML() : ninaHTML();
+  if (!firstPaint) keep.forEach(([sel, top, left]) => { const el = app.querySelector(sel); if (el) { el.scrollTop = top; el.scrollLeft = left; } });
+  const chat = app.querySelector('.chat');
+  if (chat && state.chat.length !== shownChat) chat.scrollTop = chat.scrollHeight;
+  shownChat = state.chat.length;
+  state.chat.forEach(m => seenMsgs.add(m.id));
+  const cited = app.querySelector('#cited');
+  if (cited && state.doc && state.doc.fresh) { state.doc.fresh = false; cited.scrollIntoView({ block: 'center' }); }
+  const f = (state.focus && app.querySelector(state.focus)) || (fk && app.querySelector(fk));
+  state.focus = null;
+  if (f) f.focus({ preventScroll: true });
+  $('#b-url').textContent = state.role === 'omar' ? 'acme.firstweek.app/new-hires/nina-costa' : 'acme.firstweek.app/my-first-week';
+}
+function headHTML(role) {
+  const p = PEOPLE[role];
+  const nav = role === 'omar' ? [['navNewHires', true], ['navDocs'], ['navAnswers']] : [['navWeek', true], ['navPeople']];
+  return `<header class="app-head">
+      <div class="brand"><span class="logo">${LOGO}</span><span>Firstweek</span><span class="ws">Acme</span></div>
+      <nav class="nav" aria-label="${t('navLabel')}">${nav.map(([k, cur]) => `<button type="button" ${cur ? 'aria-current="page"' : 'data-action="stub"'}>${t(k)}</button>`).join('')}</nav>
+      <div class="head-end"><span class="who"><b>${p.name}</b><span>${t(role === 'omar' ? 'roleOmar' : 'roleNina')}</span></span><span class="avatar ${role}" aria-hidden="true">${p.ini}</span></div>
+    </header>`;
+}
+
+/* Omar: the week the AI drafted, which the People team makes its own */
+function omarHTML() {
+  let keep = '';
+  if (state.keep === 'pending') keep = keepHTML();
+  else if (state.keep === 'later') keep = `<div class="keep-mini"><span>${icon('chat')}${t('keepWaiting')}</span><button class="link-btn" type="button" data-action="keep-review">${t('keepReview')}</button></div>`;
+  else if (state.keep === 'kept') keep = `<p class="keep-done">${icon('check')}<span>${t('keptLine')}</span></p>`;
+  return `<div class="view omar" data-role="omar">
+    ${headHTML('omar')}
+    <div class="body">
+      <section class="plan" aria-labelledby="plan-title">
+        <div class="plan-head">
+          <div>
+            <h1 id="plan-title" tabindex="-1">${t('planTitle')}</h1>
+            <p class="meta">${t('planMeta', { date: dateNice(START), manager: MANAGER })}</p>
+          </div>
+          <div class="ph-end">
+            ${state.published ? `<span class="pill ok">${icon('check')}${t('publishedPill')}</span>`
+              : `<span class="pill ai">${icon('spark')}${t('draftPill', { n: DOC_ORDER.length })}</span><button class="btn btn-primary" type="button" data-action="publish">${icon('send')}${t('publish')}</button>`}
+          </div>
+        </div>
+        ${keep}
+        <div class="board" role="list" aria-label="${t('boardLabel')}">${[1, 2, 3, 4, 5].map(dayHTML).join('')}</div>
+      </section>
+      ${sideHTML()}
+    </div>
+  </div>`;
+}
+function dayHTML(n) {
+  const steps = state.steps.filter(s => s.day === n);
+  return `<section class="day" data-day="${n}" role="listitem" aria-labelledby="day-${n}">
+      <h2 class="day-h" id="day-${n}">${t('dayN', { n })}<span>${dayDate(n)}</span></h2>
+      <ul class="steps">${steps.map(stepHTML).join('')}</ul>
+      ${state.adding === n ? addFormHTML(n) : `<button class="add-btn" type="button" data-action="add-step" data-day="${n}">${icon('plus')}${t('addStep')}</button>`}
+    </section>`;
+}
+function stepHTML(s) {
+  const name = esc(stepText(s));
+  const src = s.custom ? `<span class="src custom">${icon('person')}<span>${t('stepAdded')}</span></span>`
+    : `<button class="src" type="button" data-action="step-src" data-step="${s.id}" aria-label="${t('srcAria', { doc: docTitle(s.src[0]) })}">${icon('doc')}<span>${docTitle(s.src[0])}</span></button>`;
+  const menu = state.menu !== s.id ? '' : `
+      <div class="menu" role="group" aria-label="${t('moveLabel')}">
+        <p class="menu-h">${t('moveTo')}</p>
+        <div class="menu-days">${[1, 2, 3, 4, 5].map(d => `<button type="button" data-action="move-to" data-step="${s.id}" data-day="${d}" aria-label="${t('dayN', { n: d })}"${d === s.day ? ' aria-disabled="true" aria-current="true"' : ''}>${d}</button>`).join('')}</div>
+        <button class="menu-rm" type="button" data-action="remove-step" data-step="${s.id}">${icon('trash')}${t('remove')}</button>
+      </div>`;
+  return `<li class="step${state.flash === s.id ? ' flash' : ''}" draggable="true" data-drag="${s.id}">
+      <p class="step-t">${name}</p>
+      ${src}
+      <button class="step-menu-btn" type="button" data-action="step-menu" data-step="${s.id}" aria-expanded="${state.menu === s.id}" aria-label="${t('stepMenu', { step: name })}">${icon('more')}</button>
+      ${menu}
+    </li>`;
+}
+function addFormHTML(n) {
+  return `<form class="add-form" id="add-form" data-day="${n}">
+      <label class="sr-only" for="add-input">${t('addStepPh')}</label>
+      <input class="input" id="add-input" name="add" autocomplete="off" placeholder="${t('addStepPh')}" value="${esc(state.addDraft)}">
+      <p class="ideas-h">${t('ideasH')}</p>
+      <div class="ideas">${IDEAS.map(k => `<button class="idea" type="button" data-action="idea" data-idea="${k}">${t('idea_' + k)}</button>`).join('')}</div>
+      <div class="add-row"><button class="btn btn-primary btn-sm" type="button" data-action="add-save">${t('addSave')}</button><button class="btn btn-plain btn-sm" type="button" data-action="add-cancel">${t('cancel')}</button></div>
+    </form>`;
+}
+function sideHTML() {
+  const s = state.srcView && state.steps.find(x => x.id === state.srcView);
+  if (s) {
+    const [doc, sec] = s.src, section = DOCS[doc].sections.find(x => x.id === sec);
+    return `<aside class="side open" aria-labelledby="side-title">
+        <button class="link-back" type="button" data-action="src-close">${icon('back')}${t('backToDocs')}</button>
+        <p class="side-label">${t('srcTitle')}</p>
+        <h2 class="side-title" id="side-title" tabindex="-1">${esc(stepText(s))}</h2>
+        <div class="doc-card">
+          <p class="doc-name">${icon('doc')}<span>${docTitle(doc)}</span></p>
+          <p class="doc-upd">${updatedText(doc)}</p>
+          <h3 class="doc-sec">${t(section.h)}</h3>
+          <p class="doc-pass"><mark>${t(section.p)}</mark></p>
+        </div>
+        <p class="side-note">${icon('spark')}<span>${t('srcNote')}</span></p>
+      </aside>`;
+  }
+  return `<aside class="side" aria-labelledby="side-title">
+      <p class="side-label" id="side-title">${t('docsTitle', { n: DOC_ORDER.length })}</p>
+      <ul class="docs">${DOC_ORDER.map(id => `<li>${icon('doc')}<span><b>${docTitle(id)}</b>${updatedText(id)}</span>${id === 'handbook' && state.docAdded ? `<span class="pill ok sm">${icon('check')}</span>` : ''}</li>`).join('')}</ul>
+      <p class="side-note">${icon('spark')}<span>${t('docsNote')}</span></p>
+    </aside>`;
+}
+function keepHTML() {
+  return `<section class="keep" aria-labelledby="keep-h">
+      <span class="keep-ic">${icon('chat')}</span>
+      <div>
+        <h2 class="keep-h" id="keep-h">${t('keepTitle')}</h2>
+        <p><b>${t('keepAsked', { name: PEOPLE.nina.name })}</b> ${t('q3')}</p>
+        <p><b>${t('keepAnswered', { name: MANAGER })}</b> “${t('jReply')}”</p>
+        <p class="keep-why">${t('keepWhy')}</p>
+        <div class="keep-row"><button class="btn btn-primary btn-sm" type="button" data-action="keep-add">${icon('plus')}${t('keepAdd')}</button><button class="btn btn-plain btn-sm" type="button" data-action="keep-later">${t('keepLater')}</button></div>
+      </div>
+    </section>`;
+}
+
+/* Nina: day 1 on the left, and answers from Acme's documents on the right */
+function ninaHTML() {
+  const day1 = state.steps.filter(s => s.day === 1), day2 = state.steps.filter(s => s.day === 2);
+  const doneN = day1.filter(s => state.checked[s.id]).length;
+  return `<div class="view nina" data-role="nina">
+    ${headHTML('nina')}
+    <div class="body nina-body">
+      <section class="week" aria-labelledby="week-title">
+        <h1 id="week-title" tabindex="-1">${t('welcome')}</h1>
+        <p class="meta">${t('dayOneMeta', { date: dateNice(START) })}</p>
+        <div class="progress" aria-hidden="true"><span style="--p:${day1.length ? doneN / day1.length : 0}"></span></div>
+        <p class="meta sm">${t('doneOf', { d: doneN, n: day1.length })}</p>
+        <ul class="checklist" aria-label="${t('todoLabel')}">${day1.map(s => `<li><label class="check"><input type="checkbox" id="todo-${s.id}" name="todo" data-step="${s.id}"${state.checked[s.id] ? ' checked' : ''}><span class="box" aria-hidden="true">${icon('check')}</span><span class="ct"><span class="ct-t">${esc(stepText(s))}</span>${s.custom ? '' : `<span class="ct-s">${docTitle(s.src[0])}</span>`}</span></label></li>`).join('')}</ul>
+        <h2 class="h2">${t('comingUp')}</h2>
+        <ul class="upcoming">${day2.map(s => `<li>${esc(stepText(s))}</li>`).join('')}</ul>
+      </section>
+      ${docViewerHTML()}
+      <section class="ask" aria-labelledby="ask-title">
+        <div class="ask-head"><h2 id="ask-title">${icon('spark')}${t('askTitle')}</h2><p>${t('askSub')}</p></div>
+        <div class="chat" role="log" aria-label="${t('askTitle')}">${state.chat.length ? state.chat.map(msgHTML).join('') : `<p class="chat-empty">${t('chatEmpty')}</p>`}</div>
+        ${suggestHTML()}
+        <form class="ask-form" id="ask-form"><label class="sr-only" for="ask-input">${t('askPh')}</label><input class="input" id="ask-input" name="ask" autocomplete="off" placeholder="${t('askPh')}" value="${esc(state.askDraft)}"><button class="btn btn-primary" type="submit" aria-label="${t('askSend')}">${icon('send')}</button></form>
+      </section>
+    </div>
+    ${modalHTML()}
+  </div>`;
+}
+function suggestHTML() {
+  const qs = ['q1', 'q2', 'q3'].filter(q => !state.asked[q]);
+  if (!qs.length) return '';
+  return `<div class="suggest"><p class="suggest-h">${t('suggestH')}</p><div class="q-chips">${qs.map(q => `<button class="q-chip" type="button" data-action="ask-q" data-q="${q}">${t(q)}</button>`).join('')}</div></div>`;
+}
+function cite(n, doc, sec, q) {
+  return `<button class="cite" type="button" data-action="cite" data-doc="${doc}" data-sec="${sec}" data-q="${q}" aria-label="${t('citeAria', { n, doc: docTitle(doc) })}">${n}</button>`;
+}
+function sourcesHTML(list, q) {
+  return `<div class="sources"><p class="sources-h">${t('sourcesH')}</p>${list.map(([doc, sec], i) => `<button class="src" type="button" data-action="cite" data-doc="${doc}" data-sec="${sec}" data-q="${q}"><b>${i + 1}</b><span>${docTitle(doc)} · ${monthYear(DOCS[doc].updated)}</span></button>`).join('')}</div>`;
+}
+function answerHTML(m) {
+  if (m.q === 'q1') return `<p>${t('a1', { deadline: dateShort(HEALTH_DEADLINE).replace(/ /g, ' '), c1: cite(1, 'benefits', 'enroll', 'q1') })}</p>${sourcesHTML([['benefits', 'enroll']], 'q1')}`;
+  if (m.q === 'q2') {
+    const c1 = cite(1, 'handbook', 'vac_old', 'q2'), c2 = cite(2, 'vacation', 'vac_new', 'q2');
+    return `<p>${t('a2', { c2 })}</p>
+      <div class="conflict" role="group" aria-label="${t('conflictH')}">
+        <p class="conflict-h">${icon('alert')}<span>${t('conflictH')}</span></p>
+        <div class="cf-row">
+          <div class="cf old"><span class="cf-tag">${t('cfOld')}</span><b>${t('cfOldVal')}</b><span>${docTitle('handbook')} · ${monthYear(DOCS.handbook.updated)}</span></div>
+          <div class="cf new"><span class="cf-tag">${icon('check')}${t('cfNew')}</span><b>${t('cfNewVal')}</b><span>${docTitle('vacation')} · ${monthYear(DOCS.vacation.updated)}</span></div>
+        </div>
+        <p class="cf-why">${t('cfWhy', { c1, c2 })}</p>
+      </div>
+      ${sourcesHTML([['handbook', 'vac_old'], ['vacation', 'vac_new']], 'q2')}`;
+  }
+  // nothing in the documents: no guess, a person instead
+  const dog = m.q === 'q3', sent = dog ? state.sentJordan : m.sent;
+  return `<p>${t(dog ? 'a3' : 'aUnknown')}</p><p class="handoff">${t('a3b', { manager: MANAGER })}</p>
+    ${sent ? `<p class="sent-note">${icon('check')}<span>${t('jAsked')}</span></p>` : `<button class="btn btn-primary btn-sm" type="button" data-action="ask-jordan" data-q="${m.q}" data-m="${m.id}">${icon('chat')}${t('askJordan')}</button>`}`;
+}
+function msgHTML(m) {
+  const fresh = seenMsgs.has(m.id) ? '' : ' in';
+  if (m.kind === 'me') return `<div class="msg me${fresh}"><p>${esc(m.text)}</p></div>`;
+  if (m.kind === 'think') return `<div class="msg think${fresh}"><span class="spinner" aria-hidden="true"></span>${t('searching')}</div>`;
+  if (m.kind === 'sent') return `<p class="msg sys${fresh}">${icon('send')}<span>${t('jSent')}</span></p>`;
+  if (m.kind === 'human') return `<div class="msg human${fresh}"><span class="avatar jordan sm" aria-hidden="true">JL</span><div class="bubble"><p class="from">${t('jFrom')}</p><p>${t(m.generic ? 'jReplyGeneric' : 'jReply')}</p></div></div>`;
+  return `<div class="msg ai${fresh}"><div class="bubble"><p class="ai-label"><span class="logo">${LOGO}</span>Firstweek</p>${answerHTML(m)}</div></div>`;
+}
+function docViewerHTML() {
+  if (!state.doc) return '';
+  const { doc, sec } = state.doc;
+  const secs = DOCS[doc].sections.concat(doc === 'handbook' && state.docAdded ? [DOG_SECTION] : []);
+  return `<div class="doc" role="region" aria-labelledby="doc-title">
+      <div class="doc-top"><p class="side-label">${t('docSource')}</p><button class="icon-btn" type="button" data-action="doc-close" aria-label="${t('docClose')}">${icon('close')}</button></div>
+      <h2 class="doc-title" id="doc-title" tabindex="-1">${docTitle(doc)}</h2>
+      <p class="doc-upd">${updatedText(doc)}</p>
+      ${secs.map(x => {
+        const on = x.id === sec;
+        return `<section class="doc-s${on ? ' cited' : ''}${x.added ? ' added' : ''}"${on ? ' id="cited"' : ''}><h3>${t(x.h)}</h3><p>${on ? `<mark>${t(x.p)}</mark>` : t(x.p)}</p>${on ? `<p class="cited-tag">${icon('spark')}<span>${t('citedTag')}</span></p>` : ''}${x.added ? `<p class="added-tag">${t('dogsAdded', { date: dateShort(START), manager: MANAGER })}</p>` : ''}</section>`;
+      }).join('')}
+    </div>`;
+}
+function modalHTML() {
+  if (!state.modal) return '';
+  return `<div class="modal-layer" data-action="modal-close"><div class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+      <h2 id="modal-title">${t('jTitle', { manager: MANAGER })}</h2>
+      <p class="modal-to"><span class="avatar jordan sm" aria-hidden="true">JL</span>${t('jTo', { manager: MANAGER })}</p>
+      <label class="sr-only" for="j-msg">${t('jMsgLabel')}</label>
+      <textarea class="input" id="j-msg" name="jmsg" rows="4">${esc(state.jDraft)}</textarea>
+      <p class="modal-note">${t('jNote')}</p>
+      <div class="modal-row"><button class="btn btn-plain btn-sm" type="button" data-action="modal-close">${t('cancel')}</button><button class="btn btn-primary btn-sm" type="button" data-action="send-jordan">${icon('send')}${t('jSend')}</button></div>
+    </div></div>`;
+}
+
+/* switching laptops: an overlay says whose screen it is now, and when */
+function renderSwitch() {
+  const layer = $('#switch');
+  if (!state.switching) {
+    if (!layer.classList.contains('on')) return;
+    if (reduceMotion()) { layer.classList.remove('on', 'out'); layer.innerHTML = ''; return; }
+    layer.classList.add('out');
+    setTimeout(() => { if (!state.switching) { layer.classList.remove('on', 'out'); layer.innerHTML = ''; } }, 250);
+    return;
+  }
+  const { role, when } = state.switching;
+  layer.innerHTML = `<div class="switch-card"><span class="avatar big ${role}">${PEOPLE[role].ini}</span><p class="sw-name">${t(role === 'nina' ? 'switchNina' : 'switchOmar')}</p><p class="sw-when">${t(when)}</p></div>`;
+  layer.classList.remove('out'); layer.classList.add('on');
+}
+function switchTo(role, when) {
+  if (state.role === role && !state.switching) return;
+  const run = state;
+  state.switching = { role, when };
+  state.menu = null; state.adding = null; state.modal = null;
+  renderSwitch();
+  announce(`${t(role === 'nina' ? 'switchNina' : 'switchOmar')}, ${t(when)}`);
+  setTimeout(() => {
+    if (state !== run) return;
+    state.role = role; state.srcView = null; state.doc = null;
+    renderApp(); renderGuide();
+  }, reduceMotion() ? 150 : 750);
+  setTimeout(() => {
+    if (state !== run) return;
+    state.switching = null; renderSwitch(); markActive();
+    const h = $('#app h1'); if (h) h.focus({ preventScroll: true });
+  }, reduceMotion() ? 500 : 1700);
+}
+let toastTimer = null;
+function showToast(msg) {
+  announce(msg);
+  const el = $('#toast');
+  el.querySelector('span').textContent = msg;
+  el.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => el.classList.remove('show'), 3000);
+}
+
+/* actions */
+function openSource(id) {
+  state.srcView = id; state.menu = null; state.checkedSource = true;
+  state.focus = '#side-title';
+  renderApp(); renderGuide();
+}
+function moveStep(id, day) {
+  const i = state.steps.findIndex(s => s.id === id);
+  if (i < 0) return;
+  const s = state.steps[i];
+  state.menu = null;
+  if (s.day === day) { renderApp(); return; }
+  // a moved step goes to the end of its new day
+  state.steps.splice(i, 1); s.day = day; state.steps.push(s);
+  if (id === 'vpn' && day === 1) state.moved = true;
+  state.flash = id; state.focus = `[data-action="step-menu"][data-step="${id}"]`;
+  renderApp(); renderGuide(); state.flash = null;
+  showToast(t('movedToast', { n: day }));
+}
+function addSave() {
+  const n = state.adding, text = state.addDraft.trim();
+  if (!n) return;
+  if (!text) { const inp = $('#add-input'); if (inp) { replay(inp, 'shake'); inp.focus(); } return; }
+  const id = 'c' + (++state.customN);
+  state.steps.push({ id, day: n, custom: true, title: text, idea: state.addIdea && t('idea_' + state.addIdea) === text ? state.addIdea : null });
+  if (n === 2) state.added = true;
+  state.adding = null; state.addDraft = ''; state.addIdea = null;
+  state.flash = id; state.focus = `[data-action="add-step"][data-day="${n}"]`;
+  renderApp(); renderGuide(); state.flash = null;
+  showToast(t('addedToast', { n }));
+}
+function publish() {
+  const run = state;
+  startClock();
+  state.published = true; state.menu = null; state.adding = null; state.srcView = null;
+  renderApp(); renderGuide();
+  showToast(t('publishedToast'));
+  state.switchQueued = true;
+  setTimeout(() => { if (state === run) { state.switchQueued = false; switchTo('nina', 'whenMon'); } }, reduceMotion() ? 600 : 1500);
+}
+function matchQuestion(text) {
+  const s = text.toLowerCase();
+  if (/health|insurance|benefit|medical|saúde|plano|convênio|benefício/.test(s)) return 'q1';
+  if (/vacation|days off|time off|pto|holiday|leave|férias|folga/.test(s)) return 'q2';
+  if (/\bdogs?\b|\bpets?\b|puppy|cachorr|\bcão\b|\bcães\b|animal/.test(s)) return 'q3';
+  return 'other';
+}
+function ask(q, text) {
+  const run = state;
+  startClock();
+  if (q !== 'other') state.asked[q] = true;
+  state.chat.push({ id: ++msgN, kind: 'me', text: text || t(q) });
+  const think = { id: ++msgN, kind: 'think' };
+  state.chat.push(think);
+  state.askDraft = ''; state.doc = null;
+  renderApp();
+  setTimeout(() => {
+    if (state !== run) return;
+    const answer = { id: ++msgN, kind: 'ai', q, text: text || t(q) };
+    const i = state.chat.indexOf(think);
+    if (i >= 0) state.chat.splice(i, 1, answer); else state.chat.push(answer);
+    if (q !== 'other') state.answered[q] = true;
+    if (state.role === 'nina') renderApp();
+    renderGuide();
+    keepSwitch(reduceMotion() ? 900 : 2600);
+    announce(t(q === 'q3' ? 'a3' : q === 'other' ? 'aUnknown' : 'sourcesH'));
+  }, reduceMotion() ? 250 : 1100);
+}
+function openDoc(doc, sec, q) {
+  state.doc = { doc, sec, fresh: true };
+  if (q === 'q1' && doc === 'benefits') state.q1Src = true;
+  state.focus = '#doc-title';
+  renderApp(); renderGuide();
+  keepSwitch(reduceMotion() ? 900 : 2600);
+}
+function openAskJordan(msgId) {
+  const m = state.chat.find(x => x.id === msgId);
+  state.modal = 'jordan'; state.modalMsg = msgId;
+  state.jDraft = m && m.q === 'other' ? t('jMsgOther', { q: m.text }) : t('jMsg'); state.jEdited = false;
+  state.focus = '#j-msg';
+  renderApp();
+}
+function closeModal() {
+  state.modal = null;
+  state.focus = `[data-action="ask-jordan"][data-m="${state.modalMsg}"]`;
+  renderApp();
+}
+function sendJordan() {
+  const run = state, m = state.chat.find(x => x.id === state.modalMsg), dog = !m || m.q === 'q3';
+  state.modal = null;
+  if (dog) state.sentJordan = true; else m.sent = true;
+  state.chat.push({ id: ++msgN, kind: 'sent' });
+  renderApp(); renderGuide();
+  setTimeout(() => {
+    if (state !== run) return;
+    state.chat.push({ id: ++msgN, kind: 'human', generic: !dog });
+    if (state.role === 'nina') renderApp();
+    showToast(t('jToast', { manager: MANAGER }));
+    if (!dog) return;
+    // Jordan's answer reaches the People team as one to keep
+    state.keep = 'pending';
+    if (state.role === 'omar') renderApp();
+    keepSwitch(reduceMotion() ? 900 : 2600);
+  }, reduceMotion() ? 600 : 2200);
+}
+// back to Omar's laptop for the answer to keep, once Nina's own tasks are done (asked out of order, it waits).
+// switchQueued marks a switch already on its way, so Show me doesn't start a second one
+function keepSwitch(delay) {
+  if (state.keep !== 'pending' || state.role !== 'nina' || state.switching || state.switchQueued || currentTask() !== 't7') return;
+  const run = state;
+  state.switchQueued = true;
+  setTimeout(() => { if (state === run) { state.switchQueued = false; if (state.role === 'nina' && !state.switching) switchTo('omar', 'whenLater'); } }, delay);
+}
+function keepAnswer() {
+  state.keep = 'kept'; state.docAdded = true;
+  state.finishMs = state.startedAt ? Date.now() - state.startedAt : null;
+  state.focus = '#plan-title';
+  renderApp(); renderGuide();
+  showToast(t('keptToast'));
+}
+
+/* ================= Events ================= */
+document.addEventListener('click', e => {
+  if (state.guideOpen && !e.target.closest('#guide')) closeGuide();
+  // a click anywhere else closes a step's menu
+  if (state.menu && !e.target.closest('.menu') && !e.target.closest('[data-action="step-menu"]')) { state.menu = null; renderApp(); }
+  const el = e.target.closest('[data-action]');
+  if (!el) return;
+  if (el.getAttribute('aria-disabled') === 'true') return;
+  const a = el.dataset.action;
+  const before = currentTask();
+  switch (a) {
+    case 'demo': demo(); break;
+    case 'guide-toggle': {
+      const refocus = () => { const b = document.querySelector('[data-action="guide-toggle"]'); if (b) b.focus(); };
+      if (state.guideOpen) closeGuide(refocus);
+      else { openGuide(); refocus(); }
+      break;
+    }
+    case 'lang': {
+      const inPanel = !!el.closest('#intro');
+      state.lang = state.lang === 'en' ? 'pt' : 'en';
+      // an idea picked for a new step, and an untouched message to Jordan, follow the language
+      if (state.addIdea) state.addDraft = t('idea_' + state.addIdea);
+      if (state.modal && !state.jEdited) { const m = state.chat.find(x => x.id === state.modalMsg); state.jDraft = m && m.q === 'other' ? t('jMsgOther', { q: m.text }) : t('jMsg'); }
+      if (typing) typing.finish();
+      renderIntro(); render();
+      const b = document.querySelector(inPanel ? '#intro [data-action="lang"]' : '#guide [data-action="lang"]'); if (b) b.focus();
+      if (!reduceMotion()) { document.querySelectorAll('.lang-btn').forEach(btn => replay(btn, 'is-flipping')); typeIn(); }
+      break;
+    }
+    case 'restart': {
+      const go = () => { state = newState(state); seenMsgs.clear(); msgN = 0; shownChat = 0; $('#toast').classList.remove('show'); render(); markActive(); };
+      if (state.guideOpen) closeGuide(go); else go();
+      break;
+    }
+    // Try it: the window glows and the steps panel opens with the current task
+    case 'hint': lastActivity = performance.now() - HINT_DELAY; hintScrollAt = 0; replay($('#browser'), 'look'); openGuide(); break;
+    case 'stub': showToast(t('protoOnly')); break;
+    case 'step-src': startClock(); openSource(el.dataset.step); break;
+    case 'src-close': state.srcView = null; state.focus = `[data-action="step-src"]`; renderApp(); break;
+    case 'step-menu': state.menu = state.menu === el.dataset.step ? null : el.dataset.step; state.adding = null; renderApp(); break;
+    case 'move-to': startClock(); moveStep(el.dataset.step, Number(el.dataset.day)); break;
+    case 'remove-step': {
+      state.steps = state.steps.filter(s => s.id !== el.dataset.step);
+      if (state.srcView === el.dataset.step) state.srcView = null;
+      state.menu = null; renderApp(); showToast(t('removedToast'));
+      break;
+    }
+    case 'add-step': startClock(); state.adding = Number(el.dataset.day); state.addDraft = ''; state.addIdea = null; state.menu = null; state.focus = '#add-input'; renderApp(); break;
+    case 'idea': {
+      state.addIdea = el.dataset.idea; state.addDraft = t('idea_' + state.addIdea);
+      const inp = $('#add-input'); if (inp) { inp.value = state.addDraft; inp.focus(); }
+      break;
+    }
+    case 'add-save': addSave(); break;
+    case 'add-cancel': { const n = state.adding; state.adding = null; state.focus = `[data-action="add-step"][data-day="${n}"]`; renderApp(); break; }
+    case 'publish': publish(); break;
+    case 'ask-q': ask(el.dataset.q); break;
+    case 'cite': openDoc(el.dataset.doc, el.dataset.sec, el.dataset.q); break;
+    case 'doc-close': {
+      state.doc = null; state.focus = '#ask-input'; renderApp();
+      // in the one-column layout, go back to the answer
+      const inp = $('#ask-input'); if (inp) inp.scrollIntoView({ block: 'nearest' });
+      break;
+    }
+    case 'ask-jordan': openAskJordan(Number(el.dataset.m)); break;
+    case 'modal-close': if (el.classList.contains('modal-layer') && e.target !== el) break; closeModal(); break;
+    case 'send-jordan': sendJordan(); break;
+    case 'keep-add': keepAnswer(); break;
+    case 'keep-later': state.keep = 'later'; renderApp(); break;
+    case 'keep-review': state.keep = 'pending'; state.focus = '[data-action="keep-add"]'; renderApp(); break;
+  }
+  if (!['demo', 'guide-toggle', 'lang'].includes(a) && currentTask() !== before) renderGuide();
+});
+document.addEventListener('input', e => {
+  const el = e.target;
+  if (el.name === 'ask') state.askDraft = el.value;
+  else if (el.name === 'add') { state.addDraft = el.value; if (state.addIdea && el.value !== t('idea_' + state.addIdea)) state.addIdea = null; }
+  else if (el.name === 'jmsg') { state.jDraft = el.value; state.jEdited = true; }
+});
+document.addEventListener('change', e => {
+  if (e.target.name !== 'todo') return;
+  state.checked[e.target.dataset.step] = e.target.checked;
+  renderApp();
+});
+document.addEventListener('submit', e => {
+  e.preventDefault();
+  if (e.target.id === 'add-form') addSave();
+  else if (e.target.id === 'ask-form') {
+    const text = state.askDraft.trim();
+    if (text) { state.focus = '#ask-input'; ask(matchQuestion(text), text); }
+  }
+});
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') {
+    if (state.modal) { e.preventDefault(); closeModal(); }
+    else if (state.menu) { const id = state.menu; state.menu = null; state.focus = `[data-action="step-menu"][data-step="${id}"]`; renderApp(); }
+    else if (state.adding) { const n = state.adding; state.adding = null; state.focus = `[data-action="add-step"][data-day="${n}"]`; renderApp(); }
+    else if (state.doc) { state.doc = null; state.focus = '#ask-input'; renderApp(); }
+    else if (state.srcView) { state.srcView = null; renderApp(); }
+    else if (state.guideOpen) closeGuide();
+    return;
+  }
+  // the message to Jordan keeps focus inside its dialog
+  if (e.key === 'Tab' && state.modal) {
+    const items = [...document.querySelectorAll('.modal textarea, .modal button')];
+    const first = items[0], last = items[items.length - 1];
+    if (!items.includes(document.activeElement)) { e.preventDefault(); first.focus(); }
+    else if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+    else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+  }
+});
+document.addEventListener('toggle', e => { if (e.target.classList && e.target.classList.contains('g-about')) state.aboutOpen = e.target.open; }, true);
+
+/* drag a step to another day (the step's menu does the same with the keyboard) */
+document.addEventListener('dragstart', e => {
+  const li = e.target.closest && e.target.closest('[data-drag]');
+  if (!li) return;
+  dragId = li.dataset.drag;
+  e.dataTransfer.effectAllowed = 'move';
+  e.dataTransfer.setData('text/plain', dragId);
+  li.classList.add('dragging');
+});
+document.addEventListener('dragend', () => {
+  dragId = null;
+  document.querySelectorAll('.dragging, .day.drop').forEach(x => x.classList.remove('dragging', 'drop'));
+});
+document.addEventListener('dragover', e => {
+  const day = dragId && e.target.closest && e.target.closest('.day');
+  if (!day) return;
+  e.preventDefault();
+  document.querySelectorAll('.day.drop').forEach(x => { if (x !== day) x.classList.remove('drop'); });
+  day.classList.add('drop');
+});
+document.addEventListener('drop', e => {
+  const day = dragId && e.target.closest && e.target.closest('.day');
+  if (!day) return;
+  e.preventDefault();
+  startClock();
+  moveStep(dragId, Number(day.dataset.day));
+});
+
+/* any input from the person restarts the wait before the hint */
+['pointerdown', 'keydown', 'wheel', 'touchstart'].forEach(type => document.addEventListener(type, markActive, { capture: true, passive: true }));
+
+/* the wheel scrolls the left panel from anywhere on the page, except where something else scrolls (the window, the steps dropdown) */
+document.addEventListener('wheel', e => {
+  if (isMobile() || e.ctrlKey || e.target.closest('#intro, #screen, .g-full')) return;
+  const unit = e.deltaMode === 1 ? 16 : e.deltaMode === 2 ? innerHeight : 1;
+  $('#intro').scrollTop += e.deltaY * unit;
+}, { passive: true });
+
+/* the portfolio's pointer glow and card spotlight */
+let glowFrame = 0;
+document.addEventListener('pointermove', e => {
+  if (e.pointerType !== 'mouse' || glowFrame) return;
+  glowFrame = requestAnimationFrame(() => {
+    glowFrame = 0;
+    const page = $('.page');
+    page.style.setProperty('--gx', e.clientX + 'px'); page.style.setProperty('--gy', e.clientY + 'px');
+    const card = e.target.closest && e.target.closest('.c-spot');
+    if (card) { const r = card.getBoundingClientRect(); card.style.setProperty('--sx', (e.clientX - r.left) + 'px'); card.style.setProperty('--sy', (e.clientY - r.top) + 'px'); }
+  });
+});
+
+// the left panel is drawn once (and again only for a new language), so its entrance never replays on a click
+renderIntro();
+render();
+ringLoop();
+setTimeout(() => $('.page').classList.remove('boot'), 2200);
+})();
+</script>
+</body>
+</html>
